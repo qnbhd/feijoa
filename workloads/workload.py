@@ -43,8 +43,9 @@ class Workload(metaclass=abc.ABCMeta):
 
         rendered = []
         for p, v in configuration.items():
-            result = p.accept(r, value=v)
-            rendered.append(result)
+            if v is not None:
+                result = p.accept(r, value=v)
+                rendered.append(result)
 
         rendered = ' '.join(rendered)
 

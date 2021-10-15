@@ -28,6 +28,7 @@ from rich.progress import track
 from qutune.environment import Environment
 from qutune.measurement.measurer import Measurer
 from qutune.search.searcher import Searcher
+from utils.configurations import dump_config
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +51,7 @@ class Runner:
                 suggested = list(cfg.values())
 
                 run_result = self.measurer.run_test(cfg)
-                self.searcher.tell(suggested, run_result)
+                self.searcher.tell(cfg, run_result)
                 yield suggested, cfg, run_result
             except KeyboardInterrupt:
                 break
@@ -71,11 +72,11 @@ class Runner:
             if not self.best_result or run_result < self.best_result:
                 self.best_result = run_result
                 self.best_config = cfg
-                log.info(f'New best'
-                         f' \n{json.dumps({p.name: v for p, v in self.best_config.items()}, indent=2)}\n'
+                dumped = dump_config({p.name: v for p, v in self.best_config.items()})
+                log.info(f'New best:\n{dumped}\n'
                          f'with result: \n{self.best_result}')
 
         log.info(f'Best cfg:'
-                 f'\n{json.dumps({p.name: v for p, v in self.best_config.items()})} with result:\n{self.best_result}')
+                 f'\n{dump_config({p.name: v for p, v in self.best_config.items()})} with result:\n{self.best_result}')
 
 

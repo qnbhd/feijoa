@@ -19,34 +19,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import json
-import logging
 
-import numpy as numpy
+import sys
+from typing import Any, Dict
+from qutune.search.parameters import Parameter
+from workloads.workload import Workload as BaseWorkload
+import pathlib
 
-from qutune.environment import Environment
-from utils.configurations import dump_config
-from workloads.workload import Workload
-
-log = logging.getLogger(__name__)
+import subprocess
 
 
-class Measurer:
+class Workload(BaseWorkload):
 
-    def __init__(self, workload: Workload):
-        self.workload = workload
+    NAME = 'gcc'
 
-        env = Environment()
-        self.num_runs = env.num_runs
+    def __init__(self):
+        super().__init__(Workload.NAME)
 
-    def run_test(self, configuration: dict):
-        log.debug(f'Trying configuration:\n'
-                  f'{dump_config({p.name: v for p, v in configuration.items()})}')
+    def run(self, configuration: Dict[Parameter, Any]):
+        rendered = self.render(configuration)
 
-        results = numpy.array([
-            float(self.workload.run(configuration))
-            for _ in range(self.num_runs)
-        ])
+        compile_out = subprocess.check_output(
+            f'g++ {pathlib.Path(__file__).parent.resolve()}/raytracer.cpp {rendered}', shell=True, stderr=subprocess.STDOUT)
 
-        log.debug(f'Result: \n{results}')
-        return results.mean()
+        run_out = subprocess.check_output(f'/usr/bin/time -p ./a.out', shell=True, stderr=subprocess.STDOUT)
+
+        return run_out.decode('utf-8').split()[1]

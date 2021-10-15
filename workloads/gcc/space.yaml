@@ -1,0 +1,191 @@
+- signature: -fsplit-loops
+  type: categorical
+  choices: [-fsplit-loops, null]
+
+- signature: -falign-functions
+  type: categorical
+  choices: [-falign-functions, null]
+
+- signature: -falign-jumps
+  type: categorical
+  choices: [-falign-jumps, null]
+
+- signature: -fauto-inc-dec
+  type: categorical
+  choices: [-fauto-inc-dec, null]
+
+- signature: -fbranch-count-reg
+  type: categorical
+  choices: [-fbranch-count-reg, null]
+
+- signature: -fcombine-stack-adjustments
+  type: categorical
+  choices: [-fcombine-stack-adjustments, null]
+
+- signature: -fcompare-elim
+  type: categorical
+  choices: [-fcompare-elim, null]
+
+- signature: -fcprop-registers
+  type: categorical
+  choices: [-fcprop-registers, null]
+
+- signature: -fdce
+  type: categorical
+  choices: [-fdce, null]
+
+- signature: -fdefer-pop
+  type: categorical
+  choices: [-fdefer-pop, null]
+
+- signature: -fdelayed-branch
+  type: categorical
+  choices: [-fdelayed-branch, null]
+
+- signature: -fdse
+  type: categorical
+  choices: [-fdse, null]
+
+- signature: -fforward-propagate
+  type: categorical
+  choices: [-fforward-propagate, null]
+
+- signature: -fguess-branch-probability
+  type: categorical
+  choices: [-fguess-branch-probability, null]
+
+- signature: -fif-conversion
+  type: categorical
+  choices: [-fif-conversion, null]
+
+- signature: -fif-conversion2
+  type: categorical
+  choices: [-fif-conversion2, null]
+
+- signature: -finline-functions-called-once
+  type: categorical
+  choices: [-finline-functions-called-once, null]
+
+- signature: -fipa-profile
+  type: categorical
+  choices: [-fipa-profile, null]
+
+- signature: -fipa-pure-const
+  type: categorical
+  choices: [-fipa-pure-const, null]
+
+- signature: -fipa-reference
+  type: categorical
+  choices: [-fipa-reference, null]
+
+- signature: -fipa-reference-addressable
+  type: categorical
+  choices: [-fipa-reference-addressable, null]
+
+- signature: -fmerge-constants
+  type: categorical
+  choices: [-fmerge-constants, null]
+
+- signature: -fmove-loop-invariants
+  type: categorical
+  choices: [-fmove-loop-invariants, null]
+
+- signature: -fomit-frame-pointer
+  type: categorical
+  choices: [-fomit-frame-pointer, null]
+
+- signature: -freorder-blocks
+  type: categorical
+  choices: [-freorder-blocks, null]
+
+- signature: -fshrink-wrap
+  type: categorical
+  choices: [-fshrink-wrap, null]
+
+- signature: -fshrink-wrap-separate
+  type: categorical
+  choices: [-fshrink-wrap-separate, null]
+
+- signature: -fsplit-wide-types
+  type: categorical
+  choices: [-fsplit-wide-types, null]
+
+- signature: -fssa-backprop
+  type: categorical
+  choices: [-fssa-backprop, null]
+
+- signature: -fssa-phiopt
+  type: categorical
+  choices: [-fssa-phiopt, null]
+
+- signature: -ftree-bit-ccp
+  type: categorical
+  choices: [-ftree-bit-ccp, null]
+
+- signature: -ftree-ccp
+  type: categorical
+  choices: [-ftree-ccp, null]
+
+- signature: -ftree-ch
+  type: categorical
+  choices: [-ftree-ch, null]
+
+- signature: -ftree-coalesce-vars
+  type: categorical
+  choices: [-ftree-coalesce-vars, null]
+
+- signature: -ftree-copy-prop
+  type: categorical
+  choices: [-ftree-copy-prop, null]
+
+- signature: -ftree-dce
+  type: categorical
+  choices: [-ftree-dce, null]
+
+- signature: -ftree-dominator-opts
+  type: categorical
+  choices: [-ftree-dominator-opts, null]
+
+- signature: -ftree-dse
+  type: categorical
+  choices: [-ftree-dse, null]
+
+- signature: -ftree-forwprop
+  type: categorical
+  choices: [-ftree-forwprop, null]
+
+- signature: -ftree-fre
+  type: categorical
+  choices: [-ftree-fre, null]
+
+- signature: -ftree-phiprop
+  type: categorical
+  choices: [-ftree-phiprop, null]
+
+- signature: -ftree-pta
+  type: categorical
+  choices: [-ftree-pta, null]
+
+- signature: -ftree-scev-cprop
+  type: categorical
+  choices: [-ftree-scev-cprop, null]
+
+- signature: -ftree-sink
+  type: categorical
+  choices: [-ftree-sink, null]
+
+- signature: -ftree-slsr
+  type: categorical
+  choices: [-ftree-slsr, null]
+
+- signature: -ftree-sra
+  type: categorical
+  choices: [-ftree-sra, null]
+
+- signature: -ftree-ter
+  type: categorical
+  choices: [-ftree-ter, null]
+
+- signature: -funit-at-a-time
+  type: categorical
+  choices: [-funit-at-a-time, null]

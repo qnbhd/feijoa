@@ -7,8 +7,6 @@ from qutune.search.searcher import Searcher
 import qutune.search.space
 from utils import logging
 from workloads import get_workload
-from workloads.workload import Workload
-
 
 @click.group()
 def cli():

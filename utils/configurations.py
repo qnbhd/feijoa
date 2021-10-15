@@ -19,34 +19,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from typing import Dict, Any
 import json
-import logging
-
-import numpy as numpy
-
-from qutune.environment import Environment
-from utils.configurations import dump_config
-from workloads.workload import Workload
-
-log = logging.getLogger(__name__)
 
 
-class Measurer:
-
-    def __init__(self, workload: Workload):
-        self.workload = workload
-
-        env = Environment()
-        self.num_runs = env.num_runs
-
-    def run_test(self, configuration: dict):
-        log.debug(f'Trying configuration:\n'
-                  f'{dump_config({p.name: v for p, v in configuration.items()})}')
-
-        results = numpy.array([
-            float(self.workload.run(configuration))
-            for _ in range(self.num_runs)
-        ])
-
-        log.debug(f'Result: \n{results}')
-        return results.mean()
+def dump_config(cfg: Dict[str, Any]):
+    return json.dumps({
+        k: v for k, v in cfg.items() if v
+    }, indent=2)

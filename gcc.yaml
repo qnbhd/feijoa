@@ -1,0 +1,4 @@
+workload_name: 'workloads://gcc'
+space: 'workloads/gcc/space.yaml'
+test_limit: 100
+num_runs: 2
