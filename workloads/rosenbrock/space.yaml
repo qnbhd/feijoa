@@ -1,0 +1,13 @@
+- signature: --x=
+  type: real
+  low: -5.0
+  high: 5.0
+
+- signature: --y=
+  type: real
+  low: -5.0
+  high: 5.0
+
+- signature: -O
+  type: categorical
+  choices: [-O2, -O3, -Os, -Oz, -Og]

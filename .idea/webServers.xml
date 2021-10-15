@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="4a308278-136f-4dca-85e9-520879a50da9" name="qnbhd - wsl">
+        <fileTransfer accessType="SFTP" host="172.31.255.131" port="7777" sshConfigId="2aa6f3a3-c02b-4156-991c-e708492ad562" sshConfig="qnbhd@172.31.255.131:7777 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
