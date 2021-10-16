@@ -22,7 +22,9 @@
 import json
 import logging
 
+import yaml
 from rich.console import Console
+from rich.markdown import Markdown
 from rich.progress import track
 
 from qutune.environment import Environment
@@ -41,6 +43,10 @@ class Runner:
         self.best_result = None
         self.best_config = None
 
+    @property
+    def workload(self):
+        return self.searcher.workload
+
     def _SearchWrapper(self):
         while True:
             try:
@@ -58,7 +64,18 @@ class Runner:
 
 
     def process(self):
+
         log.info('Tuning session was started.')
+
+        env = Environment()
+
+        workload_args_list = '\n'.join([f'  * {k}: {v}' for k, v in env.workload_args.items()])
+
+        md = Markdown(f"""***
+* Workload: {env.workload_name}
+{workload_args_list}\n***""")
+        console = Console()
+        console.print(md)
 
         ProgressWrapper = track(
             self._SearchWrapper(),
@@ -72,11 +89,15 @@ class Runner:
             if not self.best_result or run_result < self.best_result:
                 self.best_result = run_result
                 self.best_config = cfg
-                dumped = dump_config({p.name: v for p, v in self.best_config.items()})
-                log.info(f'New best:\n{dumped}\n'
-                         f'with result: \n{self.best_result}')
+                dumped = self.workload.render(self.best_config)
+                log.info(f'[green]New best:\n{dumped}\n'
+                         f'\nwith result: \n{self.best_result}')
 
-        log.info(f'Best cfg:'
-                 f'\n{dump_config({p.name: v for p, v in self.best_config.items()})} with result:\n{self.best_result}')
+        log.info('Tuning was finished.')
+
+        if self.best_config:
+            md = Markdown(f'# Best configuration')
+            console.print(md)
+            console.print(f'[green][bold]{self.workload.render(self.best_config)}')
 
 

@@ -30,12 +30,13 @@ import pathlib
 
 class Workload(BaseWorkload):
 
-    NAME = 'rosenbrock'
-
     def __init__(self):
-        super().__init__(Workload.NAME)
+        super().__init__()
+        self.rendered = ""
 
-    def run(self, configuration: Dict[Parameter, Any]):
-        rendered = self.render(configuration)
-        cmd = f'{sys.executable} {pathlib.Path(__file__).parent.resolve()}/rosenbrock.py {rendered}'
+    def prepare(self, configuration: Dict[Parameter, Any]):
+        self.rendered = self.render(configuration)
+
+    def run(self):
+        cmd = f'{sys.executable} {pathlib.Path(__file__).parent.resolve()}/rosenbrock.py {self.rendered}'
         return execute(cmd, capture=True)

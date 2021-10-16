@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import abc
+import logging
 import os
 import subprocess
 import sys
@@ -27,14 +28,17 @@ from typing import Any, Dict
 
 import rich
 from executor import execute
+from rich.console import Console
+from rich.syntax import Syntax
 
 from qutune.search.parameters import Parameter
 from qutune.search.renderer import Renderer
 
+log = logging.getLogger(__name__)
 
 class Workload(metaclass=abc.ABCMeta):
 
-    def __init__(self, workload: str):
+    def __init__(self, **kwargs):
         pass
 
     @staticmethod
@@ -51,6 +55,19 @@ class Workload(metaclass=abc.ABCMeta):
 
         return rendered
 
+    def run_command(self, command: str):
+        log.debug(f'RUN COMMAND:\n[cyan][bold]{command}')
+
+        output = subprocess.check_output(
+            command, shell=True, stderr=subprocess.STDOUT)
+        decoded = output.decode('utf-8').strip()
+        if decoded:
+            log.debug(f'[yellow][bold]OUT:\n{decoded}"')
+
     @abc.abstractmethod
-    def run(self, configuration: Dict[Parameter, Any]):
+    def prepare(self, configuration: Dict[Parameter, Any]):
+        pass
+
+    @abc.abstractmethod
+    def run(self):
         pass

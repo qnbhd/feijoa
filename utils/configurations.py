@@ -26,4 +26,4 @@ import json
 def dump_config(cfg: Dict[str, Any]):
     return json.dumps({
         k: v for k, v in cfg.items() if v
-    }, indent=2)
+    })

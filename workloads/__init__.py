@@ -24,10 +24,11 @@ import importlib
 import importlib.util
 
 
-def get_workload(workload_name: str):
+def workloadFactory(workload_name: str, **kwargs):
     _, name = workload_name.split('://', maxsplit=2)
 
     workload_module = importlib.import_module(f'.{name}.workload', __name__)
-    workload = workload_module.Workload()
+    # noinspection PyUnresolvedReferences
+    workload = workload_module.Workload(**kwargs)
 
     return workload

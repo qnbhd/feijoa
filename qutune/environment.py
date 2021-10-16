@@ -53,6 +53,10 @@ class Environment(metaclass=SingletonMeta):
         return self.env.get('workload_name')
 
     @property
+    def workload_args(self):
+        return self.env.get('workload_args')
+
+    @property
     def space(self):
         return self.env.get('space')
 

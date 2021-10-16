@@ -6,7 +6,7 @@ from qutune.runner import Runner
 from qutune.search.searcher import Searcher
 import qutune.search.space
 from utils import logging
-from workloads import get_workload
+from workloads import workloadFactory
 
 @click.group()
 def cli():
@@ -14,13 +14,14 @@ def cli():
 
 @click.command()
 @click.option("--env", type=str, required=True)
-def run(env):
-    logging.init()
+@click.option("--verbose", "-v", is_flag=True)
+def run(env, verbose):
+    logging.init(verbose)
 
     environment = Environment()
     environment.load_from_file(env)
 
-    workload = get_workload(environment.workload_name)
+    workload = workloadFactory(environment.workload_name, **environment.workload_args)
     space_yaml = environment.space
 
     space = qutune.search.space.from_yaml(space_yaml)

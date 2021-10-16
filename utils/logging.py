@@ -20,12 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import logging
+
+import click
 from rich.logging import RichHandler
+from rich.traceback import install
 
 
-def init():
+def init(verbose=False):
+    install(suppress=[click])
+
     logging.basicConfig(
-        level="INFO",
+        level="DEBUG" if verbose else "INFO",
         format="%(message)s",
         datefmt="[%X]",
         handlers=[RichHandler(

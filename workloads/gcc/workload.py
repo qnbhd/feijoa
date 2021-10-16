@@ -19,7 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
+import logging
+import re
 import sys
 from typing import Any, Dict
 from qutune.search.parameters import Parameter
@@ -28,20 +29,26 @@ import pathlib
 
 import subprocess
 
+log = logging.getLogger(__name__)
 
 class Workload(BaseWorkload):
 
-    NAME = 'gcc'
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.source_file = kwargs['source_file']
 
-    def __init__(self):
-        super().__init__(Workload.NAME)
-
-    def run(self, configuration: Dict[Parameter, Any]):
+    def prepare(self, configuration: Dict[Parameter, Any]):
         rendered = self.render(configuration)
 
-        compile_out = subprocess.check_output(
-            f'g++ {pathlib.Path(__file__).parent.resolve()}/raytracer.cpp {rendered}', shell=True, stderr=subprocess.STDOUT)
+        compile_out = self.run_command(f'g++ {self.source_file} {rendered}')
 
-        run_out = subprocess.check_output(f'/usr/bin/time -p ./a.out', shell=True, stderr=subprocess.STDOUT)
+    def run(self):
+        run_out = subprocess.check_output(
+            f'/usr/bin/time -p ./a.out',
+            shell=True, stderr=subprocess.STDOUT)
 
-        return run_out.decode('utf-8').split()[1]
+        decoded = run_out.decode('utf-8')
+        splitted = decoded.split('\n')
+        real = splitted[1].split()[1]
+
+        return real

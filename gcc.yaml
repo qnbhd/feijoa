@@ -1,4 +1,8 @@
 workload_name: 'workloads://gcc'
+
+workload_args:
+  source_file: 'workloads/gcc/matrixmultiply/matrixmultiply.cpp'
+
 space: 'workloads/gcc/space.yaml'
 test_limit: 100
 num_runs: 2

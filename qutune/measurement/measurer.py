@@ -40,11 +40,13 @@ class Measurer:
         self.num_runs = env.num_runs
 
     def run_test(self, configuration: dict):
-        log.debug(f'Trying configuration:\n'
-                  f'{dump_config({p.name: v for p, v in configuration.items()})}')
+        log.debug(f'Trying configuration:[white][italic]\n'
+                  f'{self.workload.render(configuration)}')
+
+        self.workload.prepare(configuration)
 
         results = numpy.array([
-            float(self.workload.run(configuration))
+            float(self.workload.run())
             for _ in range(self.num_runs)
         ])
 
