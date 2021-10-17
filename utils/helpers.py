@@ -19,20 +19,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from inspect import Parameter
-from typing import Dict, Any
+import hashlib
+import json
+
+from numpy import int64
 
 
-class Configuration:
-
-    def __init__(self, d: dict=None):
-        self.container: Dict[Parameter, Any] = d or dict()
-
-    def add_pair(self, p: Parameter, v):
-        self.container[p] = v
-
-    def render(self):
-        repr = []
-        for p in self.container:
-            repr.append(p.__repr__())
-        return ' '.join(repr)
+def configuration_hash(cfg):
+    return \
+        hashlib.sha1(json.dumps({
+            k: int(v) if isinstance(v, int64) else v for k, v in cfg.items()}, sort_keys=True).encode('utf-8')).hexdigest()

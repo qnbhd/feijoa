@@ -19,54 +19,36 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import json
 import logging
 import warnings
 from collections import Coroutine
 
-import hashlib
-from numpy.ma import MaskedArray
-import sklearn.utils.fixes
+from qutune.search.algorithms.skopt import SkoptBayesianAlgorithm
+from utils.helpers import configuration_hash
 
-from qutune.search.renderer import Renderer
-from utils.configurations import dump_config
+import qutune.environment as ENV
 
-sklearn.utils.fixes.MaskedArray = MaskedArray
-
-from qutune.environment import Environment
 from qutune.search.space import SearchSpace
 from workloads.workload import Workload
 
-import skopt
 
 log = logging.getLogger(__name__)
+
 
 class Searcher:
 
     def __init__(self, workload: Workload, space: SearchSpace):
         self.workload = workload
         self.space = space
-        self.skopt_space = self.space.to_skopt()
+        self.search_algorithm = SkoptBayesianAlgorithm(space)
 
         self.hashes_storage = dict()
-
-        env = Environment()
-        self.test_limit = env.test_limit
+        self.test_limit = ENV.test_limit
         self.test_count = 0
-
-        self.opt = skopt.Optimizer(self.skopt_space)
+        self.max_retries = 3
 
         self.ask_coroutine = self._ask_coroutine()
         self.ask_coroutine.send(None)
-        self.max_retries = 3
-
-        self.renderer = Renderer()
-
-    @staticmethod
-    def hash(cfg):
-        return \
-            hashlib.sha1(json.dumps(cfg, sort_keys=True)
-                .encode('utf-8')).hexdigest()
 
     def ask(self):
         try:
@@ -76,50 +58,39 @@ class Searcher:
             return None
 
     def _AskWrapper(self):
-        @skopt.utils.use_named_args(self.skopt_space)
-        def named(**kwargs):
-            return kwargs
+        retries = 0
+        while True:
+            suggested_configs_list = self.search_algorithm.ask()
 
-        cur_retries = 0
-        while self.test_count < self.test_limit:
-            cfg = self.opt.ask()
+            to_emit = list()
 
-            named_cfg = named(cfg)
-            h = self.hash(named_cfg)
+            for c in suggested_configs_list:
+                h = configuration_hash(c)
 
-            if h in self.hashes_storage:
-                if cur_retries == 0:
-                    log.warning(f'Current config'
-                                f' {dump_config(named_cfg)} is measured before.')
+                if h in self.hashes_storage:
+                    retries += 1
+                    continue
+                else:
+                    retries = 0
 
-                cur_retries += 1
+                to_emit.append({
+                    self.space.get_by_name(p): value
+                    for p, value in c.items()
+                })
 
-                if cur_retries >= self.max_retries:
-                    log.error('Technique does not generate new configurations')
-                    break
-
-                continue
-            else:
-                cur_retries = 0
-
-            d = dict()
-            for p, value in named_cfg.items():
-                d[self.space.get_by_name(p)] = value
-
-            yield d
-            self.test_count += 1
+            yield to_emit
 
     def _ask_coroutine(self) -> Coroutine:
         yield from self._AskWrapper()
 
     def tell(self, cfg, result):
-        h = self.hash({
+        h = configuration_hash({
                 p.name: v for p, v in cfg.items()})
 
         if h not in self.hashes_storage:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                self.opt.tell(list(cfg.values()), result)
+                self.search_algorithm.tell(list(cfg.values()), result)
                 self.hashes_storage[h] = result
 
 

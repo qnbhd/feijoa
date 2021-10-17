@@ -189,3 +189,19 @@
 - signature: -funit-at-a-time
   type: categorical
   choices: [-funit-at-a-time, null]
+
+- signature: -flto
+  type: categorical
+  choices: [-flto, null]
+
+- signature: -funroll-loops
+  type: categorical
+  choices: [-funroll-loops, null]
+
+- signature: -funroll-all-loops
+  type: categorical
+  choices: [-funroll-all-loops, null]
+
+- signature: -O
+  type: categorical
+  choices: [-O3, -O2, null]

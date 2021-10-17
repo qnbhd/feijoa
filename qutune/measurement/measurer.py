@@ -24,8 +24,7 @@ import logging
 
 import numpy as numpy
 
-from qutune.environment import Environment
-from utils.configurations import dump_config
+import qutune.environment as ENV
 from workloads.workload import Workload
 
 log = logging.getLogger(__name__)
@@ -35,9 +34,7 @@ class Measurer:
 
     def __init__(self, workload: Workload):
         self.workload = workload
-
-        env = Environment()
-        self.num_runs = env.num_runs
+        self.num_runs = ENV.num_runs
 
     def run_test(self, configuration: dict):
         log.debug(f'Trying configuration:[white][italic]\n'
@@ -49,6 +46,8 @@ class Measurer:
             float(self.workload.run())
             for _ in range(self.num_runs)
         ])
+
+        self.workload.teardown()
 
         log.debug(f'Result: \n{results}')
         return results.mean()

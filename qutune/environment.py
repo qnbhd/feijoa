@@ -40,23 +40,10 @@ class Environment(metaclass=SingletonMeta):
         assert isinstance(item, str), 'Attr must be str'
         return self.env.get(item, None)
 
-    @property
-    def num_runs(self):
-        return self.env.get('num_runs')
+    def set(self, k, v):
+        assert isinstance(k, str)
+        self.env[k] = v
 
-    @property
-    def test_limit(self):
-        return self.env.get('test_limit')
-
-    @property
-    def workload_name(self):
-        return self.env.get('workload_name')
-
-    @property
-    def workload_args(self):
-        return self.env.get('workload_args')
-
-    @property
-    def space(self):
-        return self.env.get('space')
+def __getattr__(name):
+    return Environment().get(name)
 

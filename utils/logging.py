@@ -36,3 +36,5 @@ def init(verbose=False):
         handlers=[RichHandler(
             rich_tracebacks=True, markup=True, enable_link_path=False)]
     )
+
+    logging.getLogger('executor').setLevel(logging.CRITICAL)

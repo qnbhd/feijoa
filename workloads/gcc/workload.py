@@ -19,36 +19,43 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import io
 import logging
-import re
-import sys
 from typing import Any, Dict
 from qutune.search.parameters import Parameter
+from utils.helpers import configuration_hash
 from workloads.workload import Workload as BaseWorkload
-import pathlib
+import random
 
 import subprocess
 
 log = logging.getLogger(__name__)
+
 
 class Workload(BaseWorkload):
 
     def __init__(self, **kwargs):
         super().__init__()
         self.source_file = kwargs['source_file']
+        self.binary_out = ''
 
     def prepare(self, configuration: Dict[Parameter, Any]):
+        d = {p.name: v for p, v in configuration.items()}
+        self.binary_out = configuration_hash(d) + str(random.randint(1, 999999)) + '.out'
         rendered = self.render(configuration)
-
-        compile_out = self.run_command(f'g++ {self.source_file} {rendered}')
+        self.run_command(f'g++ -o {self.binary_out} {self.source_file} {rendered}')
 
     def run(self):
         run_out = subprocess.check_output(
-            f'/usr/bin/time -p ./a.out',
+            f'/usr/bin/time -f \'%e\' ./{self.binary_out}',
             shell=True, stderr=subprocess.STDOUT)
 
         decoded = run_out.decode('utf-8')
-        splitted = decoded.split('\n')
-        real = splitted[1].split()[1]
+        log.info(f'RUN OUT:\n{decoded}')
 
+        splitted = decoded.strip().split('\n')
+        real = splitted[-1]
         return real
+
+    def teardown(self):
+        self.run_command(f'rm {self.binary_out}')

@@ -19,20 +19,32 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import json
 import logging
+from datetime import datetime
+from functools import partial
+from itertools import repeat
 
-import yaml
+import csv
+
+import numpy
+import os
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.progress import track
 
-from qutune.environment import Environment
+import qutune.environment as ENV
 from qutune.measurement.measurer import Measurer
 from qutune.search.searcher import Searcher
-from utils.configurations import dump_config
+from rich.table import Table
+
+from multiprocessing import Pool
 
 log = logging.getLogger(__name__)
+
+
+def f(config, measurer):
+    return measurer.run_test(config)
+
 
 class Runner:
 
@@ -42,62 +54,121 @@ class Runner:
 
         self.best_result = None
         self.best_config = None
+        self.tests_count = 0
+
+        self.impacts_history = numpy.array([])
+        self.warmup_tests_count = ENV.test_limit // 5
+        self.impact_threshold = 0.005
+        self.without_new_best = 0
+        self.without_new_best_threshold = ENV.test_limit // 5
+
+        self.console = Console()
+
+    def convergence_check(self):
+        test_check = self.tests_count >= ENV.test_limit
+
+        warmup_stage_is_completed = self.tests_count >= self.warmup_tests_count
+        if warmup_stage_is_completed:
+            chunk_mean = self.impacts_history[len(self.impacts_history)//2:].mean()
+
+            if chunk_mean < self.impact_threshold:
+                log.info(f'Small impact in last {len(self.impacts_history)} best results.')
+                return True
+            if self.without_new_best > self.without_new_best_threshold:
+                log.info(f'No new best results in last {self.without_new_best} tests.')
+                return True
+
+        return test_check
 
     @property
     def workload(self):
         return self.searcher.workload
 
     def _SearchWrapper(self):
-        while True:
+        while not self.convergence_check() and (suggested_cfgs := self.searcher.ask()):
             try:
-                cfg = self.searcher.ask()
-                if not cfg:
-                    break
 
-                suggested = list(cfg.values())
+                with Pool(ENV.processes_count) as p:
+                    results = p.starmap(f, zip(suggested_cfgs, repeat(self.measurer)))
 
-                run_result = self.measurer.run_test(cfg)
-                self.searcher.tell(cfg, run_result)
-                yield suggested, cfg, run_result
+                for config, result in zip(suggested_cfgs, results):
+                    self.searcher.tell(config, result)
+                    self.tests_count += 1
+
+                generated = [
+                    (list(c.keys()), c, result)
+                    for c, result in zip(suggested_cfgs, results)
+                ]
+
+                yield from generated
             except KeyboardInterrupt:
                 break
 
-
-    def process(self):
-
+    def print_header(self):
         log.info('Tuning session was started.')
-
-        env = Environment()
-
-        workload_args_list = '\n'.join([f'  * {k}: {v}' for k, v in env.workload_args.items()])
+        workload_args_list = '\n'.join([f'  * {k}: {v}' for k, v in ENV.workload_args.items()])
 
         md = Markdown(f"""***
-* Workload: {env.workload_name}
+* Workload: {ENV.workload_name}
 {workload_args_list}\n***""")
-        console = Console()
-        console.print(md)
+
+        self.console.print(md)
+
+    def process(self):
+        self.print_header()
 
         ProgressWrapper = track(
             self._SearchWrapper(),
             description='tests count',
-            total=Environment().test_limit,
+            total=ENV.test_limit,
             transient=True,
             update_period=0.01
         )
 
+        results = []
+
         for suggested, cfg, run_result in ProgressWrapper:
+            results.append(
+                {'id': len(results),
+                 'result': run_result,
+                 **{p.name: v for p, v in cfg.items()}})
+
             if not self.best_result or run_result < self.best_result:
+                if self.best_result:
+                    imp = (self.best_result - run_result) / run_result
+                    self.impacts_history = numpy.append(self.impacts_history, imp)
+
                 self.best_result = run_result
                 self.best_config = cfg
+
                 dumped = self.workload.render(self.best_config)
-                log.info(f'[green]New best:\n{dumped}\n'
-                         f'\nwith result: \n{self.best_result}')
+                log.info(f'[green]New best:\n{dumped}\n\nwith result: \n{self.best_result}')
+
+                self.without_new_best = 0
+            else:
+                self.without_new_best += 1
 
         log.info('Tuning was finished.')
 
+        workload_name = ENV.workload_name.replace('/', '_').replace(':', '')
+        dt_string = datetime.now().strftime("%d-%m-%Y_%H:%M")
+        output_filename = f'{workload_name}_{dt_string}.csv'
+        dataframes_folder = os.path.join(os.getcwd(), 'tuning_dataframes')
+        os.makedirs(dataframes_folder, exist_ok=True)
+
+        with open(os.path.join(dataframes_folder, output_filename), 'w') as output_file:
+            dict_writer = csv.DictWriter(
+                output_file, fieldnames=['id', 'result', *self.searcher.space.name2param.keys()],
+                restval='-', delimiter=',')
+            dict_writer.writeheader()
+            dict_writer.writerows(results)
+
+        log.info(f'Tuning dataframe was written in {output_filename}.')
+
         if self.best_config:
             md = Markdown(f'# Best configuration')
-            console.print(md)
-            console.print(f'[green][bold]{self.workload.render(self.best_config)}')
+            self.console.print(md)
+            self.console.print(f'[green][bold]{self.workload.render(self.best_config)}')
+
 
 

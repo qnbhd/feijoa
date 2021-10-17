@@ -1,8 +1,19 @@
 workload_name: 'workloads://gcc'
 
 workload_args:
-  source_file: 'workloads/gcc/matrixmultiply/matrixmultiply.cpp'
+  source_file: 'workloads/gcc/tsp_ga/tsp_ga.cpp'
+
+#  Working source files
+# 'workloads/gcc/Misc-C++/oopack_v1p8.cpp'
+# 'workloads/gcc/raytracer/raytracer.cpp'
+# 'workloads/gcc/adobe++/loop_unroll.cpp'
+# 'workloads/gcc/Shootout-C++/ackermann.cpp'
+# 'workloads/gcc/Shootout-C++/ary.cpp'
+# 'workloads/gcc/SmallPT/smallpt.cpp'
+# 'workloads/gcc/CoyoteBench/fftbench.cpp'
+
+
 
 space: 'workloads/gcc/space.yaml'
 test_limit: 100
-num_runs: 2
+num_runs: 1

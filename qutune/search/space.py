@@ -19,15 +19,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import copy
 from pprint import pformat
 from typing import List
 
-import skopt
 import yaml
 
 from qutune.search import ParameterFactory
-from qutune.search.parameters import Parameter, Integer, Real, Categorical
+from qutune.search.parameters import Parameter
 
 
 class SearchSpace:
@@ -46,20 +44,6 @@ class SearchSpace:
     def __repr__(self) -> str:
         representation = pformat(self.params).replace('\n', '\n\t')
         return f"SearchSpace(\n\t{representation}\n)"
-
-    def to_skopt(self):
-        params = []
-
-        for p in self.params:
-            if isinstance(p, Integer):
-                params.append(skopt.space.Integer(name=p.name, low=p.low, high=p.high))
-            elif isinstance(p, Real):
-                params.append(skopt.space.Real(name=p.name, low=p.low, high=p.high))
-            elif isinstance(p, Categorical):
-                params.append(skopt.space.Categorical(name=p.name, categories=p.choices))
-
-        return params
-
 
 
 def from_yaml(yaml_file: str) -> SearchSpace:

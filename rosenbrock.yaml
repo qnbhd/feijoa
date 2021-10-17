@@ -1,4 +1,6 @@
 workload_name: 'workloads://rosenbrock'
+workload_args:
+  a: 1
 space: 'workloads/rosenbrock/space.yaml'
-test_limit: 16
-num_runs: 5
+test_limit: 100
+num_runs: 1

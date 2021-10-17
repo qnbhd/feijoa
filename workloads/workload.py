@@ -60,6 +60,7 @@ class Workload(metaclass=abc.ABCMeta):
 
         output = subprocess.check_output(
             command, shell=True, stderr=subprocess.STDOUT)
+
         decoded = output.decode('utf-8').strip()
         if decoded:
             log.debug(f'[yellow][bold]OUT:\n{decoded}"')
@@ -70,4 +71,8 @@ class Workload(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def run(self):
+        pass
+
+    @abc.abstractmethod
+    def teardown(self):
         pass

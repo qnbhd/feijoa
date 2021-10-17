@@ -28,9 +28,10 @@ from qutune.search.parameters import Parameter
 from workloads.workload import Workload as BaseWorkload
 import pathlib
 
+
 class Workload(BaseWorkload):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self.rendered = ""
 
@@ -40,3 +41,6 @@ class Workload(BaseWorkload):
     def run(self):
         cmd = f'{sys.executable} {pathlib.Path(__file__).parent.resolve()}/rosenbrock.py {self.rendered}'
         return execute(cmd, capture=True)
+
+    def teardown(self):
+        pass
