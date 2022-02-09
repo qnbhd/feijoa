@@ -24,7 +24,7 @@ import logging
 
 import numpy as numpy
 
-import qutune.environment as ENV
+import polytune.environment as ENV
 from workloads.workload import Workload
 
 log = logging.getLogger(__name__)

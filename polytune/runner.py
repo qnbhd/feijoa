@@ -32,9 +32,9 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.progress import track
 
-import qutune.environment as ENV
-from qutune.measurement.measurer import Measurer
-from qutune.search.searcher import Searcher
+import polytune.environment as ENV
+from polytune.measurement.measurer import Measurer
+from polytune.search.searcher import Searcher
 from rich.table import Table
 
 from multiprocessing import Pool

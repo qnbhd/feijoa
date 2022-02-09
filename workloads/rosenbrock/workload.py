@@ -24,7 +24,7 @@ from typing import Any, Dict
 
 from executor import execute
 
-from qutune.search.parameters import Parameter
+from polytune.search.parameters import Parameter
 from workloads.workload import Workload as BaseWorkload
 import pathlib
 

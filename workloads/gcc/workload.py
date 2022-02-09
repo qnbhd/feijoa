@@ -22,7 +22,7 @@
 import io
 import logging
 from typing import Any, Dict
-from qutune.search.parameters import Parameter
+from polytune.search.parameters import Parameter
 from utils.helpers import configuration_hash
 from workloads.workload import Workload as BaseWorkload
 import random

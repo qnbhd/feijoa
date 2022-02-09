@@ -1,10 +1,10 @@
 import click
 
-import qutune.environment
-from qutune.measurement.measurer import Measurer
-from qutune.runner import Runner
-from qutune.search.searcher import Searcher
-import qutune.search.space
+import polytune.environment
+from polytune.measurement.measurer import Measurer
+from polytune.runner import Runner
+from polytune.search.searcher import Searcher
+import polytune.search.space
 from utils import logging
 from workloads import workloadFactory
 
@@ -21,19 +21,19 @@ def cli():
 def run(prop, verbose, processes):
     logging.init(verbose)
 
-    environment = qutune.environment.Environment()
+    environment = polytune.environment.Environment()
     environment.load_from_file(prop)
     environment.set('processes_count', processes)
 
-    wargs = qutune.environment.workload_args or dict()
+    wargs = polytune.environment.workload_args or dict()
 
     workload = workloadFactory(
-        qutune.environment.workload_name,
+        polytune.environment.workload_name,
         **wargs)
 
-    space_yaml = qutune.environment.space
+    space_yaml = polytune.environment.space
 
-    space = qutune.search.space.from_yaml(space_yaml)
+    space = polytune.search.space.from_yaml(space_yaml)
 
     searcher = Searcher(workload, space)
     measurer = Measurer(workload)

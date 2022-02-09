@@ -31,8 +31,8 @@ from executor import execute
 from rich.console import Console
 from rich.syntax import Syntax
 
-from qutune.search.parameters import Parameter
-from qutune.search.renderer import Renderer
+from polytune.search.parameters import Parameter
+from polytune.search.renderer import Renderer
 
 log = logging.getLogger(__name__)
 

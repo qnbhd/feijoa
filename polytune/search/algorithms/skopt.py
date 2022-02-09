@@ -21,15 +21,15 @@
 # SOFTWARE.
 
 from .algorithm import SearchAlgorithm
-from qutune.search import Integer, Real, Categorical
-from qutune.search.space import SearchSpace
+from polytune.search import Integer, Real, Categorical
+from polytune.search.space import SearchSpace
 
 import sklearn.utils.fixes
 from numpy.ma import MaskedArray
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 import skopt
-import qutune.environment as ENV
+import polytune.environment as ENV
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):

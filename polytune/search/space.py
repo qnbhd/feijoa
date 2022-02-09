@@ -24,8 +24,8 @@ from typing import List
 
 import yaml
 
-from qutune.search import ParameterFactory
-from qutune.search.parameters import Parameter
+from polytune.search import ParameterFactory
+from polytune.search.parameters import Parameter
 
 
 class SearchSpace:

@@ -23,12 +23,12 @@ import logging
 import warnings
 from collections import Coroutine
 
-from qutune.search.algorithms.skopt import SkoptBayesianAlgorithm
+from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from utils.helpers import configuration_hash
 
-import qutune.environment as ENV
+import polytune.environment as ENV
 
-from qutune.search.space import SearchSpace
+from polytune.search.space import SearchSpace
 from workloads.workload import Workload
 
 

@@ -19,12 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from qutune.search.parameters import Integer, Real, Categorical
+from polytune.search.parameters import Integer, Real, Categorical
 
 from itertools import chain
 from typing import Any, Dict
 
-from qutune.search import Integer, Real
+from polytune.search import Integer, Real
 
 _RegisteredTypes: Dict[str, Any] = dict()
 
