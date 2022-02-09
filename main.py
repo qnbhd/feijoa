@@ -5,8 +5,9 @@ from polytune.measurement.measurer import Measurer
 from polytune.runner import Runner
 from polytune.search.searcher import Searcher
 import polytune.search.space
+from polytune.storages.default import MemoryStorage
 from utils import logging
-from workloads import workloadFactory
+from workloads import workload_factory
 
 
 @click.group()
@@ -27,7 +28,7 @@ def run(prop, verbose, processes):
 
     wargs = polytune.environment.workload_args or dict()
 
-    workload = workloadFactory(
+    workload = workload_factory(
         polytune.environment.workload_name,
         **wargs)
 
@@ -35,10 +36,12 @@ def run(prop, verbose, processes):
 
     space = polytune.search.space.from_yaml(space_yaml)
 
-    searcher = Searcher(workload, space)
-    measurer = Measurer(workload)
+    storage = MemoryStorage()
 
-    runner = Runner(searcher, measurer)
+    searcher = Searcher(workload, space, storage)
+    measurer = Measurer(workload, space)
+
+    runner = Runner(searcher, measurer, storage)
 
     runner.process()
 

@@ -25,6 +25,9 @@ import logging
 import numpy as numpy
 
 import polytune.environment as ENV
+from polytune.models.configuration import Configuration
+from polytune.search.renderer import Renderer
+from polytune.search.space import SearchSpace
 from workloads.workload import Workload
 
 log = logging.getLogger(__name__)
@@ -32,18 +35,19 @@ log = logging.getLogger(__name__)
 
 class Measurer:
 
-    def __init__(self, workload: Workload):
+    def __init__(self, workload: Workload, space: SearchSpace):
         self.workload = workload
+        self.space = space
         self.num_runs = ENV.num_runs
 
-    def run_test(self, configuration: dict):
-        log.debug(f'Trying configuration:[white][italic]\n'
-                  f'{self.workload.render(configuration)}')
+    def run_test(self, configuration: Configuration):
+        rendered = configuration.render(self.space, Renderer)
 
-        self.workload.prepare(configuration)
+        log.debug(f'Trying configuration:[white][italic]\n'
+                  f'{rendered}')
 
         results = numpy.array([
-            float(self.workload.run())
+            float(self.workload.run(rendered))
             for _ in range(self.num_runs)
         ])
 

@@ -65,6 +65,14 @@ python-versions = "*"
 test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
+name = "eff"
+version = "1.0.0"
+description = "None"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "executor"
 version = "23.2"
 description = "Programmer friendly subprocess wrapper"
@@ -371,7 +379,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.9"
-content-hash = "e22ea90eeaa45d2637c0c5e8edba4f00408aee9ef17d78b573910aaa56347b89"
+content-hash = "d66331501a0a2ae3fa74ae978a5e966ccb8ca8e09f27a74b8b0453dffb796966"
 
 [metadata.files]
 atomicwrites = [
@@ -397,6 +405,10 @@ coloredlogs = [
 commonmark = [
     {file = "commonmark-0.9.1-py2.py3-none-any.whl", hash = "sha256:da2f38c92590f83de410ba1a3cbceafbc74fee9def35f9251ba9a971d6d66fd9"},
     {file = "commonmark-0.9.1.tar.gz", hash = "sha256:452f9dc859be7f06631ddcb328b6919c67984aca654e5fefb3914d54691aed60"},
+]
+eff = [
+    {file = "eff-1.0.0-py3-none-any.whl", hash = "sha256:ad5e686eaf58e292c2231a152cde31cf4ee780d4906c1b8a116d5cfbec5cbd94"},
+    {file = "eff-1.0.0.tar.gz", hash = "sha256:a2d8698c8c3fc056235ddc86e48046f8294a44d8f78d93306ef75c4127b4652f"},
 ]
 executor = [
     {file = "executor-23.2-py2.py3-none-any.whl", hash = "sha256:f2ea8cf92a1570a9898d5915b9620033aa9d4789eaf27e8a915d91dc8ba83dd9"},

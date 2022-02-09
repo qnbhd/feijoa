@@ -34,10 +34,13 @@ from rich.progress import track
 
 import polytune.environment as ENV
 from polytune.measurement.measurer import Measurer
+from polytune.search.renderer import Renderer
 from polytune.search.searcher import Searcher
 from rich.table import Table
 
 from multiprocessing import Pool
+
+from polytune.storages import Storage
 
 log = logging.getLogger(__name__)
 
@@ -48,12 +51,11 @@ def f(config, measurer):
 
 class Runner:
 
-    def __init__(self, searcher: Searcher, measurer: Measurer):
+    def __init__(self, searcher: Searcher, measurer: Measurer, storage: Storage):
         self.searcher = searcher
         self.measurer = measurer
+        self.storage = storage
 
-        self.best_result = None
-        self.best_config = None
         self.tests_count = 0
 
         self.impacts_history = numpy.array([])
@@ -96,7 +98,7 @@ class Runner:
                     self.tests_count += 1
 
                 generated = [
-                    (list(c.keys()), c, result)
+                    (list(c.data.keys()), c, result)
                     for c, result in zip(suggested_cfgs, results)
                 ]
 
@@ -117,7 +119,7 @@ class Runner:
     def process(self):
         self.print_header()
 
-        ProgressWrapper = track(
+        progress_wrapper = track(
             self._SearchWrapper(),
             description='tests count',
             total=ENV.test_limit,
@@ -127,22 +129,18 @@ class Runner:
 
         results = []
 
-        for suggested, cfg, run_result in ProgressWrapper:
-            results.append(
-                {'id': len(results),
-                 'result': run_result,
-                 **{p.name: v for p, v in cfg.items()}})
+        for suggested, cfg, run_result in progress_wrapper:
 
-            if not self.best_result or run_result < self.best_result:
-                if self.best_result:
-                    imp = (self.best_result - run_result) / run_result
-                    self.impacts_history = numpy.append(self.impacts_history, imp)
+            new_best = self.storage.insert_result(cfg, run_result)
+            best_config = self.storage.best_configuration()
+            best_result = self.storage.get_result(best_config)
 
-                self.best_result = run_result
-                self.best_config = cfg
+            if new_best:
+                imp = (best_result - run_result) / run_result
+                self.impacts_history = numpy.append(self.impacts_history, imp)
 
-                dumped = self.workload.render(self.best_config)
-                log.info(f'[green]New best:\n{dumped}\n\nwith result: \n{self.best_result}')
+                dumped = best_config.render(self.searcher.space, Renderer)
+                log.info(f'[green]New best:\n{dumped}\nwith result: \n{best_result}')
 
                 self.without_new_best = 0
             else:
@@ -165,10 +163,12 @@ class Runner:
 
         log.info(f'Tuning dataframe was written in {output_filename}.')
 
-        if self.best_config:
+        best_config = self.storage.best_configuration()
+
+        if best_config:
             md = Markdown(f'# Best configuration')
             self.console.print(md)
-            self.console.print(f'[green][bold]{self.workload.render(self.best_config)}')
+            self.console.print(f'[green][bold]{best_config.render(self.searcher.space, Renderer)}')
 
 
 

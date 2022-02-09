@@ -24,7 +24,7 @@ import importlib
 import importlib.util
 
 
-def workloadFactory(workload_name: str, **kwargs):
+def workload_factory(workload_name: str, **kwargs):
     _, name = workload_name.split('://', maxsplit=2)
 
     workload_module = importlib.import_module(f'.{name}.workload', __name__)

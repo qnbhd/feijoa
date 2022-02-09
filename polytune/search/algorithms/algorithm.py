@@ -21,6 +21,8 @@
 # SOFTWARE.
 import abc
 
+from polytune.models.configuration import Configuration
+
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
 
@@ -28,9 +30,9 @@ class SearchAlgorithm(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def ask(self):
+    def ask(self) -> Configuration:
         raise NotImplemented()
 
     @abc.abstractmethod
-    def tell(self, suggested, result):
+    def tell(self, suggested: Configuration, result):
         pass

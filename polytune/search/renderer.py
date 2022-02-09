@@ -19,20 +19,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from polytune.models.configuration import Configuration
 from polytune.search import Categorical, Real, Integer
 from polytune.search.visitor import ParametersVisitor
 
 
 class Renderer(ParametersVisitor):
 
-    def visit_integer(self, p: Integer, **kwargs):
-        return f"{p.name}{kwargs['value']}"
+    def __init__(self, cfg: Configuration):
+        super().__init__()
+        self.config = cfg
 
-    def visit_real(self, p: Real, **kwargs):
-        return f"{p.name}{kwargs['value']}"
+    def get_value(self, param):
+        value = self.config.data[param.name]
+        return value
+
+    def visit_common(self, p):
+        value = self.get_value(p)
+        return f"{p.name}{value}"
+
+    def visit_integer(self, p: Integer):
+        return self.visit_common(p)
+
+    def visit_real(self, p: Real):
+        return self.visit_common(p)
 
     def visit_categorical(self, p: Categorical, **kwargs):
-        return f"{kwargs['value']}"
-
-    def __init__(self):
-        super().__init__()
+        value = self.get_value(p)
+        return f"{value}"

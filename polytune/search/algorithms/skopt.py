@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from typing import Generator, List
 
 from .algorithm import SearchAlgorithm
 from polytune.search import Integer, Real, Categorical
@@ -26,6 +27,8 @@ from polytune.search.space import SearchSpace
 
 import sklearn.utils.fixes
 from numpy.ma import MaskedArray
+
+from ...models.configuration import Configuration
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 import skopt
@@ -57,22 +60,27 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
         return params
 
-    def _ask(self):
+    def _ask(self) -> Generator:
+
         @skopt.utils.use_named_args(self.skopt_space)
         def named(**kwargs):
             return kwargs
 
         while True:
-            asked = [
-                named(self.optimizer_instance.ask()) for _ in range(self.per_emit_count)
-            ]
+            asked = list()
+
+            for _ in range(self.per_emit_count):
+                raw = named(self.optimizer_instance.ask())
+                cfg = Configuration(raw)
+                asked.append(cfg)
+
             yield asked
 
-    def ask(self):
+    def ask(self) -> List[Configuration]:
         try:
             return next(self.coroutine)
         except StopIteration:
             pass
 
-    def tell(self, suggested, result):
-        self.optimizer_instance.tell(suggested, result)
+    def tell(self, suggested: Configuration, result):
+        self.optimizer_instance.tell(list(suggested.data.values()), result)

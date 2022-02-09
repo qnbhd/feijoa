@@ -21,6 +21,7 @@
 # SOFTWARE.
 import abc
 
+
 class Parameter(metaclass=abc.ABCMeta):
 
     def __init__(self, name: str):
@@ -33,7 +34,7 @@ class Parameter(metaclass=abc.ABCMeta):
         raise NotImplemented
 
     @abc.abstractmethod
-    def accept(self, v, **kwargs):
+    def accept(self, v):
         raise NotImplemented()
 
 
@@ -47,8 +48,8 @@ class Integer(Parameter):
     def __repr__(self):
         return f"Integer {self.name}: [{self.low}, {self.high}]"
 
-    def accept(self, v, **kwargs):
-        return v.visit_integer(self, **kwargs)
+    def accept(self, v):
+        return v.visit_integer(self)
 
 
 class Real(Parameter):
@@ -61,8 +62,8 @@ class Real(Parameter):
     def __repr__(self):
         return f"Real {self.name}: [{self.low}, {self.high}]"
 
-    def accept(self, v, **kwargs):
-        return v.visit_real(self, **kwargs)
+    def accept(self, v):
+        return v.visit_real(self)
 
 
 class Categorical(Parameter):
@@ -74,5 +75,5 @@ class Categorical(Parameter):
     def __repr__(self):
         return f"Categorical {self.name}: [{self.choices}]"
 
-    def accept(self, v, **kwargs):
-        return v.visit_categorical(self, **kwargs)
+    def accept(self, v):
+        return v.visit_categorical(self)

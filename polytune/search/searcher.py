@@ -23,8 +23,9 @@ import logging
 import warnings
 from collections import Coroutine
 
+from polytune.models.configuration import Configuration
 from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
-from utils.helpers import configuration_hash
+from polytune.storages import Storage
 
 import polytune.environment as ENV
 
@@ -37,12 +38,13 @@ log = logging.getLogger(__name__)
 
 class Searcher:
 
-    def __init__(self, workload: Workload, space: SearchSpace):
+    def __init__(self, workload: Workload, space: SearchSpace, storage: Storage):
         self.workload = workload
         self.space = space
+        self.storage = storage
+
         self.search_algorithm = SkoptBayesianAlgorithm(space)
 
-        self.hashes_storage = dict()
         self.test_limit = ENV.test_limit
         self.test_count = 0
         self.max_retries = 3
@@ -57,40 +59,33 @@ class Searcher:
         except StopIteration:
             return None
 
-    def _AskWrapper(self):
+    def _ask_coroutine(self) -> Coroutine:
         retries = 0
-        while True:
+        while retries != self.max_retries:
             suggested_configs_list = self.search_algorithm.ask()
 
             to_emit = list()
 
             for c in suggested_configs_list:
-                h = configuration_hash(c)
+                h = c.get_hash()
 
-                if h in self.hashes_storage:
+                if self.storage.hash_is_exists(h):
                     retries += 1
                     continue
                 else:
                     retries = 0
 
-                to_emit.append({
-                    self.space.get_by_name(p): value
-                    for p, value in c.items()
-                })
+                to_emit.append(c)
 
             yield to_emit
 
-    def _ask_coroutine(self) -> Coroutine:
-        yield from self._AskWrapper()
+    def tell(self, cfg: Configuration, result):
+        h = cfg.get_hash()
 
-    def tell(self, cfg, result):
-        h = configuration_hash({
-                p.name: v for p, v in cfg.items()})
-
-        if h not in self.hashes_storage:
+        if not self.storage.hash_is_exists(h):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                self.search_algorithm.tell(list(cfg.values()), result)
-                self.hashes_storage[h] = result
+                self.search_algorithm.tell(cfg, result)
+                self.storage.insert_hash(h)
 
 

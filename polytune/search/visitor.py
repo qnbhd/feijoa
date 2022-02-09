@@ -27,11 +27,11 @@ class ParametersVisitor:
     def __init__(self):
         pass
 
-    def visit_integer(self, p: Integer, **kwargs):
+    def visit_integer(self, p: Integer):
         pass
 
-    def visit_real(self, p: Real, **kwargs):
+    def visit_real(self, p: Real):
         pass
 
-    def visit_categorical(self, p: Categorical, **kwargs):
+    def visit_categorical(self, p: Categorical):
         pass

@@ -31,15 +31,8 @@ import pathlib
 
 class Workload(BaseWorkload):
 
-    def __init__(self, **kwargs):
-        super().__init__()
-        self.rendered = ""
-
-    def prepare(self, configuration: Dict[Parameter, Any]):
-        self.rendered = self.render(configuration)
-
-    def run(self):
-        cmd = f'{sys.executable} {pathlib.Path(__file__).parent.resolve()}/rosenbrock.py {self.rendered}'
+    def run(self, rendered):
+        cmd = f'{sys.executable} {pathlib.Path(__file__).parent.resolve()}/rosenbrock.py {rendered}'
         return execute(cmd, capture=True)
 
     def teardown(self):

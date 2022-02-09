@@ -31,10 +31,12 @@ from executor import execute
 from rich.console import Console
 from rich.syntax import Syntax
 
+from polytune.models.configuration import Configuration
 from polytune.search.parameters import Parameter
 from polytune.search.renderer import Renderer
 
 log = logging.getLogger(__name__)
+
 
 class Workload(metaclass=abc.ABCMeta):
 
@@ -66,11 +68,7 @@ class Workload(metaclass=abc.ABCMeta):
             log.debug(f'[yellow][bold]OUT:\n{decoded}"')
 
     @abc.abstractmethod
-    def prepare(self, configuration: Dict[Parameter, Any]):
-        pass
-
-    @abc.abstractmethod
-    def run(self):
+    def run(self, rendered):
         pass
 
     @abc.abstractmethod
