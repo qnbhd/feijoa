@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 3.8.10 (sftp://qnbhd@172.30.174.113:7777/home/qnbhd/qutune/.venv/bin/python)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Poetry (polytune) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
