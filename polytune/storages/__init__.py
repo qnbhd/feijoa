@@ -1,5 +1,4 @@
 class Storage:
-
     def insert_hash(self, h):
         raise NotImplementedError()
 
@@ -13,4 +12,7 @@ class Storage:
         raise NotImplementedError()
 
     def get_result(self, cfg):
+        raise NotImplementedError()
+
+    def results_list(self):
         raise NotImplementedError()

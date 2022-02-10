@@ -1,11 +1,12 @@
 import click
 
 import polytune.environment
+import polytune.search.space
 from polytune.measurement.measurer import Measurer
+from polytune.models.configuration import Configuration
 from polytune.runner import Runner
 from polytune.search.searcher import Searcher
-import polytune.search.space
-from polytune.storages.default import MemoryStorage
+from polytune.storages.memory import MemoryStorage
 from utils import logging
 from workloads import workload_factory
 
@@ -42,6 +43,7 @@ def run(prop, verbose, processes):
     measurer = Measurer(workload, space)
 
     runner = Runner(searcher, measurer, storage)
+    # runner.add_convergence_plugin(ImpactsHistoryPlugin())
 
     runner.process()
 

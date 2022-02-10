@@ -159,3 +159,11 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/python
 .idea/
 /tuning_dataframes/
+
+polytune/__pycache__/
+workloads/__pycache__/
+polytune/search/__pycache__/
+polytune/measurement/__pycache__/
+workloads/rosenbrock/__pycache__/
+utils/__pycache__/
+*.pyc

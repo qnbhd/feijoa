@@ -1,3 +1,6 @@
+from typing import Dict
+
+from polytune.models.result import Result
 from polytune.storages import Storage
 from numpy import float64
 from polytune.models.configuration import Configuration
@@ -6,7 +9,7 @@ from polytune.models.configuration import Configuration
 class MemoryStorage(Storage):
     def __init__(self):
         super().__init__()
-        self.results = dict()
+        self.results: Dict[Configuration, Result] = dict()
         self.best_cfg = None
         self.hashes = set()
 
@@ -32,5 +35,20 @@ class MemoryStorage(Storage):
     def best_configuration(self) -> Configuration:
         return self.best_cfg
 
-    def get_result(self, cfg: Configuration) -> float64:
+    def get_result(self, cfg: Configuration) -> Result:
         return self.results.get(cfg, None)
+
+    def results_list(self):
+        buffer = []
+
+        for configuration, result in self.results.items():
+            prepared = {
+                'id': result.idx,
+                'time': result.time,
+                'timestamp': result.timestamp,
+                **configuration.data
+            }
+            buffer.append(prepared)
+
+        buffer.sort(key=lambda x: x['timestamp'])
+        return buffer

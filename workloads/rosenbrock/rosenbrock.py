@@ -21,6 +21,7 @@
 # SOFTWARE.
 import click
 
+
 @click.command()
 @click.option('--x', type=float, required=True)
 @click.option('--y', type=float, required=True)

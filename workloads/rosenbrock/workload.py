@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import pathlib
 import sys
 from typing import Any, Dict
 
@@ -26,7 +27,6 @@ from executor import execute
 
 from polytune.search.parameters import Parameter
 from workloads.workload import Workload as BaseWorkload
-import pathlib
 
 
 class Workload(BaseWorkload):

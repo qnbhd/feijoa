@@ -1,38 +1,31 @@
 import hashlib
+import json
 
+from polytune.search.renderer import Renderer
 from polytune.search.space import SearchSpace
+from typing import Dict, Type, Union
+
+from pydantic import BaseModel
 
 
-class Configuration:
-
-    def __init__(self, data):
-        self.data = data
+class Configuration(BaseModel):
+    data: dict
 
     def __repr__(self):
-        return f'Configuration({str(self.data)[1:-1]})'
+        return f"Configuration({str(self.data)[1:-1]})"
 
-    def get_hash(self):
-        curve = hashlib.sha256()
+    def __hash__(self):
+        encoded = json.dumps(self.data, sort_keys=True).encode()
+        return hash(encoded)
 
-        for p, v in self.data.items():
-            encoded = f'{p}{v}'.encode()
-            curve.update(encoded)
-
-        return curve.hexdigest()
-
-    def validate(self):
-        pass
-
-    def normalize(self):
-        pass
-
-    def render(self, space: SearchSpace, renderer_cls):
+    def render(self, space: SearchSpace, renderer_cls: Type[Renderer]) -> str:
         renderer = renderer_cls(self)
 
-        rendered = []
+        rendered = list()
+
         for p_name in self.data.keys():
             p = space.get_by_name(p_name)
             result = p.accept(renderer)
             rendered.append(result)
 
-        return ' '.join(rendered)
+        return " ".join(rendered)

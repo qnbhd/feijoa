@@ -1,17 +1,17 @@
 # MIT License
-# 
+#
 # Copyright (c) 2021 Templin Konstantin
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,23 +21,20 @@
 # SOFTWARE.
 import logging
 import warnings
-from collections import Coroutine
-
-from polytune.models.configuration import Configuration
-from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
-from polytune.storages import Storage
+from typing import List, Coroutine
 
 import polytune.environment as ENV
-
+from polytune.models.configuration import Configuration
+from polytune.models.result import Result
+from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from polytune.search.space import SearchSpace
+from polytune.storages import Storage
 from workloads.workload import Workload
-
 
 log = logging.getLogger(__name__)
 
 
 class Searcher:
-
     def __init__(self, workload: Workload, space: SearchSpace, storage: Storage):
         self.workload = workload
         self.space = space
@@ -52,7 +49,7 @@ class Searcher:
         self.ask_coroutine = self._ask_coroutine()
         self.ask_coroutine.send(None)
 
-    def ask(self):
+    def ask(self) -> List[Configuration]:
         try:
             # noinspection PyTypeChecker
             return next(self.ask_coroutine)
@@ -67,7 +64,7 @@ class Searcher:
             to_emit = list()
 
             for c in suggested_configs_list:
-                h = c.get_hash()
+                h = hash(c)
 
                 if self.storage.hash_is_exists(h):
                     retries += 1
@@ -79,13 +76,13 @@ class Searcher:
 
             yield to_emit
 
-    def tell(self, cfg: Configuration, result):
-        h = cfg.get_hash()
+    def tell(self, cfg: Configuration, result: Result) -> None:
+        h = hash(cfg)
 
-        if not self.storage.hash_is_exists(h):
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                self.search_algorithm.tell(cfg, result)
-                self.storage.insert_hash(h)
+        if self.storage.hash_is_exists(h):
+            return
 
-
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.search_algorithm.tell(cfg, result)
+            self.storage.insert_hash(h)

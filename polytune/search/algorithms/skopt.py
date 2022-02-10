@@ -1,17 +1,17 @@
 # MIT License
-# 
+#
 # Copyright (c) 2021 Templin Konstantin
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,26 +21,27 @@
 # SOFTWARE.
 from typing import Generator, List
 
-from .algorithm import SearchAlgorithm
-from polytune.search import Integer, Real, Categorical
-from polytune.search.space import SearchSpace
-
 import sklearn.utils.fixes
 from numpy.ma import MaskedArray
 
+from polytune.search import Categorical, Integer, Real
+from polytune.search.space import SearchSpace
+
 from ...models.configuration import Configuration
+from .algorithm import SearchAlgorithm
+from ...models.result import Result
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 import skopt
+
 import polytune.environment as ENV
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):
-
     def __init__(self, search_space: SearchSpace, **kwargs):
         super().__init__(**kwargs)
         self.skopt_space = self._make_space(search_space)
-        self.optimizer_instance = skopt.Optimizer(self.skopt_space, 'GBRT')
+        self.optimizer_instance = skopt.Optimizer(self.skopt_space, "GBRT")
         self.per_emit_count = ENV.processes_count
 
         self.coroutine = self._ask()
@@ -56,12 +57,13 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
             elif isinstance(p, Real):
                 params.append(skopt.space.Real(name=p.name, low=p.low, high=p.high))
             elif isinstance(p, Categorical):
-                params.append(skopt.space.Categorical(name=p.name, categories=p.choices))
+                params.append(
+                    skopt.space.Categorical(name=p.name, categories=p.choices)
+                )
 
         return params
 
     def _ask(self) -> Generator:
-
         @skopt.utils.use_named_args(self.skopt_space)
         def named(**kwargs):
             return kwargs
@@ -71,7 +73,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
             for _ in range(self.per_emit_count):
                 raw = named(self.optimizer_instance.ask())
-                cfg = Configuration(raw)
+                cfg = Configuration(data=raw)
                 asked.append(cfg)
 
             yield asked
@@ -82,5 +84,5 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
         except StopIteration:
             pass
 
-    def tell(self, suggested: Configuration, result):
-        self.optimizer_instance.tell(list(suggested.data.values()), result)
+    def tell(self, suggested: Configuration, result: Result):
+        self.optimizer_instance.tell(list(suggested.data.values()), result.time)
