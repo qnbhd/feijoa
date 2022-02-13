@@ -1,14 +1,18 @@
+import os
+import uuid
+from datetime import datetime
+from os.path import abspath, dirname
+
 import click
 
 import polytune.environment
 import polytune.search.space
-from polytune.measurement.measurer import Measurer
-from polytune.models.configuration import Configuration
+from polytune.models.result import Result
 from polytune.runner import Runner
 from polytune.search.searcher import Searcher
-from polytune.storages.memory import MemoryStorage
+from polytune.storages.tiny import TinyDBStorage
 from utils import logging
-from workloads import workload_factory
+from workloads.gcc.runner import metric_collector, METRICS, SPACE
 
 
 @click.group()
@@ -27,23 +31,27 @@ def run(prop, verbose, processes):
     environment.load_from_file(prop)
     environment.set('processes_count', processes)
 
-    wargs = polytune.environment.workload_args or dict()
+    polytune.environment.workload_args = polytune.environment.workload_args or dict()
 
-    workload = workload_factory(
-        polytune.environment.workload_name,
-        **wargs)
+    dt_string = datetime.now().strftime("%d-%m-%Y_%H:%M")
 
-    space_yaml = polytune.environment.space
+    tuning_dbs_folder = os.path.join(abspath(dirname(__file__)), "tuning_dbs")
+    os.makedirs(tuning_dbs_folder, exist_ok=True)
+    storage_path = os.path.join(tuning_dbs_folder, f'tuning_{dt_string}_{uuid.uuid4().hex}.json')
+    storage = TinyDBStorage(storage_path)
 
-    space = polytune.search.space.from_yaml(space_yaml)
+    searcher = Searcher(SPACE, storage)
 
-    storage = MemoryStorage()
+    def objective(x: Result) -> float:
+        return x['time']
 
-    searcher = Searcher(workload, space, storage)
-    measurer = Measurer(workload, space)
-
-    runner = Runner(searcher, measurer, storage)
-    # runner.add_convergence_plugin(ImpactsHistoryPlugin())
+    runner = Runner(
+        searcher,
+        storage,
+        metric_collector,
+        METRICS,
+        objective
+    )
 
     runner.process()
 

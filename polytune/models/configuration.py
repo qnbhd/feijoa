@@ -14,6 +14,9 @@ class Configuration(BaseModel):
     def __repr__(self):
         return f"Configuration({str(self.data)[1:-1]})"
 
+    def __str__(self):
+        return self.__repr__()
+
     def __hash__(self):
         encoded = json.dumps(self.data, sort_keys=True).encode()
         return hash(encoded)

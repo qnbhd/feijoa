@@ -84,5 +84,5 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
         except StopIteration:
             pass
 
-    def tell(self, suggested: Configuration, result: Result):
-        self.optimizer_instance.tell(list(suggested.data.values()), result.time)
+    def tell(self, suggested: Configuration, result: float):
+        self.optimizer_instance.tell(list(suggested.data.values()), result)

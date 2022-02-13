@@ -20,56 +20,52 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import csv
+import json
 import logging
 import os
 from datetime import datetime
-from itertools import repeat
 from multiprocessing import Pool
-from typing import Iterable
+from os.path import abspath, dirname
+from typing import Iterable, Callable
 
-import numpy
 from rich.console import Console
 from rich.markdown import Markdown
-from rich.progress import track
+from rich import print_json
+from polytune import __poly_folder__, __project_folder__
 
 import polytune.environment as ENV
 from polytune.convergence.plugin import ConvergencePlugin
-from polytune.measurement.measurer import Measurer
 from polytune.models.result import Result
-from polytune.search.renderer import Renderer
 from polytune.search.searcher import Searcher
-from polytune.storages import Storage
+from polytune.storages.storage import Storage
+
 
 log = logging.getLogger(__name__)
 
 
-def f(cfg, measurer):
-    return measurer.run_test(cfg)
-
-
 class Runner:
-    def __init__(self, searcher: Searcher, measurer: Measurer, storage: Storage):
+    def __init__(self, searcher: Searcher,
+                 storage: Storage,
+                 metric_collector: Callable,
+                 metrics: tuple,
+                 objective: Callable):
+
         self.searcher = searcher
-        self.measurer = measurer
+        self.metric_collector = metric_collector
         self.storage = storage
+        self.objective = objective
+        self.metrics = metrics
 
         self.tests_count = 0
 
-        self.impacts_history = numpy.array([])
         self.warmup_tests_count = ENV.test_limit // 5
-        self.impact_threshold = 0.005
         self.without_new_best = 0
-        self.without_new_best_threshold = ENV.test_limit // 5
         self.convergence_plugins = []
 
         self.console = Console()
 
     def add_convergence_plugin(self, plugin: ConvergencePlugin):
         self.convergence_plugins.append(plugin)
-
-    @property
-    def workload(self):
-        return self.searcher.workload
 
     def convergence_check(self) -> bool:
         if not self.tests_count >= self.warmup_tests_count:
@@ -92,14 +88,15 @@ class Runner:
                 break
 
             with Pool(ENV.processes_count) as p:
-                results = p.starmap(f, zip(suggested_cfgs, repeat(self.measurer)))
+                results = p.map(self.metric_collector, suggested_cfgs)
 
             results = map(Result.get, results)
 
             generated = list()
 
             for config, result in zip(suggested_cfgs, results):
-                self.searcher.tell(config, result)
+                by_objective = self.objective(result)
+                self.searcher.tell(config, by_objective)
                 self.tests_count += 1
                 generated.append(
                     (
@@ -123,25 +120,29 @@ class Runner:
 
         self.console.print(md)
 
-        progress_wrapper = track(
-            self._process_wrapper(),
-            description="tests count",
-            total=ENV.test_limit,
-            transient=True,
-            update_period=0.01,
-        )
+        # progress_wrapper = track(
+        #     self._process_wrapper(),
+        #     description="tests count",
+        #     total=ENV.test_limit,
+        #     # transient=True,
+        #     update_period=0.01,
+        # )
 
-        for suggested, cfg, run_result in progress_wrapper:
-            is_new_best = self.storage.insert_result(cfg, run_result)
-            best_config = self.storage.best_configuration()
+        for suggested, cfg, run_result in self._process_wrapper():
+            self.storage.insert(cfg, run_result)
+            best_config = self.storage.best_configuration(self.objective)
             best_result = self.storage.get_result(best_config)
+            is_new_best = run_result == best_result
 
             if is_new_best:
                 for plugin in self.convergence_plugins:
                     plugin.on_new_best_result(cfg, run_result)
 
-                dumped = best_config.render(self.searcher.space, Renderer)
-                log.info(f"[green]New best:\n{dumped}\nwith result: \n{best_result}")
+                dumped = json.dumps(best_config.data, indent=2)
+                log.info(f"[green]New best")
+                log.info(dumped)
+                log.info(f"With result: \n{best_result}")
+                log.info(f"By objective: {self.objective(best_result)}")
 
                 self.without_new_best = 0
             else:
@@ -152,13 +153,19 @@ class Runner:
         workload_name = ENV.workload_name.replace("/", "_").replace(":", "").replace('__', '_')
         dt_string = datetime.now().strftime("%d-%m-%Y_%H:%M")
         output_filename = f"{workload_name}_{dt_string}.csv"
-        dataframes_folder = os.path.join(os.getcwd(), "tuning_dataframes")
+        dataframes_folder = os.path.join(__project_folder__, "tuning_dataframes")
         os.makedirs(dataframes_folder, exist_ok=True)
+
+        cols = [
+            'id', 'timestamp',
+            *[f'metric_{k}' for k in self.metrics],
+            *[f'param_{k}' for k in self.searcher.space.name2param.keys()]
+        ]
 
         with open(os.path.join(dataframes_folder, output_filename), "w") as output_file:
             dict_writer = csv.DictWriter(
                 output_file,
-                fieldnames=["id", "time", "timestamp", *self.searcher.space.name2param.keys()],
+                fieldnames=cols,
                 restval="-",
                 delimiter=",",
             )
@@ -167,11 +174,11 @@ class Runner:
 
         log.info(f"Tuning dataframe was written in {output_filename}.")
 
-        best_config = self.storage.best_configuration()
+        best_config = self.storage.best_configuration(self.objective)
 
         if best_config:
             md = Markdown(f"# Best configuration")
             self.console.print(md)
             self.console.print(
-                f"[green][bold]{best_config.render(self.searcher.space, Renderer)}"
+                f"[green][bold]{json.dumps(best_config.data, indent=2)}"
             )

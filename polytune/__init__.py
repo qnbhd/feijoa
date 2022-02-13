@@ -19,3 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+import os
+from os.path import dirname, abspath
+
+
+__version__ = '0.1.0'
+__poly_folder__ = os.path.join(dirname(abspath(__file__)))
+__project_folder__ = dirname(__poly_folder__)
+

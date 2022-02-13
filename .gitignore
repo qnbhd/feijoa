@@ -167,3 +167,5 @@ polytune/measurement/__pycache__/
 workloads/rosenbrock/__pycache__/
 utils/__pycache__/
 *.pyc
+/tuning_dbs/
+/polytune/tuning_dataframes/

@@ -21,22 +21,20 @@
 # SOFTWARE.
 import logging
 import warnings
-from typing import List, Coroutine
+from typing import List, Coroutine, Union
 
 import polytune.environment as ENV
 from polytune.models.configuration import Configuration
 from polytune.models.result import Result
 from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from polytune.search.space import SearchSpace
-from polytune.storages import Storage
-from workloads.workload import Workload
+from polytune.storages.storage import Storage
 
 log = logging.getLogger(__name__)
 
 
 class Searcher:
-    def __init__(self, workload: Workload, space: SearchSpace, storage: Storage):
-        self.workload = workload
+    def __init__(self, space: SearchSpace, storage: Storage):
         self.space = space
         self.storage = storage
 
@@ -49,7 +47,7 @@ class Searcher:
         self.ask_coroutine = self._ask_coroutine()
         self.ask_coroutine.send(None)
 
-    def ask(self) -> List[Configuration]:
+    def ask(self) -> Union[List[Configuration], None]:
         try:
             # noinspection PyTypeChecker
             return next(self.ask_coroutine)
@@ -76,7 +74,7 @@ class Searcher:
 
             yield to_emit
 
-    def tell(self, cfg: Configuration, result: Result) -> None:
+    def tell(self, cfg: Configuration, result) -> None:
         h = hash(cfg)
 
         if self.storage.hash_is_exists(h):
@@ -85,4 +83,3 @@ class Searcher:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.search_algorithm.tell(cfg, result)
-            self.storage.insert_hash(h)

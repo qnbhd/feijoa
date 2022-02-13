@@ -25,6 +25,24 @@ import click
 from rich.logging import RichHandler
 from rich.traceback import install
 
+logger = logging
+
+install(suppress=[click])
+
+logger.basicConfig(
+    level="DEBUG",
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(
+        rich_tracebacks=True, markup=True, enable_link_path=False)]
+)
+
+logger.getLogger('executor').setLevel(logging.CRITICAL)
+
+
+def getLogger(name):
+    return logger.getLogger(name)
+
 
 def init(verbose=False):
     install(suppress=[click])
@@ -38,3 +56,4 @@ def init(verbose=False):
     )
 
     logging.getLogger('executor').setLevel(logging.CRITICAL)
+

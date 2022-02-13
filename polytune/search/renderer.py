@@ -46,4 +46,6 @@ class Renderer(ParametersVisitor):
 
     def visit_categorical(self, p: Categorical, **kwargs) -> str:
         value = self.get_value(p)
-        return f"{value}"
+        if value:
+            return f"{value}"
+        return ''

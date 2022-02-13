@@ -1,13 +1,13 @@
-- signature: --x=
+- signature: x
   type: real
   low: -5.0
   high: 5.0
 
-- signature: --y=
+- signature: y
   type: real
   low: -5.0
   high: 5.0
 
-- signature: -O
+- signature: O
   type: categorical
-  choices: [-O2, -O3, -Os, -Oz, -Og]
+  choices: ['1', '2', '3']
