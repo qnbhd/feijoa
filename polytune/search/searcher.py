@@ -21,11 +21,9 @@
 # SOFTWARE.
 import logging
 import warnings
-from typing import List, Coroutine, Union
+from typing import List, Coroutine, Optional
 
-import polytune.environment as ENV
 from polytune.models.configuration import Configuration
-from polytune.models.result import Result
 from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from polytune.search.space import SearchSpace
 from polytune.storages.storage import Storage
@@ -40,14 +38,13 @@ class Searcher:
 
         self.search_algorithm = SkoptBayesianAlgorithm(space)
 
-        self.test_limit = ENV.test_limit
         self.test_count = 0
         self.max_retries = 3
 
         self.ask_coroutine = self._ask_coroutine()
         self.ask_coroutine.send(None)
 
-    def ask(self) -> Union[List[Configuration], None]:
+    def ask(self) -> Optional[List[Configuration]]:
         try:
             # noinspection PyTypeChecker
             return next(self.ask_coroutine)
@@ -58,6 +55,9 @@ class Searcher:
         retries = 0
         while retries != self.max_retries:
             suggested_configs_list = self.search_algorithm.ask()
+
+            if suggested_configs_list is None:
+                break
 
             to_emit = list()
 

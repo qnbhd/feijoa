@@ -1,7 +1,0 @@
-- signature: -falign-functions
-  type: categorical
-  choices: [-falign-functions, null]
-
-- signature: -O
-  type: categorical
-  choices: [-O1, -O2, -O3, null]

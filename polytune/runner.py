@@ -25,58 +25,53 @@ import logging
 import os
 from datetime import datetime
 from multiprocessing import Pool
-from os.path import abspath, dirname
 from typing import Iterable, Callable
 
 from rich.console import Console
 from rich.markdown import Markdown
-from rich import print_json
-from polytune import __poly_folder__, __project_folder__
+from rich.progress import track
 
-import polytune.environment as ENV
-from polytune.convergence.plugin import ConvergencePlugin
+from polytune import __project_folder__
+
 from polytune.models.result import Result
 from polytune.search.searcher import Searcher
 from polytune.storages.storage import Storage
-
+from polytune.storages.tiny import BestConfigurationNotExists
 
 log = logging.getLogger(__name__)
 
 
 class Runner:
-    def __init__(self, searcher: Searcher,
+    def __init__(self,
+                 searcher: Searcher,
                  storage: Storage,
                  metric_collector: Callable,
                  metrics: tuple,
-                 objective: Callable):
+                 objective: Callable,
+                 test_limit: int = 100,
+                 n_proc: int = 1):
 
         self.searcher = searcher
         self.metric_collector = metric_collector
         self.storage = storage
         self.objective = objective
         self.metrics = metrics
+        self.test_limit = test_limit
+        self.n_proc = n_proc
+        self.workload_name = 'WorkloadName'
 
         self.tests_count = 0
 
-        self.warmup_tests_count = ENV.test_limit // 5
+        self.warmup_tests_count = self.test_limit // 5
         self.without_new_best = 0
-        self.convergence_plugins = []
 
         self.console = Console()
-
-    def add_convergence_plugin(self, plugin: ConvergencePlugin):
-        self.convergence_plugins.append(plugin)
 
     def convergence_check(self) -> bool:
         if not self.tests_count >= self.warmup_tests_count:
             return False
 
-        for plugin in self.convergence_plugins:
-            if plugin.converged():
-                log.info(plugin.reason)
-                return True
-
-        return self.tests_count >= ENV.test_limit
+        return self.tests_count >= self.test_limit
 
     def _process_wrapper(self) -> Iterable:
 
@@ -87,17 +82,13 @@ class Runner:
             if not suggested_cfgs:
                 break
 
-            with Pool(ENV.processes_count) as p:
+            with Pool(self.n_proc) as p:
                 results = p.map(self.metric_collector, suggested_cfgs)
-
-            results = map(Result.get, results)
+            results = [Result.get(x) for x in results]
 
             generated = list()
 
             for config, result in zip(suggested_cfgs, results):
-                by_objective = self.objective(result)
-                self.searcher.tell(config, by_objective)
-                self.tests_count += 1
                 generated.append(
                     (
                         list(config.data.keys()),
@@ -105,38 +96,38 @@ class Runner:
                         result
                     )
                 )
+                self.tests_count += 1
+
+                if result.state != 'OK':
+                    continue
+
+                by_objective = self.objective(result)
+                self.searcher.tell(config, by_objective)
 
             yield from generated
 
     def process(self):
         log.info("Tuning session was started.")
-        workload_args_list = "\n".join(
-            [f"  * {k}: {v}" for k, v in ENV.workload_args.items()]
+
+        progress_wrapper = track(
+            self._process_wrapper(),
+            description="tests count",
+            total=self.test_limit,
+            transient=True,
+            update_period=0.01,
         )
 
-        md = Markdown(f"""***
-* Workload: {ENV.workload_name}
-{workload_args_list}\n***""")
-
-        self.console.print(md)
-
-        # progress_wrapper = track(
-        #     self._process_wrapper(),
-        #     description="tests count",
-        #     total=ENV.test_limit,
-        #     # transient=True,
-        #     update_period=0.01,
-        # )
-
-        for suggested, cfg, run_result in self._process_wrapper():
+        for suggested, cfg, run_result in progress_wrapper:
             self.storage.insert(cfg, run_result)
-            best_config = self.storage.best_configuration(self.objective)
-            best_result = self.storage.get_result(best_config)
-            is_new_best = run_result == best_result
+
+            try:
+                best_config = self.storage.best_configuration(self.objective)
+                best_result = self.storage.get_result(best_config)
+                is_new_best = run_result == best_result
+            except BestConfigurationNotExists:
+                continue
 
             if is_new_best:
-                for plugin in self.convergence_plugins:
-                    plugin.on_new_best_result(cfg, run_result)
 
                 dumped = json.dumps(best_config.data, indent=2)
                 log.info(f"[green]New best")
@@ -150,7 +141,7 @@ class Runner:
 
         log.info("Tuning was finished.")
 
-        workload_name = ENV.workload_name.replace("/", "_").replace(":", "").replace('__', '_')
+        workload_name = self.workload_name.replace("/", "_").replace(":", "").replace('__', '_')
         dt_string = datetime.now().strftime("%d-%m-%Y_%H:%M")
         output_filename = f"{workload_name}_{dt_string}.csv"
         dataframes_folder = os.path.join(__project_folder__, "tuning_dataframes")

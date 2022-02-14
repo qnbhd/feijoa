@@ -1,5 +1,5 @@
 import datetime
-from typing import Dict, Union, Any
+from typing import Dict, Union, Any, Optional
 
 from pydantic import BaseModel
 
@@ -15,8 +15,12 @@ class Result(BaseModel):
     state: str
 
     @classmethod
-    def get(cls, metrics, state='OK'):
+    def get(cls, metrics):
         idx = getattr(cls, 'idx', 0)
+
+        state = 'OK' if all(bool(v) for v in metrics.values()) else 'ERROR'
+
+        metrics = metrics or dict()
 
         time = datetime.datetime.now()
         timestamp = datetime.datetime.timestamp(time)
@@ -28,7 +32,7 @@ class Result(BaseModel):
         return instance
 
     def __repr__(self):
-        metrics = {m: round(v, 3) for m, v in self.metrics.items()}
+        metrics = {m: (round(v, 3) if v else v) for m, v in self.metrics.items()}
         timestamp = datetime.datetime.fromtimestamp(self.timestamp)
         timestamp = timestamp.strftime('<%m/%d/%Y %H:%M:%S>')
 

@@ -20,18 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import abc
+from typing import List, Optional
 
 from polytune.models.configuration import Configuration
 
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
-    def __init__(self, **kwargs):
-        pass
 
     @abc.abstractmethod
-    def ask(self) -> Configuration:
-        raise NotImplemented()
+    def ask(self) -> Optional[List[Configuration]]:
+        raise NotImplementedError()
 
     @abc.abstractmethod
     def tell(self, suggested: Configuration, result):
-        pass
+        raise NotImplementedError()

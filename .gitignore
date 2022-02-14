@@ -161,11 +161,11 @@ cython_debug/
 /tuning_dataframes/
 
 polytune/__pycache__/
-workloads/__pycache__/
+examples/__pycache__/
 polytune/search/__pycache__/
 polytune/measurement/__pycache__/
-workloads/rosenbrock/__pycache__/
-utils/__pycache__/
+examples/rosenbrock/__pycache__/
+polytune/utils/__pycache__/
 *.pyc
 /tuning_dbs/
 /polytune/tuning_dataframes/

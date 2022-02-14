@@ -5,6 +5,10 @@ from polytune.models.result import Result
 from polytune.storages.storage import Storage
 
 
+class BestConfigurationNotExists(Exception):
+    """Raises if correct configuration does'nt exists."""
+
+
 class TinyDBStorage(Storage):
 
     def __init__(self, json_path: str):
@@ -28,9 +32,17 @@ class TinyDBStorage(Storage):
 
         for item in self.tiny_db:
             r = Result(**item['result'])
-            if objective(r) < m:
-                m = objective(r)
+            by_objective = objective(r)
+
+            if isinstance(by_objective, type(None)):
+                continue
+
+            if by_objective < m:
+                m = by_objective
                 cfg = item['configuration']
+
+        if cfg is None:
+            raise BestConfigurationNotExists
 
         return Configuration(**cfg)
 

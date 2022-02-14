@@ -19,9 +19,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import Generator, List
+import warnings
+from typing import Generator, List, Optional
 
 import sklearn.utils.fixes
+from numpy import int64, float64
 from numpy.ma import MaskedArray
 
 from polytune.search import Categorical, Integer, Real
@@ -34,18 +36,21 @@ from ...models.result import Result
 sklearn.utils.fixes.MaskedArray = MaskedArray
 import skopt
 
-import polytune.environment as ENV
-
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):
     def __init__(self, search_space: SearchSpace, **kwargs):
         super().__init__(**kwargs)
         self.skopt_space = self._make_space(search_space)
         self.optimizer_instance = skopt.Optimizer(self.skopt_space, "GBRT")
-        self.per_emit_count = ENV.processes_count
 
         self.coroutine = self._ask()
         self.coroutine.send(None)
+
+    @property
+    def per_emit_count(self):
+        warnings.warn('Now per-emit count in skopt technique implemented not correctly.'
+                      ' Per-emit count is property, return default value (1).')
+        return 1
 
     @staticmethod
     def _make_space(space: SearchSpace):
@@ -73,16 +78,28 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
             for _ in range(self.per_emit_count):
                 raw = named(self.optimizer_instance.ask())
-                cfg = Configuration(data=raw)
+
+                # FIXME (qnbhd) make correct work with numpy types
+                potentially_cfg = dict()
+
+                for k, v in raw.items():
+                    if isinstance(v, int64):
+                        v = int(v)
+                    if isinstance(v, float64):
+                        v = float(v)
+
+                    potentially_cfg[k] = v
+
+                cfg = Configuration(data=potentially_cfg)
                 asked.append(cfg)
 
             yield asked
 
-    def ask(self) -> List[Configuration]:
+    def ask(self) -> Optional[List[Configuration]]:
         try:
             return next(self.coroutine)
         except StopIteration:
-            pass
+            return None
 
     def tell(self, suggested: Configuration, result: float):
         self.optimizer_instance.tell(list(suggested.data.values()), result)
