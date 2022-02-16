@@ -29,18 +29,21 @@ from numpy.ma import MaskedArray
 from polytune.search import Categorical, Integer, Real
 from polytune.search.space import SearchSpace
 
-from ...models.configuration import Configuration
 from .algorithm import SearchAlgorithm
-from ...models.result import Result
+from ...models.experiment import ExperimentsFactory, Experiment
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 import skopt
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):
-    def __init__(self, search_space: SearchSpace, **kwargs):
+    def __init__(self, search_space: SearchSpace,
+                 experiment_factory: ExperimentsFactory, **kwargs):
+
         super().__init__(**kwargs)
+
         self.skopt_space = self._make_space(search_space)
+        self.experiment_factory = experiment_factory
         self.optimizer_instance = skopt.Optimizer(self.skopt_space, "GBRT")
 
         self.coroutine = self._ask()
@@ -90,16 +93,19 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
                     potentially_cfg[k] = v
 
-                cfg = Configuration(data=potentially_cfg)
+                cfg = self.experiment_factory.create(potentially_cfg)
                 asked.append(cfg)
 
             yield asked
 
-    def ask(self) -> Optional[List[Configuration]]:
+    def ask(self) -> Optional[List[Experiment]]:
         try:
             return next(self.coroutine)
         except StopIteration:
             return None
 
-    def tell(self, suggested: Configuration, result: float):
-        self.optimizer_instance.tell(list(suggested.data.values()), result)
+    def tell(self, experiment: Experiment):
+        self.optimizer_instance.tell(
+            list(experiment.params.values()),
+            experiment.objective_result
+        )

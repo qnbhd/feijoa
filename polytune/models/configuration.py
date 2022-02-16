@@ -3,7 +3,7 @@ import json
 
 from polytune.search.renderer import Renderer
 from polytune.search.space import SearchSpace
-from typing import Dict, Type, Union
+from typing import Type
 
 from pydantic import BaseModel
 

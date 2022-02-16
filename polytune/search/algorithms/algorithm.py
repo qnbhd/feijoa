@@ -22,15 +22,15 @@
 import abc
 from typing import List, Optional
 
-from polytune.models.configuration import Configuration
+from polytune.models.experiment import Experiment
 
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
-    def ask(self) -> Optional[List[Configuration]]:
+    def ask(self) -> Optional[List[Experiment]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def tell(self, suggested: Configuration, result):
+    def tell(self, experiment: Experiment):
         raise NotImplementedError()

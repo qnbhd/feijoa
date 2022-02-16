@@ -1,16 +1,12 @@
 import os
-import uuid
-from datetime import datetime
-from os.path import abspath, dirname
 
 import click
 
-from polytune.models.result import Result
-from polytune.runner import Runner
-from polytune.search.searcher import Searcher
-from polytune.storages.tiny import TinyDBStorage
-from polytune.utils import logging
-from examples.gcc.runner import metric_collector, METRICS, SPACE
+from polytune.jobs.job import create_job, load_job
+from polytune.models.experiment import Experiment
+from polytune.search.space import from_yaml
+from examples.rosenbrock.runner import metric_collector, METRICS
+from polytune import __project_folder__
 
 
 @click.group()
@@ -18,36 +14,54 @@ def cli():
     pass
 
 
+# @click.command()
+# @click.option("--verbose", "-v", is_flag=True)
+# @click.option("-p", 'processes', type=int, default=1)
+# def run(verbose, processes):
+#     logging.init(verbose)
+#
+#     dt_string = datetime.now().strftime("%d-%m-%Y_%H:%M")
+#
+#     tuning_dbs_folder = os.path.join(abspath(dirname(__file__)), "tuning_dbs")
+#     os.makedirs(tuning_dbs_folder, exist_ok=True)
+#     storage_path = os.path.join(tuning_dbs_folder, f'tuning_{dt_string}_{uuid.uuid4().hex}.json')
+#     storage = TinyDBStorage(storage_path)
+#
+#     searcher = Searcher(SPACE, storage)
+#
+#     def objective(x: Experiment) -> float:
+#         return x['time']
+#
+#     runner = Runner(
+#         searcher,
+#         storage,
+#         metric_collector,
+#         METRICS,
+#         objective
+#     )
+#
+#     runner.process()
+#
+
 @click.command()
-@click.option("--verbose", "-v", is_flag=True)
-@click.option("-p", 'processes', type=int, default=1)
-def run(verbose, processes):
-    logging.init(verbose)
+def run():
+    yml_file = os.path.join(__project_folder__, 'examples', 'rosenbrock', 'space.yaml')
+    space = from_yaml(yml_file)
+    # job = create_job(space, 'foo')
 
-    dt_string = datetime.now().strftime("%d-%m-%Y_%H:%M")
+    job = load_job(space, 'foo', 'foo')
+    print(job.experiments_count)
+    print(job.best_experiment)
+    exit(0)
 
-    tuning_dbs_folder = os.path.join(abspath(dirname(__file__)), "tuning_dbs")
-    os.makedirs(tuning_dbs_folder, exist_ok=True)
-    storage_path = os.path.join(tuning_dbs_folder, f'tuning_{dt_string}_{uuid.uuid4().hex}.json')
-    storage = TinyDBStorage(storage_path)
+    def objective(x: Experiment) -> float:
+        return x['x']
 
-    searcher = Searcher(SPACE, storage)
-
-    def objective(x: Result) -> float:
-        return x['time']
-
-    runner = Runner(
-        searcher,
-        storage,
-        metric_collector,
-        METRICS,
-        objective
-    )
-
-    runner.process()
+    job.do(metric_collector, objective, n_trials=10)
 
 
 cli.add_command(run)
+# cli.add_command(run_v2)
 
 if __name__ == '__main__':
     cli()

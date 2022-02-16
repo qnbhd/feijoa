@@ -23,20 +23,19 @@ import logging
 import warnings
 from typing import List, Coroutine, Optional
 
-from polytune.models.configuration import Configuration
+from polytune.models.experiment import Experiment, ExperimentsFactory
 from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from polytune.search.space import SearchSpace
-from polytune.storages.storage import Storage
 
 log = logging.getLogger(__name__)
 
 
 class Searcher:
-    def __init__(self, space: SearchSpace, storage: Storage):
+    def __init__(self, space: SearchSpace, experiments_factory: ExperimentsFactory):
         self.space = space
-        self.storage = storage
+        self.experiments_factory = experiments_factory
 
-        self.search_algorithm = SkoptBayesianAlgorithm(space)
+        self.search_algorithm = SkoptBayesianAlgorithm(space, self.experiments_factory)
 
         self.test_count = 0
         self.max_retries = 3
@@ -44,7 +43,7 @@ class Searcher:
         self.ask_coroutine = self._ask_coroutine()
         self.ask_coroutine.send(None)
 
-    def ask(self) -> Optional[List[Configuration]]:
+    def ask(self) -> Optional[List[Experiment]]:
         try:
             # noinspection PyTypeChecker
             return next(self.ask_coroutine)
@@ -59,27 +58,8 @@ class Searcher:
             if suggested_configs_list is None:
                 break
 
-            to_emit = list()
+            yield suggested_configs_list
 
-            for c in suggested_configs_list:
-                h = hash(c)
-
-                if self.storage.hash_is_exists(h):
-                    retries += 1
-                    continue
-                else:
-                    retries = 0
-
-                to_emit.append(c)
-
-            yield to_emit
-
-    def tell(self, cfg: Configuration, result) -> None:
-        h = hash(cfg)
-
-        if self.storage.hash_is_exists(h):
-            return
-
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.search_algorithm.tell(cfg, result)
+    def tell(self, experiment: Experiment) -> None:
+        warnings.warn('Searcher.tell not implemented.')
+        self.search_algorithm.tell(experiment)

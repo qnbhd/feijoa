@@ -1,11 +1,11 @@
-from polytune.models.configuration import Configuration
+from polytune.models.experiment import Experiment
 
 NAME = 'rosenbrock'
 METRICS = ('x', )
 
 
-def metric_collector(configuration: Configuration):
-    params = configuration.data
+def metric_collector(experiment: Experiment):
+    params = experiment.params
 
     x = params.get('x', 5.0)
     y = params.get('y', 5.0)
