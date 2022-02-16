@@ -1,4 +1,6 @@
-<img src="https://github.com/qnbhd/polytune/blob/main/project_logo.png" alt="drawing" width="600" height="300"/>
+<p align="center">
+  <img src="https://github.com/qnbhd/polytune/blob/main/project_logo.png" alt="drawing" width="600" height="300"/>
+</p>
 
 ## Quick links:
 ***
