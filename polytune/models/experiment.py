@@ -2,7 +2,7 @@ import datetime
 import hashlib
 import json
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from pydantic import BaseModel
 
@@ -39,7 +39,7 @@ class Experiment(BaseModel):
     hash: Optional[str]
     objective_result: Optional[Any]
     params: Dict[str, Any]
-    metrics: Dict[str, Any]
+    requestor: str
     create_timestamp: float
     finish_timestamp: Optional[float]
 
@@ -54,10 +54,9 @@ class Experiment(BaseModel):
 
     def _calculate_hash(self):
         params_dumped = json.dumps(self.params, sort_keys=True)
-        metrics_dumped = json.dumps(self.metrics, sort_keys=True)
 
         curve1 = hashlib.sha1(params_dumped.encode())
-        curve2 = hashlib.sha1(metrics_dumped.encode())
+        curve2 = hashlib.sha1(str(self.objective_result).encode())
 
         hd1 = curve1.hexdigest()
         hd2 = curve2.hexdigest()
@@ -70,17 +69,6 @@ class Experiment(BaseModel):
 
         time = datetime.datetime.now()
         self.finish_timestamp = datetime.datetime.timestamp(time)
-
-    def get_metric(self, metric_name: str):
-        try:
-            result = self.metrics.get(metric_name, None)
-        except KeyError:
-            raise MetricNotExists()
-
-        return result
-
-    def __getitem__(self, item):
-        return self.get_metric(item)
 
 
 class ExperimentsFactory:
@@ -95,6 +83,6 @@ class ExperimentsFactory:
         return Experiment(id=self.job.experiments_count + 1,
                           job_id=self.job.id,
                           state=ExperimentState.WIP,
+                          requestor='UNKNOWN',
                           create_timestamp=timestamp,
-                          metrics=dict(),
                           params=params)

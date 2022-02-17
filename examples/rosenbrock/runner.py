@@ -4,7 +4,7 @@ NAME = 'rosenbrock'
 METRICS = ('x', )
 
 
-def metric_collector(experiment: Experiment):
+def rosenbrock_objective(experiment: Experiment):
     params = experiment.params
 
     x = params.get('x', 5.0)
@@ -20,4 +20,4 @@ def metric_collector(experiment: Experiment):
     else:
         r = 2
 
-    return {'x': (1-x)**2 + (1-y)**2 + r}
+    return (1-x)**2 + (1-y)**2 + r

@@ -65,20 +65,28 @@ class Optimizer:
 
             algorithm = self.algorithms.pop(0)
 
+            # TODO (qnbhd): fix seed algorithm emitting
             print(algorithm.__class__.__name__)
 
-            with suppress(StopIteration):
+            try:
                 configs = algorithm.ask()
 
-                print('GET FROM TECHNIQUE: ', configs)
+                print(len(configs) if configs else None)
 
                 if not configs:
                     continue
+
+                print(algorithm.__class__.__name__)
+
+                for c in configs:
+                    c.requestor = algorithm.__class__.__name__
 
                 # Round Robin
                 self.algorithms.append(algorithm)
 
                 yield configs
+            except StopIteration:
+                pass
 
     def tell(self, experiment: Experiment) -> None:
         for algo in self.algorithms:

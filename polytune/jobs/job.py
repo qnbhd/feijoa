@@ -59,7 +59,7 @@ class Job:
         :return: float best value.
         """
 
-        return self.best_experiment.metrics \
+        return self.best_experiment.objective_result \
             if self.best_experiment else None
 
     @property
@@ -99,12 +99,11 @@ class Job:
         """
         return self.storage.top_experiments(self.id, n)
 
-    def do(self, metric_collector: Callable, objective: Callable,
+    def do(self, objective: Callable,
            n_trials: int = 100, n_proc: int = 1):
 
         """
 
-        :param metric_collector:
         :param objective:
         :param n_trials:
         :param n_proc:
@@ -116,6 +115,8 @@ class Job:
         if self.seeds:
             self.add_algorithm(
                 SeedAlgorithm(self.experiments_factory, *self.seeds))
+            self.add_algorithm(
+                SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
 
         if not self.optimizer.algorithms:
             self.add_algorithm(
@@ -124,6 +125,7 @@ class Job:
         for it in range(n_trials):
 
             configurations = self.ask()
+
             print(configurations)
 
             if not configurations:
@@ -132,18 +134,18 @@ class Job:
 
             # noinspection PyUnresolvedReferences
             with mp.Pool(n_proc) as p:
-                metrics_list = p.map(metric_collector, configurations)
+                results_list = p.map(objective, configurations)
 
-            print(it)
-            print(list(metrics_list))
-
-            for experiment, metrics in zip(configurations, metrics_list):
-                experiment.metrics = metrics
-                experiment.objective_result = objective(experiment)
+            for experiment, result in zip(configurations, results_list):
+                print('IN DO', experiment)
+                print(result)
+                experiment.objective_result = result
                 experiment.success_finish()
 
                 self.tell(experiment)
                 self.storage.insert_experiment(experiment)
+
+                print(experiment)
 
     def tell(self, experiment: Experiment):
         """
