@@ -171,3 +171,4 @@ polytune/utils/__pycache__/
 /polytune/tuning_dataframes/
 /examples/notebooks/*.json
 /foo.json
+/test_job_*.json
