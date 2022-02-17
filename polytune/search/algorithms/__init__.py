@@ -22,3 +22,4 @@
 
 from .algorithm import SearchAlgorithm
 from .skopt import SkoptBayesianAlgorithm
+from .seed import SeedAlgorithm

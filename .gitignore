@@ -169,3 +169,5 @@ polytune/utils/__pycache__/
 *.pyc
 /tuning_dbs/
 /polytune/tuning_dataframes/
+/examples/notebooks/*.json
+/foo.json

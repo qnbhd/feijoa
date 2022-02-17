@@ -1,8 +1,9 @@
 import random
 import warnings
-from multiprocessing import Pool
+import multiprocess as mp
 from typing import Any, Callable, List, Optional, Union
 
+from polytune.search.algorithms import SearchAlgorithm, SkoptBayesianAlgorithm, SeedAlgorithm
 from polytune.models import Experiment, ExperimentsFactory
 from polytune.search import Optimizer, SearchSpace
 from polytune.storages import Storage, TinyDBStorage
@@ -30,6 +31,9 @@ class Job:
 
         self.experiments_factory = ExperimentsFactory(self)
         self.optimizer = Optimizer(search_space, self.experiments_factory)
+        self.search_space = search_space
+
+        self.seeds = []
 
         if not self.storage.is_job_name_exists(self.name):
             self.storage.insert_job(self)
@@ -95,28 +99,43 @@ class Job:
         """
         return self.storage.top_experiments(self.id, n)
 
-    def do(self, metric_collector: Callable, objective: Callable, n_trials: int = 100):
+    def do(self, metric_collector: Callable, objective: Callable,
+           n_trials: int = 100, n_proc: int = 1):
+
         """
 
         :param metric_collector:
         :param objective:
         :param n_trials:
+        :param n_proc:
         :return:
         """
 
-        n_proc = 1
         # noinspection PyPep8Naming
+
+        if self.seeds:
+            self.add_algorithm(
+                SeedAlgorithm(self.experiments_factory, *self.seeds))
+
+        if not self.optimizer.algorithms:
+            self.add_algorithm(
+                SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
 
         for it in range(n_trials):
 
             configurations = self.ask()
+            print(configurations)
 
             if not configurations:
                 warnings.warn('No new configurations.')
                 raise Exception()
 
-            with Pool(n_proc) as p:
+            # noinspection PyUnresolvedReferences
+            with mp.Pool(n_proc) as p:
                 metrics_list = p.map(metric_collector, configurations)
+
+            print(it)
+            print(list(metrics_list))
 
             for experiment, metrics in zip(configurations, metrics_list):
                 experiment.metrics = metrics
@@ -125,7 +144,6 @@ class Job:
 
                 self.tell(experiment)
                 self.storage.insert_experiment(experiment)
-                print(experiment)
 
     def tell(self, experiment: Experiment):
         """
@@ -157,6 +175,12 @@ class Job:
         :return:
         """
         pass
+
+    def add_algorithm(self, algo: SearchAlgorithm):
+        self.optimizer.add_algorithm(algo)
+
+    def add_seed(self, seed):
+        self.seeds.append(seed)
 
 
 def create_job(search_space: SearchSpace, name: str = None,

@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import logging
-import warnings
 from contextlib import suppress
 from typing import Coroutine, List, Optional
 
@@ -40,35 +39,38 @@ class Optimizer:
     def __init__(self, space: SearchSpace, experiments_factory: ExperimentsFactory):
         self.space = space
         self.experiments_factory = experiments_factory
-
         self.algorithms: List[SearchAlgorithm] = list()
 
-        self.algorithms.append(
-            SkoptBayesianAlgorithm(space, self.experiments_factory)
-        )
-
-        self.ask_coroutine = self._ask_coroutine()
-        self.ask_coroutine.send(None)
+        self._ask_coro = None
 
     def add_algorithm(self, algo: SearchAlgorithm):
         self.algorithms.append(algo)
 
     def ask(self) -> Optional[List[Experiment]]:
+        if not self._ask_coro:
+            self._ask_coro = self._ask_coroutine()
+            self._ask_coro.send(None)
+
         try:
             # noinspection PyTypeChecker
-            return next(self.ask_coroutine)
+            return next(self._ask_coro)
         except StopIteration:
             return None
 
     def _ask_coroutine(self) -> Coroutine:
 
+        assert self.algorithms, 'Algorithms must be in list'
+
         while self.algorithms:
 
             algorithm = self.algorithms.pop(0)
 
+            print(algorithm.__class__.__name__)
+
             with suppress(StopIteration):
                 configs = algorithm.ask()
-                print(algorithm.__class__.__name__)
+
+                print('GET FROM TECHNIQUE: ', configs)
 
                 if not configs:
                     continue
@@ -79,7 +81,5 @@ class Optimizer:
                 yield configs
 
     def tell(self, experiment: Experiment) -> None:
-        warnings.warn('Searcher.tell not implemented.')
-
         for algo in self.algorithms:
             algo.tell(experiment)
