@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-import executor
 from pprint import pprint
+
+import executor
 
 if __name__ == '__main__':
     cmd = "g++-11 --help=optimizers | awk '$1 ~ /^-/ {print $1}'"

@@ -21,6 +21,14 @@
 # SOFTWARE.
 import abc
 
+__all__ = [
+    'Parameter',
+    'Integer',
+    'Real',
+    'Categorical',
+    'ParametersVisitor'
+]
+
 
 class Parameter(metaclass=abc.ABCMeta):
     def __init__(self, name: str):
@@ -73,3 +81,17 @@ class Categorical(Parameter):
 
     def accept(self, v):
         return v.visit_categorical(self)
+
+
+class ParametersVisitor:
+    def __init__(self):
+        pass
+
+    def visit_integer(self, p: Integer):
+        pass
+
+    def visit_real(self, p: Real):
+        pass
+
+    def visit_categorical(self, p: Categorical):
+        pass

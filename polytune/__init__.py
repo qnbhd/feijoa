@@ -21,8 +21,7 @@
 # SOFTWARE.
 
 import os
-from os.path import dirname, abspath
-
+from os.path import abspath, dirname
 
 __version__ = '0.1.0'
 __poly_folder__ = os.path.join(dirname(abspath(__file__)))

@@ -1,11 +1,14 @@
-import warnings
 from typing import List, Optional
 
-from tinydb import TinyDB, Query
-from tinydb.table import Table, Document
+from tinydb import Query, TinyDB
+from tinydb.table import Document
 
-from polytune.models.experiment import Experiment
-from polytune.storages.storage import StorageV2
+from polytune.models import Experiment
+from polytune.storages.storage import Storage
+
+__all__ = [
+    'TinyDBStorage'
+]
 
 
 class DBVersionException(Exception):
@@ -13,7 +16,7 @@ class DBVersionException(Exception):
 
 
 # noinspection PyTypeChecker
-class TinyDBStorageV2(StorageV2):
+class TinyDBStorage(Storage):
 
     __version__ = '0.1.0'
 
@@ -38,7 +41,7 @@ class TinyDBStorageV2(StorageV2):
     def insert_job(self, job):
         doc = {
             'name': job.name,
-            'id': job.job_id,
+            'id': job.id,
         }
         self.jobs_table.insert(doc)
 

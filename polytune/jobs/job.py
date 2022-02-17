@@ -1,13 +1,16 @@
 import random
 import warnings
 from multiprocessing import Pool
-from typing import Any, Callable, Optional, List, Union
+from typing import Any, Callable, List, Optional, Union
 
-from polytune.models.experiment import Experiment, ExperimentsFactory
-from polytune.search.searcher import Searcher
-from polytune.search.space import SearchSpace
-from polytune.storages.storage import Storage, StorageV2
-from polytune.storages.tiny import TinyDBStorageV2
+from polytune.models import Experiment, ExperimentsFactory
+from polytune.search import Optimizer, SearchSpace
+from polytune.storages import Storage, TinyDBStorage
+
+__all__ = [
+    'create_job',
+    'load_job'
+]
 
 
 class Job:
@@ -16,17 +19,17 @@ class Job:
     Facade of framework.
     """
 
-    def __init__(self, name: str, storage: StorageV2,
+    def __init__(self, name: str, storage: Storage,
                  search_space: SearchSpace, job_id: int,
                  pruners: Any = None):
 
         self.name = name
         self.storage = storage
         self.pruners = pruners
-        self.job_id = job_id
+        self.id = job_id
 
         self.experiments_factory = ExperimentsFactory(self)
-        self.optimizer = Searcher(search_space, self.experiments_factory)
+        self.optimizer = Optimizer(search_space, self.experiments_factory)
 
         if not self.storage.is_job_name_exists(self.name):
             self.storage.insert_job(self)
@@ -41,7 +44,8 @@ class Job:
         :return: the best parameters' dict.
         """
 
-        return self.best_experiment.params
+        return self.best_experiment.params \
+            if self.best_experiment else None
 
     @property
     def best_value(self) -> Optional[Any]:
@@ -51,7 +55,8 @@ class Job:
         :return: float best value.
         """
 
-        return self.best_experiment.metrics
+        return self.best_experiment.metrics \
+            if self.best_experiment else None
 
     @property
     def best_experiment(self) -> Optional[Experiment]:
@@ -61,33 +66,26 @@ class Job:
         :return: best experiment.
         """
 
-        return self.storage.best_experiment(self.job_id)
+        return self.storage.best_experiment(self.id)
 
     @property
-    def experiments(self):
+    def experiments(self) -> List[Experiment]:
         """
         Load all experiments.
 
         :return:
         """
 
-        return self.storage.get_experiments_by_job_id(self.job_id)
+        return self.storage.get_experiments_by_job_id(self.id)
 
     @property
-    def experiments_count(self):
+    def experiments_count(self) -> int:
         """
 
         :return:
         """
 
-        return self.storage.get_experiments_count(self.job_id)
-
-    def get_configurations(self):
-        """
-
-        :return:
-        """
-        pass
+        return self.storage.get_experiments_count(self.id)
 
     def top_configurations(self, n: int):
         """
@@ -95,7 +93,7 @@ class Job:
         :param n:
         :return:
         """
-        return self.storage.top_experiments(self.job_id, n)
+        return self.storage.top_experiments(self.id, n)
 
     def do(self, metric_collector: Callable, objective: Callable, n_trials: int = 100):
         """
@@ -112,6 +110,10 @@ class Job:
         for it in range(n_trials):
 
             configurations = self.ask()
+
+            if not configurations:
+                warnings.warn('No new configurations.')
+                raise Exception()
 
             with Pool(n_proc) as p:
                 metrics_list = p.map(metric_collector, configurations)
@@ -130,6 +132,7 @@ class Job:
         Finish concrete experiment.
 
         :return:
+        :raises:
         """
 
         if experiment.is_ok():
@@ -170,14 +173,14 @@ def create_job(search_space: SearchSpace, name: str = None,
     name = name or f'test_job_{random.randint(0, 9999)}'
 
     if not storage:
-        storage = TinyDBStorageV2(f'{name}.json')
+        storage = TinyDBStorage(f'{name}.json')
     else:
         if isinstance(storage, str):
-            storage = TinyDBStorageV2(f'{storage}.json')
+            storage = TinyDBStorage(f'{storage}.json')
 
     assert isinstance(name, str)
     assert isinstance(search_space, SearchSpace)
-    assert issubclass(type(storage), StorageV2)
+    assert issubclass(type(storage), Storage)
 
     if storage.is_job_name_exists(name):
         # TODO (qnbhd): refine exception type
@@ -187,7 +190,7 @@ def create_job(search_space: SearchSpace, name: str = None,
 
 
 def load_job(search_space: SearchSpace, name: str,
-             storage: Union[str, StorageV2]):
+             storage: Union[str, Storage]):
 
     """
 
@@ -198,7 +201,7 @@ def load_job(search_space: SearchSpace, name: str,
     """
 
     if isinstance(storage, str):
-        storage = TinyDBStorageV2(f'{storage}.json')
+        storage = TinyDBStorage(f'{storage}.json')
 
     job_id = storage.get_job_id_by_name(name)
 

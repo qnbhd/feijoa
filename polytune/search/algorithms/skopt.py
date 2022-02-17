@@ -23,17 +23,23 @@ import warnings
 from typing import Generator, List, Optional
 
 import sklearn.utils.fixes
-from numpy import int64, float64
+from numpy import float64, int64
 from numpy.ma import MaskedArray
 
-from polytune.search import Categorical, Integer, Real
+from polytune.models import Experiment, ExperimentsFactory
+from polytune.search.parameters import Categorical, Integer, Real
 from polytune.search.space import SearchSpace
 
-from .algorithm import SearchAlgorithm
-from ...models.experiment import ExperimentsFactory, Experiment
+from . import SearchAlgorithm
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
+# noinspection PyPackageRequirements
 import skopt
+
+
+__all__ = [
+    'SkoptBayesianAlgorithm'
+]
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):

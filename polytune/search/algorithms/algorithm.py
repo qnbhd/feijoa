@@ -22,7 +22,11 @@
 import abc
 from typing import List, Optional
 
-from polytune.models.experiment import Experiment
+from polytune.models import Experiment
+
+__all__ = [
+    'SearchAlgorithm'
+]
 
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):

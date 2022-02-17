@@ -21,27 +21,37 @@
 # SOFTWARE.
 import logging
 import warnings
-from typing import List, Coroutine, Optional
+from contextlib import suppress
+from typing import Coroutine, List, Optional
 
 from polytune.models.experiment import Experiment, ExperimentsFactory
+from polytune.search.algorithms.algorithm import SearchAlgorithm
 from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from polytune.search.space import SearchSpace
 
 log = logging.getLogger(__name__)
 
+__all__ = [
+    'Optimizer'
+]
 
-class Searcher:
+
+class Optimizer:
     def __init__(self, space: SearchSpace, experiments_factory: ExperimentsFactory):
         self.space = space
         self.experiments_factory = experiments_factory
 
-        self.search_algorithm = SkoptBayesianAlgorithm(space, self.experiments_factory)
+        self.algorithms: List[SearchAlgorithm] = list()
 
-        self.test_count = 0
-        self.max_retries = 3
+        self.algorithms.append(
+            SkoptBayesianAlgorithm(space, self.experiments_factory)
+        )
 
         self.ask_coroutine = self._ask_coroutine()
         self.ask_coroutine.send(None)
+
+    def add_algorithm(self, algo: SearchAlgorithm):
+        self.algorithms.append(algo)
 
     def ask(self) -> Optional[List[Experiment]]:
         try:
@@ -51,15 +61,25 @@ class Searcher:
             return None
 
     def _ask_coroutine(self) -> Coroutine:
-        retries = 0
-        while retries != self.max_retries:
-            suggested_configs_list = self.search_algorithm.ask()
 
-            if suggested_configs_list is None:
-                break
+        while self.algorithms:
 
-            yield suggested_configs_list
+            algorithm = self.algorithms.pop(0)
+
+            with suppress(StopIteration):
+                configs = algorithm.ask()
+                print(algorithm.__class__.__name__)
+
+                if not configs:
+                    continue
+
+                # Round Robin
+                self.algorithms.append(algorithm)
+
+                yield configs
 
     def tell(self, experiment: Experiment) -> None:
         warnings.warn('Searcher.tell not implemented.')
-        self.search_algorithm.tell(experiment)
+
+        for algo in self.algorithms:
+            algo.tell(experiment)

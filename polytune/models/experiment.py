@@ -1,14 +1,10 @@
 import datetime
+import hashlib
 import json
 from enum import Enum
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
-
-from polytune.search.renderer import Renderer
-from polytune.search.space import SearchSpace
-
-import hashlib
 
 
 class MetricNotExists(Exception):
@@ -86,18 +82,6 @@ class Experiment(BaseModel):
     def __getitem__(self, item):
         return self.get_metric(item)
 
-    def render(self, space: SearchSpace, renderer_cls: Type[Renderer]) -> str:
-        renderer = renderer_cls(self)
-
-        rendered = list()
-
-        for p_name in self.metrics.keys():
-            p = space.get_by_name(p_name)
-            result = p.accept(renderer)
-            rendered.append(result)
-
-        return " ".join(rendered)
-
 
 class ExperimentsFactory:
 
@@ -109,7 +93,7 @@ class ExperimentsFactory:
         timestamp = datetime.datetime.timestamp(time)
 
         return Experiment(id=self.job.experiments_count + 1,
-                          job_id=self.job.job_id,
+                          job_id=self.job.id,
                           state=ExperimentState.WIP,
                           create_timestamp=timestamp,
                           metrics=dict(),

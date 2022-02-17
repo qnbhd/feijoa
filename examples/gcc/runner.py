@@ -13,6 +13,43 @@
 # from executor import execute
 # from polytune.utils.os_dispatch import UnknownOsException
 #
+
+# def render(self, space: SearchSpace, renderer_cls: Type[Renderer]) -> str:
+#     renderer = renderer_cls(self)
+#
+#     rendered = list()
+#
+#     for p_name in self.metrics.keys():
+#         p = space.get_by_name(p_name)
+#         result = p.accept(renderer)
+#         rendered.append(result)
+#
+#     return " ".join(rendered)
+# class Renderer(ParametersVisitor):
+#     def __init__(self, cfg):
+#         super().__init__()
+#         self.config = cfg
+#
+#     def get_value(self, param: Parameter) -> Union[str, float]:
+#         value = self.config.data[param.name]
+#         return value
+#
+#     def visit_common(self, p: Parameter) -> str:
+#         value = self.get_value(p)
+#         return f"{p.name}{value}"
+#
+#     def visit_integer(self, p: Integer):
+#         return self.visit_common(p)
+#
+#     def visit_real(self, p: Real) -> str:
+#         return self.visit_common(p)
+#
+#     def visit_categorical(self, p: Categorical, **kwargs) -> str:
+#         value = self.get_value(p)
+#         if value:
+#             return f"{value}"
+#         return ''
+
 #
 # NAME = 'gcc'
 # METRICS = ('time', 'compile_time', 'size')

@@ -1,29 +1,14 @@
+import abc
 from typing import List, Optional
 
-from polytune.jobs.job import Experiment
+from polytune.models import Experiment
+
+__all__ = [
+    'Storage'
+]
 
 
-class Storage:
-    def insert(self, cfg, result):
-        raise NotImplementedError()
-
-    def hash_is_exists(self, h):
-        raise NotImplementedError()
-
-    def best_configuration(self, objective):
-        raise NotImplementedError()
-
-    def get_result(self, cfg):
-        raise NotImplementedError()
-
-    def results_list(self):
-        raise NotImplementedError()
-
-
-import abc
-
-
-class StorageV2(metaclass=abc.ABCMeta):
+class Storage(metaclass=abc.ABCMeta):
 
     def insert_job(self, job):
         """

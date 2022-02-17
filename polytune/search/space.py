@@ -1,10 +1,13 @@
 from pprint import pformat
-from typing import Union, List
+from typing import List, Union
 
 import yaml
 
-from polytune.search import ParameterFactory
-from polytune.search.parameters import Categorical, Real, Parameter
+from polytune.search.parameters import Categorical, Integer, Parameter, Real
+
+__all__ = [
+    'SearchSpace'
+]
 
 
 class SearchSpace:
@@ -22,6 +25,28 @@ class SearchSpace:
     def __repr__(self) -> str:
         representation = pformat(self.params).replace("\n", "\n\t")
         return f"SearchSpace(\n\t{representation}\n)"
+
+
+class ArgExpectedException(BaseException):
+    """Raises if some arg expected, but not founded."""
+
+
+def ParameterFactory(**kwargs):
+    param_signature = kwargs["signature"]
+
+    if kwargs["type"] == "integer":
+        param_potentially_range = kwargs.get('range', None)
+        if param_potentially_range is not None:
+            low, high = param_potentially_range
+        else:
+            low, high = kwargs['low'], kwargs['high']
+        return Integer(param_signature, low=low, high=high)
+    elif kwargs["type"] == "real":
+        return Real(param_signature, low=kwargs["low"], high=kwargs["high"])
+    elif kwargs["type"] == "categorical":
+        return Categorical(param_signature, choices=kwargs["choices"])
+
+    raise TypeError()
 
 
 def from_yaml(yaml_file: str) -> SearchSpace:

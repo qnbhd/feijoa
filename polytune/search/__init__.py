@@ -19,45 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from itertools import chain
-from typing import Any, Dict
-
-from polytune.search.parameters import Categorical, Integer, Real
-
-_RegisteredTypes: Dict[str, Any] = dict()
-
-
-def register_type(type_name, type_cls, *aliases):
-    for name in chain(type_name, aliases):
-        _RegisteredTypes[name] = type_cls
-
-
-register_type("integer", Integer, "int")
-register_type("real", Real, "real")
-register_type("categorical", Categorical, "categorical")
-
-
-def build_type_cls(name: str):
-    return _RegisteredTypes[name]
-
-
-class ArgExpectedException(BaseException):
-    """Raises if some arg expected, but not founded."""
-
-
-def ParameterFactory(**kwargs):
-    param_signature = kwargs["signature"]
-
-    if kwargs["type"] == "integer":
-        param_potentially_range = kwargs.get('range', None)
-        if param_potentially_range is not None:
-            low, high = param_potentially_range
-        else:
-            low, high = kwargs['low'], kwargs['high']
-        return Integer(param_signature, low=low, high=high)
-    elif kwargs["type"] == "real":
-        return Real(param_signature, low=kwargs["low"], high=kwargs["high"])
-    elif kwargs["type"] == "categorical":
-        return Categorical(param_signature, choices=kwargs["choices"])
-
-    raise TypeError()
+from .optimizer import Optimizer
+from .parameters import Categorical, Integer, ParametersVisitor, Real
+from .space import SearchSpace

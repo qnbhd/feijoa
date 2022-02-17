@@ -2,11 +2,11 @@ import os
 
 import click
 
-from polytune.jobs.job import create_job, load_job
+from examples.rosenbrock.runner import METRICS, metric_collector
+from polytune import __project_folder__
+from polytune.jobs import create_job, load_job
 from polytune.models.experiment import Experiment
 from polytune.search.space import from_yaml
-from examples.rosenbrock.runner import metric_collector, METRICS
-from polytune import __project_folder__
 
 
 @click.group()
@@ -47,12 +47,12 @@ def cli():
 def run():
     yml_file = os.path.join(__project_folder__, 'examples', 'rosenbrock', 'space.yaml')
     space = from_yaml(yml_file)
-    # job = create_job(space, 'foo')
+    job = create_job(space, 'foo')
 
-    job = load_job(space, 'foo', 'foo')
-    print(job.experiments_count)
-    print(job.best_experiment)
-    exit(0)
+    # job = load_job(space, 'foo', 'foo')
+    # print(job.experiments_count)
+    # print(job.best_experiment)
+    # exit(0)
 
     def objective(x: Experiment) -> float:
         return x['x']
