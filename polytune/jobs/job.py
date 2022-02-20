@@ -1,9 +1,13 @@
 import random
 import warnings
-import multiprocess as mp
-from typing import Any, Callable, List, Optional, Union
+from itertools import repeat
+import pandas as pd
 
-from polytune.search.algorithms import SearchAlgorithm, SkoptBayesianAlgorithm, SeedAlgorithm
+import multiprocess as mp
+from typing import Any, Callable, List, Optional, Union, Type
+
+from polytune.search.algorithms import SearchAlgorithm, SkoptBayesianAlgorithm, SeedAlgorithm, get_algo, RandomSearch, \
+    GridSearch
 from polytune.models import Experiment, ExperimentsFactory
 from polytune.search import Optimizer, SearchSpace
 from polytune.storages import Storage, TinyDBStorage
@@ -100,13 +104,15 @@ class Job:
         return self.storage.top_experiments(self.id, n)
 
     def do(self, objective: Callable,
-           n_trials: int = 100, n_proc: int = 1):
+           n_trials: int = 100, n_proc: int = 1,
+           algo_list: List[Union[str, Type[SearchAlgorithm]]] = None):
 
         """
 
         :param objective:
         :param n_trials:
         :param n_proc:
+        :param algo_list
         :return:
         """
 
@@ -115,37 +121,60 @@ class Job:
         if self.seeds:
             self.add_algorithm(
                 SeedAlgorithm(self.experiments_factory, *self.seeds))
+
+        if not algo_list:
             self.add_algorithm(
                 SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+        else:
+            for algo in algo_list:
+                if isinstance(algo, str):
+                    algo_cls = get_algo(algo)
+                elif issubclass(algo, SearchAlgorithm):
+                    algo_cls = algo
+                else:
+                    # TODO (qnbhd): Refine exception type
+                    raise Exception()
 
-        if not self.optimizer.algorithms:
-            self.add_algorithm(
-                SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+                if algo_cls == SkoptBayesianAlgorithm:
+                    self.add_algorithm(
+                        SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+                elif algo_cls == RandomSearch:
+                    self.add_algorithm(
+                        RandomSearch(self.search_space, self.experiments_factory)
+                    )
+                elif algo_cls == GridSearch:
+                    self.add_algorithm(
+                        GridSearch(self.search_space, self.experiments_factory)
+                    )
+                else:
+                    raise Exception()
 
-        for it in range(n_trials):
+        trials = 0
+
+        while trials < n_trials:
 
             configurations = self.ask()
 
-            print(configurations)
-
             if not configurations:
                 warnings.warn('No new configurations.')
-                raise Exception()
+                # TODO (qnbhd): make closing
+                break
+
+            trials += len(configurations)
 
             # noinspection PyUnresolvedReferences
             with mp.Pool(n_proc) as p:
-                results_list = p.map(objective, configurations)
+                results = p.map(objective, configurations)
 
-            for experiment, result in zip(configurations, results_list):
-                print('IN DO', experiment)
-                print(result)
-                experiment.objective_result = result
+            # Applying result
+            for experiment, result in zip(configurations, results):
+                experiment.apply(result)
+
+            # Finishing
+            for experiment in configurations:
                 experiment.success_finish()
-
                 self.tell(experiment)
                 self.storage.insert_experiment(experiment)
-
-                print(experiment)
 
     def tell(self, experiment: Experiment):
         """
@@ -156,6 +185,7 @@ class Job:
         """
 
         if experiment.is_ok():
+            self.experiments_factory.experiment_is_done()
             self.optimizer.tell(experiment)
             return
 
@@ -177,6 +207,19 @@ class Job:
         :return:
         """
         pass
+
+    @property
+    def dataframe(self):
+
+        container = []
+
+        for experiment in self.experiments:
+            dataframe_dict = experiment.dict()
+            metrics = dataframe_dict.pop('params')
+
+            container.append({**dataframe_dict, **metrics})
+
+        return pd.DataFrame(container)
 
     def add_algorithm(self, algo: SearchAlgorithm):
         self.optimizer.add_algorithm(algo)

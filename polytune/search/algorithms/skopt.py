@@ -52,14 +52,13 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
         self.experiment_factory = experiment_factory
         self.optimizer_instance = skopt.Optimizer(self.skopt_space, "GBRT")
 
-        self.coroutine = self._ask()
-        self.coroutine.send(None)
+        self.ask_generator = self._ask()
 
     @property
     def per_emit_count(self):
         warnings.warn('Now per-emit count in skopt technique implemented not correctly.'
                       ' Per-emit count is property, return default value (1).')
-        return 1
+        return 2
 
     @staticmethod
     def _make_space(space: SearchSpace):
@@ -106,7 +105,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
     def ask(self) -> Optional[List[Experiment]]:
         try:
-            return next(self.coroutine)
+            return next(self.ask_generator)
         except StopIteration:
             return None
 

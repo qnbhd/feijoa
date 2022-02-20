@@ -1,6 +1,7 @@
 import datetime
 import hashlib
 import json
+from asyncio import Queue
 from enum import Enum
 from typing import Any, Dict, Optional, Union
 
@@ -46,6 +47,10 @@ class Experiment(BaseModel):
     def __repr__(self):
         return f'Experiment({json.dumps(self.dict(), indent=4)})'
 
+    def apply(self, result):
+        # TODO (qnbhd): make safe operations
+        self.objective_result = result
+
     def __str__(self):
         return repr(self)
 
@@ -75,14 +80,24 @@ class ExperimentsFactory:
 
     def __init__(self, job):
         self.job = job
+        self.pending_experiments = 0
 
     def create(self, params):
         time = datetime.datetime.now()
         timestamp = datetime.datetime.timestamp(time)
 
-        return Experiment(id=self.job.experiments_count + 1,
-                          job_id=self.job.id,
-                          state=ExperimentState.WIP,
-                          requestor='UNKNOWN',
-                          create_timestamp=timestamp,
-                          params=params)
+        result = Experiment(
+            id=self.job.experiments_count + self.pending_experiments + 1,
+            job_id=self.job.id,
+            state=ExperimentState.WIP,
+            requestor='UNKNOWN',
+            create_timestamp=timestamp,
+            params=params
+        )
+
+        self.pending_experiments += 1
+
+        return result
+
+    def experiment_is_done(self):
+        self.pending_experiments -= 1

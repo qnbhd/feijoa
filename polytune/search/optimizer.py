@@ -21,7 +21,7 @@
 # SOFTWARE.
 import logging
 from contextlib import suppress
-from typing import Coroutine, List, Optional
+from typing import Coroutine, List, Optional, Generator
 
 from polytune.models.experiment import Experiment, ExperimentsFactory
 from polytune.search.algorithms.algorithm import SearchAlgorithm
@@ -41,23 +41,22 @@ class Optimizer:
         self.experiments_factory = experiments_factory
         self.algorithms: List[SearchAlgorithm] = list()
 
-        self._ask_coro = None
+        self._ask_generator = None
 
     def add_algorithm(self, algo: SearchAlgorithm):
         self.algorithms.append(algo)
 
     def ask(self) -> Optional[List[Experiment]]:
-        if not self._ask_coro:
-            self._ask_coro = self._ask_coroutine()
-            self._ask_coro.send(None)
+        if not self._ask_generator:
+            self._ask_generator = self._ask_coroutine()
 
         try:
             # noinspection PyTypeChecker
-            return next(self._ask_coro)
+            return next(self._ask_generator)
         except StopIteration:
             return None
 
-    def _ask_coroutine(self) -> Coroutine:
+    def _ask_coroutine(self) -> Generator:
 
         assert self.algorithms, 'Algorithms must be in list'
 
@@ -65,18 +64,11 @@ class Optimizer:
 
             algorithm = self.algorithms.pop(0)
 
-            # TODO (qnbhd): fix seed algorithm emitting
-            print(algorithm.__class__.__name__)
-
             try:
                 configs = algorithm.ask()
 
-                print(len(configs) if configs else None)
-
                 if not configs:
                     continue
-
-                print(algorithm.__class__.__name__)
 
                 for c in configs:
                     c.requestor = algorithm.__class__.__name__

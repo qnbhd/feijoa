@@ -35,14 +35,18 @@ class Parameter(metaclass=abc.ABCMeta):
         self.name = name
 
     def __repr__(self):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def __str__(self):
-        raise NotImplemented
+        return repr(self)
 
     @abc.abstractmethod
     def accept(self, v):
-        raise NotImplemented()
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def seed(self):
+        raise NotImplementedError()
 
 
 class Integer(Parameter):
@@ -57,6 +61,9 @@ class Integer(Parameter):
     def accept(self, v):
         return v.visit_integer(self)
 
+    def seed(self):
+        return self.low
+
 
 class Real(Parameter):
     def __init__(self, name: str, *, low: float, high: float):
@@ -70,10 +77,14 @@ class Real(Parameter):
     def accept(self, v):
         return v.visit_real(self)
 
+    def seed(self):
+        return self.low
+
 
 class Categorical(Parameter):
     def __init__(self, name: str, *, choices):
         super().__init__(name)
+        assert choices
         self.choices = choices
 
     def __repr__(self):
@@ -82,16 +93,20 @@ class Categorical(Parameter):
     def accept(self, v):
         return v.visit_categorical(self)
 
+    def seed(self):
+        return self.choices[0]
 
-class ParametersVisitor:
-    def __init__(self):
-        pass
 
+class ParametersVisitor(metaclass=abc.ABCMeta):
+
+    @abc.abstractmethod
     def visit_integer(self, p: Integer):
-        pass
+        raise NotImplementedError()
 
+    @abc.abstractmethod
     def visit_real(self, p: Real):
-        pass
+        raise NotImplementedError()
 
+    @abc.abstractmethod
     def visit_categorical(self, p: Categorical):
-        pass
+        raise NotImplementedError()

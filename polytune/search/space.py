@@ -26,6 +26,9 @@ class SearchSpace:
         representation = pformat(self.params).replace("\n", "\n\t")
         return f"SearchSpace(\n\t{representation}\n)"
 
+    def __iter__(self):
+        return iter(self.params)
+
 
 class ArgExpectedException(BaseException):
     """Raises if some arg expected, but not founded."""

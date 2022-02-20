@@ -23,3 +23,37 @@
 from .algorithm import SearchAlgorithm
 from .skopt import SkoptBayesianAlgorithm
 from .seed import SeedAlgorithm
+from .randomized import RandomSearch
+from .grid import GridSearch
+
+registry = {}
+
+
+def register(algo_name, algo_cls, *algo_aliases):
+    registry[algo_name] = algo_cls
+
+    for alias in algo_aliases:
+        registry[alias] = algo_cls
+
+
+register('skopt', SkoptBayesianAlgorithm,
+         'Skopt', 'Bayesian')
+register('seed', SeedAlgorithm,
+         'Seed')
+register('random', RandomSearch,
+         'Random', 'RandomSearch')
+register('grid', GridSearch,
+         'Grid', 'GridSearch')
+
+
+class NoAlgoFoundedException(Exception):
+    """Raises if algo not founded."""
+
+
+def get_algo(algo_name):
+    algo = registry.get(algo_name, None)
+
+    if not algo:
+        raise NoAlgoFoundedException()
+
+    return algo

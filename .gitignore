@@ -172,3 +172,4 @@ polytune/utils/__pycache__/
 /examples/notebooks/*.json
 /foo.json
 /test_job_*.json
+examples/gcc/*.out
