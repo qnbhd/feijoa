@@ -21,7 +21,7 @@
 # SOFTWARE.
 import logging
 from contextlib import suppress
-from typing import Coroutine, List, Optional, Generator
+from typing import List, Optional, Generator
 
 from polytune.models.experiment import Experiment, ExperimentsFactory
 from polytune.search.algorithms.algorithm import SearchAlgorithm
@@ -48,7 +48,7 @@ class Optimizer:
 
     def ask(self) -> Optional[List[Experiment]]:
         if not self._ask_generator:
-            self._ask_generator = self._ask_coroutine()
+            self._ask_generator = self._ask_generator()
 
         try:
             # noinspection PyTypeChecker
@@ -56,7 +56,7 @@ class Optimizer:
         except StopIteration:
             return None
 
-    def _ask_coroutine(self) -> Generator:
+    def _ask_generator(self) -> Generator:
 
         assert self.algorithms, 'Algorithms must be in list'
 

@@ -15,6 +15,9 @@ __all__ = [
 
 
 class GridMaker(ParametersVisitor):
+    """
+
+    """
 
     EPS = 0.1
 
@@ -66,8 +69,10 @@ class GridSearch(SearchAlgorithm):
                     break
 
                 cfg = {
-                    h.name: v for h, v in zip(self.search_space, generation)
+                    h.name: v
+                    for h, v in zip(self.search_space, generation)
                 }
+
                 cfgs.append(self.experiments_factory.create(cfg))
 
             if not cfgs:
