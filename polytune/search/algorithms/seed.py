@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import List, Optional
 
-from polytune.search.algorithms import SearchAlgorithm
 from polytune.models import Experiment
+from polytune.search.algorithms import SearchAlgorithm
 
 
 class SeedAlgorithm(SearchAlgorithm):

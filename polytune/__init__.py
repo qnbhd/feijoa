@@ -29,8 +29,8 @@ __project_folder__ = dirname(__poly_folder__)
 
 from .jobs import create_job, load_job
 from .models import Experiment
-from .search.algorithms import SearchAlgorithm, SkoptBayesianAlgorithm, SeedAlgorithm
-from .search import Integer, Real, Categorical
-from .search import SearchSpace
+from .search import Categorical, Integer, Real, SearchSpace
+from .search.algorithms import (SearchAlgorithm, SeedAlgorithm,
+                                SkoptBayesianAlgorithm, GridSearch,
+                                RandomSearch)
 from .storages import Storage, TinyDBStorage
-

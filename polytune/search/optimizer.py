@@ -20,12 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import logging
-from contextlib import suppress
-from typing import List, Optional, Generator
+from typing import Generator, List, Optional
 
 from polytune.models.experiment import Experiment, ExperimentsFactory
 from polytune.search.algorithms.algorithm import SearchAlgorithm
-from polytune.search.algorithms.skopt import SkoptBayesianAlgorithm
 from polytune.search.space import SearchSpace
 
 log = logging.getLogger(__name__)
@@ -36,19 +34,46 @@ __all__ = [
 
 
 class Optimizer:
-    def __init__(self, space: SearchSpace, experiments_factory: ExperimentsFactory):
+
+    """
+    Experiment's optimizer class.
+
+    Optimizer has two main methods:
+
+    Parameters:
+        - space
+        - experiments_factory
+    """
+
+    def __init__(
+        self,
+        space: SearchSpace,
+        experiments_factory: ExperimentsFactory
+    ):
         self.space = space
         self.experiments_factory = experiments_factory
         self.algorithms: List[SearchAlgorithm] = list()
-
         self._ask_generator = None
 
     def add_algorithm(self, algo: SearchAlgorithm):
+        """
+        Append algorithm to algorithms list.
+
+        :param algo: search algorithm instance.
+        :return: None
+        """
+
         self.algorithms.append(algo)
 
     def ask(self) -> Optional[List[Experiment]]:
-        if not self._ask_generator:
-            self._ask_generator = self._ask_generator()
+        """
+        Optimizer experiments ask method.
+
+        :return: list of experiments or None if
+                 no new experiments available.
+        """
+
+        self._ask_generator = self._ask_generator or self._ask()
 
         try:
             # noinspection PyTypeChecker
@@ -56,7 +81,7 @@ class Optimizer:
         except StopIteration:
             return None
 
-    def _ask_generator(self) -> Generator:
+    def _ask(self) -> Generator:
 
         assert self.algorithms, 'Algorithms must be in list'
 
@@ -81,5 +106,7 @@ class Optimizer:
                 pass
 
     def tell(self, experiment: Experiment) -> None:
+        """Tell results to all search algorithms"""
+
         for algo in self.algorithms:
             algo.tell(experiment)

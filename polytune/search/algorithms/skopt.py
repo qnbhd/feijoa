@@ -36,7 +36,6 @@ sklearn.utils.fixes.MaskedArray = MaskedArray
 # noinspection PyPackageRequirements
 import skopt
 
-
 __all__ = [
     'SkoptBayesianAlgorithm'
 ]

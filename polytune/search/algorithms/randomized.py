@@ -1,10 +1,11 @@
+import random
 import warnings
-from typing import Optional, List
+from typing import List, Optional
 
 from polytune.models.experiment import Experiment
-from polytune.search.parameters import Categorical, Real, Integer, ParametersVisitor
 from polytune.search.algorithms import SearchAlgorithm
-import random
+from polytune.search.parameters import (Categorical, Integer,
+                                        ParametersVisitor, Real)
 
 __all__ = [
     'RandomSearch'

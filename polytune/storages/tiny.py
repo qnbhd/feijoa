@@ -3,16 +3,13 @@ from typing import List, Optional
 from tinydb import Query, TinyDB
 from tinydb.table import Document
 
+from polytune.exceptions import DBVersionError
 from polytune.models import Experiment
 from polytune.storages.storage import Storage
 
 __all__ = [
     'TinyDBStorage'
 ]
-
-
-class DBVersionException(Exception):
-    """Raises if version isn't correct."""
 
 
 # noinspection PyTypeChecker
@@ -33,7 +30,7 @@ class TinyDBStorage(Storage):
             ver_record, *_ = db_version_table.all()
             ver = ver_record['version']
             if ver < self.version:
-                raise DBVersionException()
+                raise DBVersionError()
 
         self.jobs_table = self.tiny_db.table('job')
         self.experiments_table = self.tiny_db.table('experiment')

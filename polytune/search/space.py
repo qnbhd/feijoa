@@ -1,3 +1,4 @@
+import warnings
 from pprint import pformat
 from typing import List, Union
 
@@ -26,15 +27,29 @@ class SearchSpace:
         representation = pformat(self.params).replace("\n", "\n\t")
         return f"SearchSpace(\n\t{representation}\n)"
 
+    def __str__(self):
+        return repr(self)
+
     def __iter__(self):
         return iter(self.params)
 
+    @classmethod
+    def from_yaml(cls, yaml_file):
+        """Load search space from yaml file."""
 
-class ArgExpectedException(BaseException):
-    """Raises if some arg expected, but not founded."""
+        with open(yaml_file) as f:
+            space_dumped = yaml.safe_load(f)
+
+        space = SearchSpace()
+
+        for p in space_dumped:
+            loaded = parameter_factory(**p)
+            space.add_parameter(loaded)
+
+        return space
 
 
-def ParameterFactory(**kwargs):
+def parameter_factory(**kwargs):
     param_signature = kwargs["signature"]
 
     if kwargs["type"] == "integer":
@@ -53,13 +68,19 @@ def ParameterFactory(**kwargs):
 
 
 def from_yaml(yaml_file: str) -> SearchSpace:
+    """Load search space from yaml file."""
+
+    warnings.warn('Function `from_yaml` is deprecated.'
+                  'Use SearchSpace.from_yaml instead.',
+                  DeprecationWarning)
+
     with open(yaml_file) as f:
         space_dumped = yaml.safe_load(f)
 
     space = SearchSpace()
 
     for p in space_dumped:
-        loaded = ParameterFactory(**p)
+        loaded = parameter_factory(**p)
         space.add_parameter(loaded)
 
     return space

@@ -1,15 +1,19 @@
 import random
 import warnings
+from datetime import datetime
 from itertools import repeat
-import pandas as pd
+from typing import Any, Callable, List, Optional, Type, Union
 
 import multiprocess as mp
-from typing import Any, Callable, List, Optional, Union, Type
+import pandas as pd
 
-from polytune.search.algorithms import SearchAlgorithm, SkoptBayesianAlgorithm, SeedAlgorithm, get_algo, RandomSearch, \
-    GridSearch
+from polytune.exceptions import DuplicatedJobError, JobNotFoundError, ExperimentNotFinishedError, \
+    SearchAlgorithmNotFoundedError
 from polytune.models import Experiment, ExperimentsFactory
 from polytune.search import Optimizer, SearchSpace
+from polytune.search.algorithms import (GridSearch, RandomSearch,
+                                        SearchAlgorithm, SeedAlgorithm,
+                                        SkoptBayesianAlgorithm, get_algo)
 from polytune.storages import Storage, TinyDBStorage
 
 __all__ = [
@@ -108,12 +112,11 @@ class Job:
            algo_list: List[Union[str, Type[SearchAlgorithm]]] = None):
 
         """
-
-        :param objective:
-        :param n_trials:
-        :param n_proc:
-        :param algo_list
-        :return:
+        :param objective: objective function
+        :param n_trials: count of max trials.
+        :param n_proc: max number of processes.
+        :param algo_list: chosen search algorithm's list.
+        :return: None
         """
 
         # noinspection PyPep8Naming
@@ -128,13 +131,15 @@ class Job:
         else:
             for algo in algo_list:
                 if isinstance(algo, str):
-                    algo_cls = get_algo(algo)
+                    try:
+                        algo_cls = get_algo(algo)
+                    except SearchAlgorithmNotFoundedError:
+                        raise SearchAlgorithmNotFoundedError()
                 elif issubclass(algo, SearchAlgorithm):
                     algo_cls = algo
-                else:
-                    # TODO (qnbhd): Refine exception type
-                    raise Exception()
 
+                # TODO (qnbhd): fix 'Local variable 'algo_cls'
+                #  might be referenced before assignment'
                 if algo_cls == SkoptBayesianAlgorithm:
                     self.add_algorithm(
                         SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
@@ -147,7 +152,7 @@ class Job:
                         GridSearch(self.search_space, self.experiments_factory)
                     )
                 else:
-                    raise Exception()
+                    raise SearchAlgorithmNotFoundedError()
 
         trials = 0
 
@@ -189,8 +194,7 @@ class Job:
             self.optimizer.tell(experiment)
             return
 
-        # TODO (qnbhd): refine exception type
-        raise Exception()
+        raise ExperimentNotFinishedError()
 
     def ask(self) -> Optional[List[Experiment]]:
         """
@@ -216,6 +220,11 @@ class Job:
         for experiment in self.experiments:
             dataframe_dict = experiment.dict()
             metrics = dataframe_dict.pop('params')
+            dataframe_dict['create_timestamp'] = \
+                datetime.fromtimestamp(dataframe_dict['create_timestamp'])
+
+            dataframe_dict['finish_timestamp'] = \
+                datetime.fromtimestamp(dataframe_dict['finish_timestamp'])
 
             container.append({**dataframe_dict, **metrics})
 
@@ -252,8 +261,7 @@ def create_job(search_space: SearchSpace, name: str = None,
     assert issubclass(type(storage), Storage)
 
     if storage.is_job_name_exists(name):
-        # TODO (qnbhd): refine exception type
-        raise Exception()
+        raise DuplicatedJobError(f'Job {name} is already exists.')
 
     return Job(name, storage, search_space, storage.jobs_count + 1)
 
@@ -275,8 +283,7 @@ def load_job(search_space: SearchSpace, name: str,
     job_id = storage.get_job_id_by_name(name)
 
     if not job_id:
-        # TODO (qnbhd): refine exception type
-        raise Exception()
+        raise JobNotFoundError(f'Job {name} not found is storage.')
 
     experiments = storage.get_experiments_by_job_id(job_id)
 

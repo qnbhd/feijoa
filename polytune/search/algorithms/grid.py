@@ -1,13 +1,13 @@
 import warnings
 from itertools import product
-from typing import Optional, List, Generator
+from typing import List, Optional
 
 import numpy
 
 from polytune.models.experiment import Experiment
-from polytune.search.parameters import Categorical, Real, Integer, ParametersVisitor, Parameter
 from polytune.search.algorithms import SearchAlgorithm
-import random
+from polytune.search.parameters import (Categorical, Integer,
+                                        ParametersVisitor, Real)
 
 __all__ = [
     'GridSearch'

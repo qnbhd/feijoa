@@ -8,10 +8,6 @@ from typing import Any, Dict, Optional, Union
 from pydantic import BaseModel
 
 
-class MetricNotExists(Exception):
-    """Raises if metric not in result"""
-
-
 class ExperimentState(str, Enum):
     OK = 'OK'
     WIP = 'WIP'
