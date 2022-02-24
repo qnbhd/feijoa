@@ -47,11 +47,15 @@ class Experiment(BaseModel):
         # TODO (qnbhd): make safe operations
         self.objective_result = result
 
+    def set_error(self):
+        self.state = ExperimentState.ERROR
+
     def __str__(self):
         return repr(self)
 
-    def is_ok(self):
-        return self.state == ExperimentState.OK
+    def is_finished(self):
+        return self.state == ExperimentState.OK or \
+               self.state == ExperimentState.ERROR
 
     def _calculate_hash(self):
         params_dumped = json.dumps(self.params, sort_keys=True)
@@ -66,6 +70,13 @@ class Experiment(BaseModel):
 
     def success_finish(self):
         self.state = ExperimentState.OK
+        self.hash = self._calculate_hash()
+
+        time = datetime.datetime.now()
+        self.finish_timestamp = datetime.datetime.timestamp(time)
+
+    def error_finish(self):
+        self.state = ExperimentState.ERROR
         self.hash = self._calculate_hash()
 
         time = datetime.datetime.now()

@@ -107,6 +107,10 @@ class Job:
         """
         return self.storage.top_experiments(self.id, n)
 
+    def setup_default_algo(self):
+        self.add_algorithm(
+            SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+
     def do(self, objective: Callable,
            n_trials: int = 100, n_proc: int = 1,
            algo_list: List[Union[str, Type[SearchAlgorithm]]] = None):
@@ -141,16 +145,19 @@ class Job:
                 # TODO (qnbhd): fix 'Local variable 'algo_cls'
                 #  might be referenced before assignment'
                 if algo_cls == SkoptBayesianAlgorithm:
+
                     self.add_algorithm(
                         SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+
                 elif algo_cls == RandomSearch:
+
                     self.add_algorithm(
-                        RandomSearch(self.search_space, self.experiments_factory)
-                    )
+                        RandomSearch(self.search_space, self.experiments_factory))
+
                 elif algo_cls == GridSearch:
+
                     self.add_algorithm(
-                        GridSearch(self.search_space, self.experiments_factory)
-                    )
+                        GridSearch(self.search_space, self.experiments_factory))
                 else:
                     raise SearchAlgorithmNotFoundedError()
 
@@ -179,7 +186,6 @@ class Job:
             for experiment in configurations:
                 experiment.success_finish()
                 self.tell(experiment)
-                self.storage.insert_experiment(experiment)
 
     def tell(self, experiment: Experiment):
         """
@@ -189,9 +195,10 @@ class Job:
         :raises:
         """
 
-        if experiment.is_ok():
+        if experiment.is_finished():
             self.experiments_factory.experiment_is_done()
             self.optimizer.tell(experiment)
+            self.storage.insert_experiment(experiment)
             return
 
         raise ExperimentNotFinishedError()

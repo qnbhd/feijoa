@@ -1,5 +1,6 @@
 import click
-from polytune import create_job, Experiment, SearchSpace, Real
+
+from polytune import Experiment, Real, SearchSpace, create_job
 
 
 @click.group()

@@ -25,6 +25,7 @@ mypy = "^0.931"
 types-PyYAML = "^6.0.4"
 pydeps = "^1.10.12"
 isort = "^5.10.1"
+yapf = "^0.32.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
