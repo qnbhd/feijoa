@@ -3,6 +3,7 @@ import hashlib
 import json
 from asyncio import Queue
 from enum import Enum
+from functools import partial
 from typing import Any, Dict, Optional, Union
 
 from pydantic import BaseModel
@@ -40,18 +41,12 @@ class Experiment(BaseModel):
     create_timestamp: float
     finish_timestamp: Optional[float]
 
-    def __repr__(self):
-        return f'Experiment({json.dumps(self.dict(), indent=4)})'
-
     def apply(self, result):
         # TODO (qnbhd): make safe operations
         self.objective_result = result
 
     def set_error(self):
         self.state = ExperimentState.ERROR
-
-    def __str__(self):
-        return repr(self)
 
     def is_finished(self):
         return self.state == ExperimentState.OK or \
@@ -68,19 +63,24 @@ class Experiment(BaseModel):
 
         return hd1 + hd2
 
-    def success_finish(self):
-        self.state = ExperimentState.OK
+    def _finish(self, state):
+        self.state = state
         self.hash = self._calculate_hash()
 
         time = datetime.datetime.now()
         self.finish_timestamp = datetime.datetime.timestamp(time)
+
+    def success_finish(self):
+        self._finish(ExperimentState.OK)
 
     def error_finish(self):
-        self.state = ExperimentState.ERROR
-        self.hash = self._calculate_hash()
+        self._finish(ExperimentState.ERROR)
 
-        time = datetime.datetime.now()
-        self.finish_timestamp = datetime.datetime.timestamp(time)
+    def __repr__(self):
+        return f'Experiment({json.dumps(self.dict(), indent=4)})'
+
+    def __str__(self):
+        return repr(self)
 
 
 class ExperimentsFactory:
@@ -95,11 +95,8 @@ class ExperimentsFactory:
 
         result = Experiment(
             id=self.job.experiments_count + self.pending_experiments + 1,
-            job_id=self.job.id,
-            state=ExperimentState.WIP,
-            requestor='UNKNOWN',
-            create_timestamp=timestamp,
-            params=params
+            job_id=self.job.id, state=ExperimentState.WIP,
+            requestor='UNKNOWN', create_timestamp=timestamp, params=params
         )
 
         self.pending_experiments += 1

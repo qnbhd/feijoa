@@ -56,7 +56,7 @@ class Integer(Parameter):
         self.high = high
 
     def __repr__(self):
-        return f"Integer {self.name}: [{self.low}, {self.high}]"
+        return f"Integer('{self.name}, low={self.low}, high={self.high})"
 
     def accept(self, v):
         return v.visit_integer(self)
@@ -72,7 +72,7 @@ class Real(Parameter):
         self.high = high
 
     def __repr__(self):
-        return f"Real {self.name}: [{self.low}, {self.high}]"
+        return f"Real('{self.name}', {self.low=}, {self.high=}]"
 
     def accept(self, v):
         return v.visit_real(self)
@@ -88,7 +88,7 @@ class Categorical(Parameter):
         self.choices = choices
 
     def __repr__(self):
-        return f"Categorical {self.name}: [{self.choices}]"
+        return f"Categorical('{self.name}', choices={self.choices})"
 
     def accept(self, v):
         return v.visit_categorical(self)

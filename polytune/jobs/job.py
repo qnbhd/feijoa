@@ -1,7 +1,27 @@
+# MIT License
+#
+# Copyright (c) 2021 Templin Konstantin
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 import random
 import warnings
 from datetime import datetime
-from itertools import repeat
 from typing import Any, Callable, List, Optional, Type, Union
 
 import multiprocess as mp
@@ -83,7 +103,7 @@ class Job:
     @property
     def experiments(self) -> List[Experiment]:
         """
-        Load all experiments.
+        Get all experiments.
 
         :return:
         """
@@ -99,12 +119,14 @@ class Job:
 
         return self.storage.get_experiments_count(self.id)
 
-    def top_configurations(self, n: int):
+    def top_experiments(self, n: int):
+        """
+        Get top-n experiments by objective.
+
+        :param n: max number of experiments.
+        :return: list of experiments
         """
 
-        :param n:
-        :return:
-        """
         return self.storage.top_experiments(self.id, n)
 
     def setup_default_algo(self):
@@ -205,7 +227,7 @@ class Job:
 
     def ask(self) -> Optional[List[Experiment]]:
         """
-
+        Ask for a new experiment.
         :return:
         """
 
@@ -227,10 +249,10 @@ class Job:
         for experiment in self.experiments:
             dataframe_dict = experiment.dict()
             metrics = dataframe_dict.pop('params')
-            dataframe_dict['create_timestamp'] = \
+            dataframe_dict['create_time'] = \
                 datetime.fromtimestamp(dataframe_dict['create_timestamp'])
 
-            dataframe_dict['finish_timestamp'] = \
+            dataframe_dict['finish_time'] = \
                 datetime.fromtimestamp(dataframe_dict['finish_timestamp'])
 
             container.append({**dataframe_dict, **metrics})

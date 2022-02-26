@@ -19,15 +19,17 @@ from polytune import create_job, Experiment, SearchSpace, Real
 from math import sin
 
 space = SearchSpace()
-space.add_parameter(Real('x', low=0.0, high=2.0))
-space.add_parameter(Real('y', low=0.0, high=2.0))
+space.insert(Real('x', low=0.0, high=2.0))
+space.insert(Real('y', low=0.0, high=2.0))
+
 
 def objective(experiment: Experiment):
     x = experiment.params.get('x')
     y = experiment.params.get('y')
 
-    return sin(x*y)
-    
+    return sin(x * y)
+
+
 job.do(objective)
 
 

@@ -11,8 +11,8 @@ def cli():
 @click.command()
 def run():
     space = SearchSpace()
-    space.add_parameter(Real('x', low=0.0, high=1.0))
-    space.add_parameter(Real('y', low=0.0, high=1.0))
+    space.insert(Real('x', low=0.0, high=1.0))
+    space.insert(Real('y', low=0.0, high=1.0))
 
     def objective(experiment: Experiment):
         params = experiment.params
