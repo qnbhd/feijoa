@@ -29,7 +29,7 @@ def objective(experiment: Experiment):
 
     return sin(x * y)
 
-
+job = create_job(space)
 job.do(objective)
 
 
