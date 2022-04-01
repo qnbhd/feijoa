@@ -15,7 +15,7 @@ jobs:
         id: setup-python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
+          python-version: 3.9.9
       #----------------------------------------------
       #  -----  install & configure poetry  -----
       #----------------------------------------------
@@ -46,11 +46,23 @@ jobs:
       #----------------------------------------------
       - name: Install library
         run: poetry install --no-interaction
+      - name: Install tree
+        run: sudo apt-get install -y tree
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
-      - name: Run tests
+      - name: Run python tests
         run: |
           source .venv/bin/activate
           pytest tests/
-          coverage report
+      - name: Run functional tests
+        run: |
+          source .venv/bin/activate
+          cd examples/gcc
+          python runner.py
+          tree
+      - name: Archive gcc runner db
+        uses: actions/upload-artifact@v3
+        with:
+          name: GCC example tiny db
+          path: examples/gcc/*.json

@@ -55,9 +55,12 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
     @property
     def per_emit_count(self):
-        warnings.warn('Now per-emit count in skopt technique implemented not correctly.'
-                      ' Per-emit count is property, return default value (1).')
-        return 2
+        is_warned = getattr(self, '_warned', False)
+        if not is_warned:
+            warnings.warn('Now per-emit count in skopt technique implemented not correctly.'
+                          ' Per-emit count is property, return default value (1).')
+            setattr(self, '_warned', True)
+        return 1
 
     @staticmethod
     def _make_space(space: SearchSpace):

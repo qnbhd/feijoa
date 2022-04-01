@@ -90,7 +90,12 @@ def parameter_factory(**kwargs):
             low, high = kwargs['low'], kwargs['high']
         return Integer(param_signature, low=low, high=high)
     elif kwargs["type"] == "real":
-        return Real(param_signature, low=kwargs["low"], high=kwargs["high"])
+        param_potentially_range = kwargs.get('range', None)
+        if param_potentially_range is not None:
+            low, high = param_potentially_range
+        else:
+            low, high = kwargs['low'], kwargs['high']
+        return Real(param_signature, low=low, high=high)
     elif kwargs["type"] == "categorical":
         return Categorical(param_signature, choices=kwargs["choices"])
 
