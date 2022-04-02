@@ -249,11 +249,15 @@ class Job:
         for experiment in self.experiments:
             dataframe_dict = experiment.dict()
             metrics = dataframe_dict.pop('params')
+
             dataframe_dict['create_time'] = \
                 datetime.fromtimestamp(dataframe_dict['create_timestamp'])
 
             dataframe_dict['finish_time'] = \
                 datetime.fromtimestamp(dataframe_dict['finish_timestamp'])
+
+            del dataframe_dict['create_timestamp']
+            del dataframe_dict['finish_timestamp']
 
             container.append({**dataframe_dict, **metrics})
 

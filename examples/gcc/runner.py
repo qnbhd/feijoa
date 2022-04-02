@@ -118,10 +118,10 @@ def metric_collector(experiment: Experiment) -> dict[str, float]:
     system_name = platform.system()
 
     if system_name == 'Linux':
-        compile_cmd = f'time -f \'%e\' g++ -o' \
+        compile_cmd = f'/usr/bin/time -f \'%e\' g++ -o' \
                       f' {binary_out} {SOURCE_FILE} {rendered} 2>&1'
 
-        run_cmd = f'time -f \'%e\' {binary_out} 2>&1'
+        run_cmd = f'/usr/bin/time -f \'%e\' {binary_out} 2>&1'
 
     elif system_name == 'Darwin':
         # gnu-time is required
