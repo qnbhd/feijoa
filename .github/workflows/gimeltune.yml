@@ -56,14 +56,26 @@ jobs:
       - name: Run python tests
         run: |
           source .venv/bin/activate
-          pytest tests/
+          pytest --cov=gimeltune --cov-report=xml tests/
+          
+
       - name: Run functional tests
         run: |
           source .venv/bin/activate
           cd examples/gcc
           python runner.py
+          
+
       - name: Archive gcc runner db
         uses: actions/upload-artifact@v3
         with:
           name: GCC example tiny db
           path: examples/gcc/*.json
+
+          
+      - name: Publish codecov report
+        uses: codecov/codecov-action@v1
+        if: matrix.python-version == '3.9'
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
