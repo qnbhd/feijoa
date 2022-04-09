@@ -25,7 +25,7 @@ import os
 import platform
 import random
 from os.path import abspath, dirname
-from typing import Type, Union
+from typing import Type, Union, Dict
 
 import numpy
 
@@ -106,7 +106,7 @@ def run_command(command: str):
     return decoded
 
 
-def metric_collector(experiment: Experiment) -> dict[str, float]:
+def metric_collector(experiment: Experiment) -> Dict[str, float]:
     rendered = render(experiment, SPACE, GccRenderer)
 
     config_hash = hashlib.sha256(str(hash(experiment.json())).encode()).hexdigest()
