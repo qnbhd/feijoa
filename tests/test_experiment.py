@@ -44,3 +44,15 @@ def test_experiment():
     assert hashlib.sha1(params_dumped.encode()).hexdigest() == params_part
     assert hashlib.sha1(str(ex1.objective_result).encode()).hexdigest() == objective_part
 
+    ex2 = Experiment(
+        id=0, job_id=0, state=ExperimentState.WIP,
+        requestor='foo', create_timestamp=0.0,
+        params={'x': 0.0, 'y': 1.0}
+    )
+
+    ex2.set_error()
+    assert ex2.state == ExperimentState.ERROR
+
+    ex2.error_finish()
+    assert ex2.finish_timestamp
+

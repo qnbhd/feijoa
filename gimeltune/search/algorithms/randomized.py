@@ -39,7 +39,7 @@ class Randomizer(ParametersVisitor):
         return random.randint(p.low, p.high)
 
     def visit_real(self, p: Real):
-        return p.high * random.random() + p.low
+        return (p.high - p.low) * random.random() + p.low
 
     def visit_categorical(self, p: Categorical):
         return random.choice(p.choices)

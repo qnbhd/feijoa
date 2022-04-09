@@ -68,3 +68,9 @@ class ExperimentNotFinishedError(GimeltuneError):
     was not completed. To complete the experiment,
     you must call the .success_finish() method
     """
+
+
+class ParametersIncorrectInputValues(GimeltuneError):
+    """
+    Raises if incorrect values passed to parameter's constructor.
+    """

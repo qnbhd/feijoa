@@ -29,6 +29,8 @@ __all__ = [
     'ParametersVisitor'
 ]
 
+from gimeltune.exceptions import ParametersIncorrectInputValues
+
 
 class Parameter(metaclass=abc.ABCMeta):
     def __init__(self, name: str):
@@ -52,6 +54,12 @@ class Parameter(metaclass=abc.ABCMeta):
 class Integer(Parameter):
     def __init__(self, name: str, *, low: int, high: int):
         super().__init__(name)
+
+        if not isinstance(low, int) or not isinstance(high, int):
+            raise ParametersIncorrectInputValues('Low and High bounds for'
+                                                 ' Integer parameter'
+                                                 ' must be ints.')
+
         self.low = low
         self.high = high
 
@@ -68,6 +76,12 @@ class Integer(Parameter):
 class Real(Parameter):
     def __init__(self, name: str, *, low: float, high: float):
         super().__init__(name)
+
+        if not isinstance(low, float) or not isinstance(high, float):
+            raise ParametersIncorrectInputValues('Low and High bounds for'
+                                                 ' Float parameter'
+                                                 ' must be floats.')
+
         self.low = low
         self.high = high
 
@@ -84,7 +98,10 @@ class Real(Parameter):
 class Categorical(Parameter):
     def __init__(self, name: str, *, choices):
         super().__init__(name)
-        assert choices
+
+        if not choices:
+            raise ParametersIncorrectInputValues('Choices for Categorical'
+                                                 ' parameter must be not empty.')
         self.choices = choices
 
     def __repr__(self):

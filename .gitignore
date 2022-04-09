@@ -174,3 +174,5 @@ gimeltune/utils/__pycache__/
 /test_job_*.json
 examples/gcc/*.out
 examples/gcc/*.json
+/tests/test_job*.json
+.DS_Store

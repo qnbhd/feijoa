@@ -39,11 +39,12 @@ class SearchSpace:
         self.name2param = dict()
 
     def insert(self, p: Parameter) -> None:
+        # TODO (qnbhd): make duplication check
         self.params.append(p)
         self.name2param[p.name] = p
 
     def get(self, item: str, default=None):
-        return self.name2param.get(item, default=default)
+        return self.name2param.get(item, default)
 
     def __repr__(self) -> str:
         buff = ['SearchSpace:']
