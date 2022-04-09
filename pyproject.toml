@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "gimeltune"
-version = "0.1.0"
+version = "0.2.0"
 description = "Hyperparameter's optimization framework"
 authors = ["Konstantin Templin <1qnbhd@gmail.com>"]
 
