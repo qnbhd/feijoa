@@ -1,8 +1,12 @@
 [tool.poetry]
 name = "gimeltune"
-version = "0.2.0"
+version = "0.2.1"
 description = "Hyperparameter's optimization framework"
 authors = ["Konstantin Templin <1qnbhd@gmail.com>"]
+readme = "README.md"
+repository = "https://github.com/qnbhd/gimeltune"
+keywords = ["hyperparameters", "BBO", "optimization", "autotuning"]
+license = "GPL-3.0"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"

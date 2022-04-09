@@ -1,16 +1,20 @@
-<p align="center">
-  <img src="https://github.com/qnbhd/gimeltune/blob/main/project_logo.png" alt="drawing" width="600" height="300"/>
-</p>
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gimeltune) ![PyPI](https://img.shields.io/pypi/v/gimeltune)
 
-## Quick links:
-***
+Gimeltune is a Python framework for hyperparameter's optimization.
 
-a b c d e f g e 
+The Gimeltune API is very easy to use, effective for optimizing machine learning algorithms and various software. Gimeltune contains many different use cases.
 
-## Introduction:
-***
+## Compatibility
 
-a b c d e f g e 
+Gimeltune works with Linux and OS X. Requires Python 3.8 or later.
+
+Gimeltune works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
+
+# Installing
+
+Install with `pip` or your favourite PyPI package manager.
+
+`python -m pip install gimeltune`
 
 ## Code example:
 
@@ -32,10 +36,7 @@ def objective(experiment: Experiment):
 job = create_job(space)
 job.do(objective)
 
-
+df = job.dataframe
+print(df)
 ```
 
-## Features:
-***
-
-a b c d e f g e 
