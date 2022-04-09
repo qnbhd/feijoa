@@ -4,6 +4,10 @@ on: pull_request
 
 jobs:
   test:
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10" ]
     runs-on: ubuntu-latest
     steps:
       #----------------------------------------------
@@ -11,11 +15,11 @@ jobs:
       #----------------------------------------------
       - name: Check out repository
         uses: actions/checkout@v2
-      - name: Set up python
+      - name: Set up python ${{ matrix.python-version }}
         id: setup-python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9.7
+          python-version: ${{ matrix.python-version }}
       #----------------------------------------------
       #  -----  install & configure poetry  -----
       #----------------------------------------------
@@ -34,7 +38,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry_backup.lock') }}
       #----------------------------------------------
       # install dependencies if cache does not exist
       #----------------------------------------------
@@ -46,8 +50,6 @@ jobs:
       #----------------------------------------------
       - name: Install library
         run: poetry install --no-interaction
-      - name: Install tree
-        run: sudo apt-get install -y tree
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
@@ -60,7 +62,6 @@ jobs:
           source .venv/bin/activate
           cd examples/gcc
           python runner.py
-          tree
       - name: Archive gcc runner db
         uses: actions/upload-artifact@v3
         with:
