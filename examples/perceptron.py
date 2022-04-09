@@ -4,8 +4,8 @@ import numpy
 import numpy as np
 import plotly.express as px
 
-from polytune import create_job, SearchSpace, load_job
-from polytune.utils import logging
+from gimeltune import create_job, SearchSpace, load_job
+from gimeltune.utils import logging
 from itertools import tee
 
 

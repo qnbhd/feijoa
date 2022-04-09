@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/qnbhd/polytune/blob/main/project_logo.png" alt="drawing" width="600" height="300"/>
+  <img src="https://github.com/qnbhd/gimeltune/blob/main/project_logo.png" alt="drawing" width="600" height="300"/>
 </p>
 
 ## Quick links:
@@ -15,7 +15,7 @@ a b c d e f g e
 ## Code example:
 
 ```python
-from polytune import create_job, Experiment, SearchSpace, Real
+from gimeltune import create_job, Experiment, SearchSpace, Real
 from math import sin
 
 space = SearchSpace()

@@ -19,51 +19,38 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import random
 import warnings
-from itertools import product
 from typing import List, Optional
 
-import numpy
-
-from polytune.models.experiment import Experiment
-from polytune.search.algorithms import SearchAlgorithm
-from polytune.search.parameters import (Categorical, Integer,
+from gimeltune.models.experiment import Experiment
+from gimeltune.search.algorithms import SearchAlgorithm
+from gimeltune.search.parameters import (Categorical, Integer,
                                         ParametersVisitor, Real)
 
 __all__ = [
-    'GridSearch'
+    'RandomSearch'
 ]
 
 
-class GridMaker(ParametersVisitor):
-    """
-
-    """
-
-    EPS = 0.1
+class Randomizer(ParametersVisitor):
 
     def visit_integer(self, p: Integer):
-        return range(p.low, p.high)
+        return random.randint(p.low, p.high)
 
     def visit_real(self, p: Real):
-        return numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS)
+        return p.high * random.random() + p.low
 
     def visit_categorical(self, p: Categorical):
-        return p.choices
+        return random.choice(p.choices)
 
 
-class GridSearch(SearchAlgorithm):
+class RandomSearch(SearchAlgorithm):
 
     def __init__(self, search_space, experiments_factory):
         self.search_space = search_space
         self.experiments_factory = experiments_factory
-
-        grids = [
-            p.accept(GridMaker())
-            for p in self.search_space.params
-        ]
-
-        self.prod_iter = product(*grids)
+        self.randomizer = Randomizer()
 
     @property
     def per_emit_count(self):
@@ -83,21 +70,15 @@ class GridSearch(SearchAlgorithm):
 
             cfgs = []
 
-            for i in range(self.per_emit_count):
-                try:
-                    generation = next(self.prod_iter)
-                except StopIteration:
-                    break
+            for _ in range(self.per_emit_count):
 
-                cfg = {
-                    h.name: v
-                    for h, v in zip(self.search_space, generation)
-                }
+                cfg = dict()
 
-                cfgs.append(self.experiments_factory.create(cfg))
+                for p in self.search_space:
+                    cfg[p.name] = p.accept(self.randomizer)
 
-            if not cfgs:
-                yield None
+                prepared = self.experiments_factory.create(cfg)
+                cfgs.append(prepared)
 
             yield cfgs
 

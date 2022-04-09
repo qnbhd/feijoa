@@ -22,9 +22,9 @@
 import logging
 from typing import Generator, List, Optional
 
-from polytune.models.experiment import Experiment, ExperimentsFactory
-from polytune.search.algorithms.algorithm import SearchAlgorithm
-from polytune.search.space import SearchSpace
+from gimeltune.models.experiment import Experiment, ExperimentsFactory
+from gimeltune.search.algorithms.algorithm import SearchAlgorithm
+from gimeltune.search.space import SearchSpace
 
 log = logging.getLogger(__name__)
 

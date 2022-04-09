@@ -1,4 +1,4 @@
-from polytune.models.experiment import Experiment
+from gimeltune.models.experiment import Experiment
 
 NAME = 'rosenbrock'
 METRICS = ('x', )

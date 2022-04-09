@@ -1,4 +1,4 @@
-from polytune.search import SearchSpace
+from gimeltune.search import SearchSpace
 
 
 def test_space_from_yaml():
