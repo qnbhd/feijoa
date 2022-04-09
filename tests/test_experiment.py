@@ -1,8 +1,8 @@
 import hashlib
 import json
 
-from polytune import Experiment
-from polytune.models.experiment import ExperimentState
+from gimeltune import Experiment
+from gimeltune.models.experiment import ExperimentState
 
 
 def test_experiment():

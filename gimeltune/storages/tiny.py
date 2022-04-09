@@ -24,9 +24,9 @@ from typing import List, Optional
 from tinydb import Query, TinyDB
 from tinydb.table import Document
 
-from polytune.exceptions import DBVersionError
-from polytune.models import Experiment
-from polytune.storages.storage import Storage
+from gimeltune.exceptions import DBVersionError
+from gimeltune.models import Experiment
+from gimeltune.storages.storage import Storage
 
 __all__ = [
     'TinyDBStorage'

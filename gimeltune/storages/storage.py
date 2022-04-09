@@ -22,7 +22,7 @@
 import abc
 from typing import List, Optional
 
-from polytune.models import Experiment
+from gimeltune.models import Experiment
 
 __all__ = [
     'Storage'

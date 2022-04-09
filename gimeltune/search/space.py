@@ -24,7 +24,7 @@ from typing import List
 
 import yaml
 
-from polytune.search.parameters import Categorical, Integer, Parameter, Real
+from gimeltune.search.parameters import Categorical, Integer, Parameter, Real
 
 __all__ = [
     'SearchSpace'

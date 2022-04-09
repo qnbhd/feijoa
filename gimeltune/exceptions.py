@@ -19,22 +19,52 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import abc
-from typing import List, Optional
-
-from polytune.models import Experiment
 
 __all__ = [
-    'SearchAlgorithm'
+    'DBVersionError',
+    'SearchAlgorithmNotFoundedError',
+    'DuplicatedJobError',
+    'JobNotFoundError',
+    'ExperimentNotFinishedError',
 ]
 
 
-class SearchAlgorithm(metaclass=abc.ABCMeta):
+class GimeltuneError(Exception):
+    """Common class for gimeltune exceptions."""
 
-    @abc.abstractmethod
-    def ask(self) -> Optional[List[Experiment]]:
-        raise NotImplementedError()
 
-    @abc.abstractmethod
-    def tell(self, experiment: Experiment):
-        raise NotImplementedError()
+class DBVersionError(GimeltuneError):
+    """
+    Raises if the loaded storage version
+    does not match the current version
+    """
+
+
+class SearchAlgorithmNotFoundedError(GimeltuneError):
+    """
+    Raises if the chosen search algorithm
+    not founded.
+    """
+
+
+class DuplicatedJobError(GimeltuneError):
+    """
+    Raises if the specified job name already
+    exists in the storage.
+    """
+
+
+class JobNotFoundError(GimeltuneError):
+    """
+    Raises if the specified job name not
+    exists in the storage.
+    """
+
+
+class ExperimentNotFinishedError(GimeltuneError):
+    """
+    Raises if an attempt was made to inform
+    the search algorithms that the experiment
+    was not completed. To complete the experiment,
+    you must call the .success_finish() method
+    """

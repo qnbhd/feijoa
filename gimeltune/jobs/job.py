@@ -27,14 +27,14 @@ from typing import Any, Callable, List, Optional, Type, Union
 import multiprocess as mp
 import pandas as pd
 
-from polytune.exceptions import DuplicatedJobError, JobNotFoundError, ExperimentNotFinishedError, \
+from gimeltune.exceptions import DuplicatedJobError, JobNotFoundError, ExperimentNotFinishedError, \
     SearchAlgorithmNotFoundedError
-from polytune.models import Experiment, ExperimentsFactory
-from polytune.search import Optimizer, SearchSpace
-from polytune.search.algorithms import (GridSearch, RandomSearch,
+from gimeltune.models import Experiment, ExperimentsFactory
+from gimeltune.search import Optimizer, SearchSpace
+from gimeltune.search.algorithms import (GridSearch, RandomSearch,
                                         SearchAlgorithm, SeedAlgorithm,
                                         SkoptBayesianAlgorithm, get_algo)
-from polytune.storages import Storage, TinyDBStorage
+from gimeltune.storages import Storage, TinyDBStorage
 
 __all__ = [
     'create_job',

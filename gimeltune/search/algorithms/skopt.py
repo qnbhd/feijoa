@@ -26,9 +26,9 @@ import sklearn.utils.fixes
 from numpy import float64, int64
 from numpy.ma import MaskedArray
 
-from polytune.models import Experiment, ExperimentsFactory
-from polytune.search.parameters import Categorical, Integer, Real
-from polytune.search.space import SearchSpace
+from gimeltune.models import Experiment, ExperimentsFactory
+from gimeltune.search.parameters import Categorical, Integer, Real
+from gimeltune.search.space import SearchSpace
 
 from . import SearchAlgorithm
 

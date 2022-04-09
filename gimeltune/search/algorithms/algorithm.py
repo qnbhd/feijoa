@@ -19,35 +19,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import abc
 from typing import List, Optional
 
-from polytune.models import Experiment
-from polytune.search.algorithms import SearchAlgorithm
+from gimeltune.models import Experiment
+
+__all__ = [
+    'SearchAlgorithm'
+]
 
 
-class SeedAlgorithm(SearchAlgorithm):
+class SearchAlgorithm(metaclass=abc.ABCMeta):
 
-    def __init__(self, experiments_factory, *seeds):
-        self.experiments_factory = experiments_factory
-        self.seeds: list = list(seeds)
-        self.is_emitted = False
-
-    def add_seed(self, seed: dict):
-        self.seeds.append(seed)
-
+    @abc.abstractmethod
     def ask(self) -> Optional[List[Experiment]]:
+        raise NotImplementedError()
 
-        if not self.is_emitted:
-            cfgs = [
-                self.experiments_factory.create(seed)
-                for seed in self.seeds
-            ]
-            self.is_emitted = True
-            return cfgs
-        else:
-            return None
-
+    @abc.abstractmethod
     def tell(self, experiment: Experiment):
-        # Tell no needed
-        pass
-
+        raise NotImplementedError()

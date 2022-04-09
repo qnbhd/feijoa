@@ -1,6 +1,6 @@
 import click
 
-from polytune import Experiment, Real, SearchSpace, create_job
+from gimeltune import Experiment, Real, SearchSpace, create_job
 
 
 @click.group()

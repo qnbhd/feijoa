@@ -29,11 +29,11 @@ from typing import Type, Union
 
 import numpy
 
-from polytune import create_job
-from polytune.models.experiment import Experiment
-from polytune.search.parameters import ParametersVisitor, Parameter, Integer, Real, Categorical
-from polytune.search.space import from_yaml, SearchSpace
-from polytune.utils.logging import init
+from gimeltune import create_job
+from gimeltune.models.experiment import Experiment
+from gimeltune.search.parameters import ParametersVisitor, Parameter, Integer, Real, Categorical
+from gimeltune.search.space import from_yaml, SearchSpace
+from gimeltune.utils.logging import init
 from executor import execute
 
 init(verbose=True)

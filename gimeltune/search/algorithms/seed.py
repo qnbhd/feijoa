@@ -19,52 +19,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from typing import List, Optional
 
-__all__ = [
-    'DBVersionError',
-    'SearchAlgorithmNotFoundedError',
-    'DuplicatedJobError',
-    'JobNotFoundError',
-    'ExperimentNotFinishedError',
-]
+from gimeltune.models import Experiment
+from gimeltune.search.algorithms import SearchAlgorithm
 
 
-class PolytuneError(Exception):
-    """Common class for polytune exceptions."""
+class SeedAlgorithm(SearchAlgorithm):
 
+    def __init__(self, experiments_factory, *seeds):
+        self.experiments_factory = experiments_factory
+        self.seeds: list = list(seeds)
+        self.is_emitted = False
 
-class DBVersionError(PolytuneError):
-    """
-    Raises if the loaded storage version
-    does not match the current version
-    """
+    def add_seed(self, seed: dict):
+        self.seeds.append(seed)
 
+    def ask(self) -> Optional[List[Experiment]]:
 
-class SearchAlgorithmNotFoundedError(PolytuneError):
-    """
-    Raises if the chosen search algorithm
-    not founded.
-    """
+        if not self.is_emitted:
+            cfgs = [
+                self.experiments_factory.create(seed)
+                for seed in self.seeds
+            ]
+            self.is_emitted = True
+            return cfgs
+        else:
+            return None
 
+    def tell(self, experiment: Experiment):
+        # Tell no needed
+        pass
 
-class DuplicatedJobError(PolytuneError):
-    """
-    Raises if the specified job name already
-    exists in the storage.
-    """
-
-
-class JobNotFoundError(PolytuneError):
-    """
-    Raises if the specified job name not
-    exists in the storage.
-    """
-
-
-class ExperimentNotFinishedError(PolytuneError):
-    """
-    Raises if an attempt was made to inform
-    the search algorithms that the experiment
-    was not completed. To complete the experiment,
-    you must call the .success_finish() method
-    """
