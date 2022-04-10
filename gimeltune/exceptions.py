@@ -26,6 +26,8 @@ __all__ = [
     'DuplicatedJobError',
     'JobNotFoundError',
     'ExperimentNotFinishedError',
+    'ParametersIncorrectInputValues',
+    'InsertExperimentWithTheExistedId',
 ]
 
 
