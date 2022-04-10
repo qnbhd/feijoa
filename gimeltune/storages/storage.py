@@ -115,7 +115,7 @@ class Storage(metaclass=abc.ABCMeta):
 
         return min(experiments, key=lambda x: x.objective_result)
 
-    def top_experiments(self, job_id, n) -> Optional[List[Experiment]]:
+    def top_experiments(self, job_id, n) -> List[Experiment]:
         """
 
         :param job_id:
@@ -125,12 +125,8 @@ class Storage(metaclass=abc.ABCMeta):
 
         experiments = self.get_experiments_by_job_id(job_id)
 
-        # TODO (qnbhd): Optional??
-        if not experiments:
-            return None
-
         experiments.sort(key=lambda x: x.objective_result)
-        return experiments[:min(len(experiments) - 1, n)]
+        return experiments[:min(len(experiments), n)]
 
     @property
     @abc.abstractmethod

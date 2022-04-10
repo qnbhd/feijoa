@@ -105,3 +105,4 @@ class ExperimentsFactory:
 
     def experiment_is_done(self):
         self.pending_experiments -= 1
+        assert self.pending_experiments >= 0

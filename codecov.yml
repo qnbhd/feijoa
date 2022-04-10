@@ -1,0 +1,2 @@
+ignore:
+  - "gimeltune/utils/logging.py"

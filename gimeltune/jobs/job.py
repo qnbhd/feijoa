@@ -161,6 +161,9 @@ class Job:
                         algo_cls = get_algo(algo)
                     except SearchAlgorithmNotFoundedError:
                         raise SearchAlgorithmNotFoundedError()
+                elif isinstance(algo, SearchAlgorithm):
+                    self.add_algorithm(algo)
+                    continue
                 elif issubclass(algo, SearchAlgorithm):
                     algo_cls = algo
 
@@ -225,6 +228,9 @@ class Job:
 
         raise ExperimentNotFinishedError()
 
+    def _tell_for_loaded(self, experiment: Experiment):
+        self.optimizer.tell(experiment)
+
     def ask(self) -> Optional[List[Experiment]]:
         """
         Ask for a new experiment.
@@ -232,14 +238,6 @@ class Job:
         """
 
         return self.optimizer.ask()
-
-    def export(self, format_: str = ''):
-        """
-
-        :param format_:
-        :return:
-        """
-        pass
 
     @property
     def dataframe(self):
@@ -323,6 +321,7 @@ def load_job(search_space: SearchSpace, name: str,
     job = Job(name, storage, search_space, job_id)
 
     for experiment in experiments:
-        job.tell(experiment)
+        # noinspection PyProtectedMember
+        job._tell_for_loaded(experiment)
 
     return job

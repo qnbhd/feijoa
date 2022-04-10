@@ -24,7 +24,7 @@ from typing import List, Optional
 from tinydb import Query, TinyDB
 from tinydb.table import Document
 
-from gimeltune.exceptions import DBVersionError
+from gimeltune.exceptions import DBVersionError, InsertExperimentWithTheExistedId
 from gimeltune.models import Experiment
 from gimeltune.storages.storage import Storage
 
@@ -81,11 +81,19 @@ class TinyDBStorage(Storage):
 
     def insert_experiment(self, experiment):
         doc = experiment.dict()
+
+        if self.get_experiment_by_id(experiment.id):
+            # TODO (qnbhd): make correct exception
+            raise InsertExperimentWithTheExistedId()
+
         self.experiments_table.insert(doc)
 
     def get_experiment_by_id(self, experiment_id):
         q = self.experiments_table.search(Query().id == experiment_id)
-        assert len(q) == 1
+
+        if not q:
+            return None
+
         exp = q[0]
         return Experiment(**exp)
 
@@ -107,3 +115,6 @@ class TinyDBStorage(Storage):
     @property
     def version(self):
         return self.__version__
+
+    def close(self):
+        self.tiny_db.close()
