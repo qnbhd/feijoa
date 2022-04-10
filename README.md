@@ -1,4 +1,4 @@
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gimeltune) ![PyPI](https://img.shields.io/pypi/v/gimeltune) [![codecov](https://codecov.io/gh/qnbhd/gimeltune/branch/main/graph/badge.svg)](https://codecov.io/gh/qnbhd/gimeltune)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gimeltune?style=for-the-badge) ![PyPI](https://img.shields.io/pypi/v/gimeltune?style=for-the-badge) ![Codecov](https://img.shields.io/codecov/c/github/qnbhd/gimeltune?style=for-the-badge)
 
 Gimeltune is a Python framework for hyperparameter's optimization.
 
