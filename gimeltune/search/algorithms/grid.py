@@ -73,7 +73,6 @@ class GridSearch(SearchAlgorithm):
     def ask(self) -> Optional[List[Experiment]]:
         return next(self._ask())
 
-
     def _ask(self):
 
         while True:

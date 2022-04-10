@@ -74,3 +74,10 @@ class ParametersIncorrectInputValues(GimeltuneError):
     """
     Raises if incorrect values passed to parameter's constructor.
     """
+
+
+class InsertExperimentWithTheExistedId(GimeltuneError):
+    """
+    Raises if the specified experiment with current id
+    is already exists in db storage.
+    """

@@ -9,6 +9,7 @@ def objective(experiment: Experiment):
 
 
 def test_skopt():
+    # noinspection DuplicatedCode
     space = SearchSpace()
 
     space.insert(Real(f'x', low=0.0, high=5.0))
