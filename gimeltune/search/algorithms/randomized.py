@@ -58,11 +58,7 @@ class RandomSearch(SearchAlgorithm):
         return 1
 
     def ask(self) -> Optional[List[Experiment]]:
-
-        try:
-            return next(self._ask())
-        except StopIteration:
-            return None
+        return next(self._ask())
 
     def _ask(self):
 

@@ -106,10 +106,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
             yield asked
 
     def ask(self) -> Optional[List[Experiment]]:
-        try:
-            return next(self.ask_generator)
-        except StopIteration:
-            return None
+        return next(self.ask_generator)
 
     def tell(self, experiment: Experiment):
         self.optimizer_instance.tell(

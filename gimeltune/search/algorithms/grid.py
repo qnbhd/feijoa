@@ -43,10 +43,10 @@ class GridMaker(ParametersVisitor):
     EPS = 0.1
 
     def visit_integer(self, p: Integer):
-        return range(p.low, p.high)
+        return range(p.low, p.high + 1)
 
     def visit_real(self, p: Real):
-        return numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS)
+        return numpy.round(numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS), 2)
 
     def visit_categorical(self, p: Categorical):
         return p.choices
@@ -71,11 +71,8 @@ class GridSearch(SearchAlgorithm):
         return 1
 
     def ask(self) -> Optional[List[Experiment]]:
+        return next(self._ask())
 
-        try:
-            return next(self._ask())
-        except StopIteration:
-            return None
 
     def _ask(self):
 

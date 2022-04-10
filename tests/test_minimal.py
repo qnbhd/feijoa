@@ -14,6 +14,6 @@ def test_minimal():
     space.insert(Real(f'y', low=0.0, high=2.0))
 
     job = create_job(space)
-    job.do(objective, n_trials=50)
+    job.do(objective, n_trials=50, algo_list=['skopt'])
 
     assert abs(job.best_value - 0) < 2
