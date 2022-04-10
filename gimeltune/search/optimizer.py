@@ -89,21 +89,18 @@ class Optimizer:
 
             algorithm = self.algorithms.pop(0)
 
-            try:
-                configs = algorithm.ask()
+            configs = algorithm.ask()
 
-                if not configs:
-                    continue
+            if not configs:
+                continue
 
-                for c in configs:
-                    c.requestor = algorithm.__class__.__name__
+            for c in configs:
+                c.requestor = algorithm.__class__.__name__
 
-                # Round Robin
-                self.algorithms.append(algorithm)
+            # Round Robin
+            self.algorithms.append(algorithm)
 
-                yield configs
-            except StopIteration:
-                pass
+            yield configs
 
     def tell(self, experiment: Experiment) -> None:
         """Tell results to all search algorithms"""

@@ -95,7 +95,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
                 for k, v in raw.items():
                     if isinstance(v, int64):
                         v = int(v)
-                    if isinstance(v, float64):
+                    if isinstance(v, (float, float64)):
                         v = float(v)
 
                     potentially_cfg[k] = v
@@ -106,10 +106,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
             yield asked
 
     def ask(self) -> Optional[List[Experiment]]:
-        try:
-            return next(self.ask_generator)
-        except StopIteration:
-            return None
+        return next(self.ask_generator)
 
     def tell(self, experiment: Experiment):
         self.optimizer_instance.tell(
