@@ -95,7 +95,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
                 for k, v in raw.items():
                     if isinstance(v, int64):
                         v = int(v)
-                    if isinstance(v, float64):
+                    if isinstance(v, (float, float64)):
                         v = float(v)
 
                     potentially_cfg[k] = v

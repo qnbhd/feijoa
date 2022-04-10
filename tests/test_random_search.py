@@ -1,4 +1,4 @@
-from gimeltune import create_job, Experiment, SearchSpace, Real
+from gimeltune import create_job, Experiment, SearchSpace, Real, Integer, Categorical
 from unittest.mock import patch
 
 
@@ -19,10 +19,14 @@ def fake_random(nums):
 
 
 @patch('random.random', side_effect=faked_random([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]))
-def test_random_search(rr):
+@patch('random.randint', side_effect=lambda lo, hi: lo)
+@patch('random.choice', side_effect=lambda x: x[0])
+def test_random_search(rr, ri, rc):
     space = SearchSpace()
     space.insert(Real('x', low=0.0, high=1.0))
     space.insert(Real('y', low=0.0, high=1.0))
+    space.insert(Integer('z', low=0, high=2))
+    space.insert(Categorical('w', choices=['foo']))
 
     def objective(experiment: Experiment):
         params = experiment.params
@@ -35,5 +39,5 @@ def test_random_search(rr):
     job = create_job(space)
     job.do(objective, n_trials=10, algo_list=['random'])
 
-    assert job.best_parameters == {'x': 0.8, 'y': 0.9}
+    assert job.best_parameters == {'w': 'foo', 'x': 0.8, 'y': 0.9, 'z': 0}
     assert job.best_experiment.requestor == 'RandomSearch'

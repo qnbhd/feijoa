@@ -32,9 +32,6 @@ class SeedAlgorithm(SearchAlgorithm):
         self.seeds: list = list(seeds)
         self.is_emitted = False
 
-    def add_seed(self, seed: dict):
-        self.seeds.append(seed)
-
     def ask(self) -> Optional[List[Experiment]]:
 
         if not self.is_emitted:
