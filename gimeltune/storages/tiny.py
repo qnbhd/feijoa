@@ -82,14 +82,17 @@ class TinyDBStorage(Storage):
     def insert_experiment(self, experiment):
         doc = experiment.dict()
 
-        if self.get_experiment_by_id(experiment.id):
+        if self.get_experiment(experiment.job_id, experiment.id):
             # TODO (qnbhd): make correct exception
             raise InsertExperimentWithTheExistedId()
 
         self.experiments_table.insert(doc)
 
-    def get_experiment_by_id(self, experiment_id):
-        q = self.experiments_table.search(Query().id == experiment_id)
+    def get_experiment(self, job_id, experiment_id):
+        q = self.experiments_table.search(
+            (Query().id == experiment_id) &
+            (Query().job_id == job_id)
+        )
 
         if not q:
             return None

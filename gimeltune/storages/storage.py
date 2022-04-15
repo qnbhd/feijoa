@@ -71,10 +71,10 @@ class Storage(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_experiment_by_id(self, experiment_id):
+    def get_experiment(self, job_id, experiment_id):
         """
 
-        :param job:
+        :param job_id:
         :param experiment_id:
         :return:
         """

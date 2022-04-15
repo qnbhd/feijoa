@@ -2,14 +2,15 @@ from typing import Optional, List
 
 import pytest
 
-from gimeltune import create_job, SearchSpace, Real, Experiment, load_job, SearchAlgorithm
+from gimeltune import create_job, SearchSpace, Real, Experiment, load_job, SearchAlgorithm, TinyDBStorage
 from gimeltune.exceptions import SearchAlgorithmNotFoundedError, ExperimentNotFinishedError, DuplicatedJobError, \
-    JobNotFoundError
+    JobNotFoundError, InvalidStorageRFC1738, InvalidStoragePassed
+from gimeltune.jobs.job import _load_storage
 from gimeltune.models.experiment import ExperimentState
 
 
 def test_job():
-    job = create_job(SearchSpace())
+    job = create_job(search_space=SearchSpace())
 
     job.setup_default_algo()
 
@@ -35,14 +36,14 @@ def test_create_load_job():
 
         return (1 - x) ** 2 + (1 - y) ** 2
 
-    job = create_job(space, 'foo', 'foo')
+    job = create_job(search_space=space, name='foo', storage='sqlite:///foo.db')
     job.do(objective, n_trials=10, algo_list=['random'])
 
     assert isinstance(job.experiments, list) and len(job.experiments) == 10
     assert job.experiments_count == 10
     assert len(job.top_experiments(100)) == 10
 
-    job2 = load_job(SearchSpace(), 'foo', 'foo')
+    job2 = load_job(search_space=SearchSpace(), name='foo', storage='sqlite:///foo.db')
 
     assert isinstance(job2.experiments, list) and len(job2.experiments) == 10
     assert job2.experiments_count == 10
@@ -53,7 +54,7 @@ def test_create_load_job():
 
 def test_incorrect_algo_passed():
     space = SearchSpace()
-    job = create_job(space)
+    job = create_job(search_space=space)
 
     with pytest.raises(SearchAlgorithmNotFoundedError):
         job.do(lambda: 1, algo_list=['some_incorrect'])
@@ -71,7 +72,7 @@ def test_incorrect_algo_passed():
 
 def test_no_configurations_warning():
     space = SearchSpace()
-    job = create_job(space)
+    job = create_job(search_space=space)
 
     class SomeAlgo(SearchAlgorithm):
         def ask(self) -> Optional[List[Experiment]]:
@@ -86,7 +87,7 @@ def test_no_configurations_warning():
 
 def test_not_finished_experiment_tell():
     space = SearchSpace()
-    job = create_job(space)
+    job = create_job(search_space=space)
 
     ex = Experiment(
         id=0, job_id=0, state=ExperimentState.WIP,
@@ -99,15 +100,29 @@ def test_not_finished_experiment_tell():
 
 
 def test_job_duplicated_error():
-    create_job(SearchSpace(), 'foo', 'foo')
+    create_job(search_space=SearchSpace(), name='foo', storage='sqlite:///foo.db')
 
     with pytest.raises(DuplicatedJobError):
-        create_job(SearchSpace(), 'foo', 'foo')
+        create_job(search_space=SearchSpace(), name='foo', storage='sqlite:///foo.db')
 
 
 def test_load_non_existed():
 
     with pytest.raises(JobNotFoundError):
-        load_job(SearchSpace(), 'simple', 'dimple')
+        load_job(search_space=SearchSpace(), name='dimple', storage='sqlite:///:memory:')
+
+    with pytest.raises(JobNotFoundError):
+        load_job(search_space=SearchSpace(), name='dimple', storage='tinydb:///zoo.json')
+
+
+def test_load_storage():
+    assert isinstance(_load_storage('tinydb:///foo.json'), TinyDBStorage)
+
+    with pytest.raises(InvalidStorageRFC1738):
+        _load_storage('dfddsfdsfsd')
+
+    with pytest.raises(InvalidStoragePassed):
+        _load_storage(dict(a=1))
+
 
 

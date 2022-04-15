@@ -17,6 +17,6 @@ def test_skopt():
     space.insert(Integer('z', low=0, high=1))
     space.insert(Categorical('w', choices=['foo']))
 
-    job = create_job(space)
+    job = create_job(search_space=space)
     job.do(objective, n_trials=10, algo_list=['skopt'])
 

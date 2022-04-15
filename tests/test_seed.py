@@ -14,7 +14,7 @@ def test_seed():
 
         return (1 - x) ** 2 + (1 - y) ** 2
 
-    job = create_job(space)
+    job = create_job(search_space=space)
     job.add_seed({'x': 1.0, 'y': 1.0})
     job.do(objective, n_trials=50, n_proc=1, algo_list=['grid'])
 

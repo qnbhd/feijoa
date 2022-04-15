@@ -20,26 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import random
+from urllib.parse import urlparse
 import warnings
 from datetime import datetime
 from typing import Any, Callable, List, Optional, Type, Union
 
 import multiprocess as mp
 import pandas as pd
+from sqlalchemy.engine.url import make_url
+from sqlalchemy.exc import ArgumentError
 
 from gimeltune.exceptions import DuplicatedJobError, JobNotFoundError, ExperimentNotFinishedError, \
-    SearchAlgorithmNotFoundedError
+    SearchAlgorithmNotFoundedError, InvalidStoragePassed, InvalidStorageRFC1738
 from gimeltune.models import Experiment, ExperimentsFactory
 from gimeltune.search import Optimizer, SearchSpace
 from gimeltune.search.algorithms import (GridSearch, RandomSearch,
-                                        SearchAlgorithm, SeedAlgorithm,
-                                        SkoptBayesianAlgorithm, get_algo)
+                                         SearchAlgorithm, SeedAlgorithm,
+                                         SkoptBayesianAlgorithm, get_algo)
 from gimeltune.storages import Storage, TinyDBStorage
 
 __all__ = [
     'create_job',
     'load_job'
 ]
+
+from gimeltune.storages.rdb.storage import RDBStorage
 
 
 class Job:
@@ -268,7 +273,30 @@ class Job:
         self.seeds.append(seed)
 
 
-def create_job(search_space: SearchSpace, name: str = None,
+def _load_storage(storage_or_name: Union[str, Optional[Storage]]):
+    if storage_or_name is None:
+        return RDBStorage('sqlite:///:memory:')
+
+    if issubclass(type(storage_or_name), Storage):
+        return storage_or_name
+
+    if not isinstance(storage_or_name, str):
+        raise InvalidStoragePassed()
+
+    try:
+        url = make_url(storage_or_name)
+    except ArgumentError:
+        raise InvalidStorageRFC1738()
+
+    assert url.database
+
+    if url.drivername == 'tinydb':
+        return TinyDBStorage(str(url.database))
+
+    return RDBStorage(storage_or_name)
+
+
+def create_job(*, search_space: SearchSpace, name: str = None,
                storage: Union[str, Optional[Storage]] = None):
 
     """
@@ -279,17 +307,12 @@ def create_job(search_space: SearchSpace, name: str = None,
     :return:
     """
 
-    name = name or f'test_job_{random.randint(0, 9999)}'
+    name = name or 'job' + datetime.now().strftime('%H_%M_%S_%m_%d_%Y')
 
-    if not storage:
-        storage = TinyDBStorage(f'{name}.json')
-    else:
-        if isinstance(storage, str):
-            storage = TinyDBStorage(f'{storage}.json')
+    storage = _load_storage(storage)
 
     assert isinstance(name, str)
     assert isinstance(search_space, SearchSpace)
-    assert issubclass(type(storage), Storage)
 
     if storage.is_job_name_exists(name):
         raise DuplicatedJobError(f'Job {name} is already exists.')
@@ -297,7 +320,7 @@ def create_job(search_space: SearchSpace, name: str = None,
     return Job(name, storage, search_space, storage.jobs_count + 1)
 
 
-def load_job(search_space: SearchSpace, name: str,
+def load_job(*, search_space: SearchSpace, name: str,
              storage: Union[str, Storage]):
 
     """
@@ -308,8 +331,7 @@ def load_job(search_space: SearchSpace, name: str,
     :return:
     """
 
-    if isinstance(storage, str):
-        storage = TinyDBStorage(f'{storage}.json')
+    storage = _load_storage(storage)
 
     job_id = storage.get_job_id_by_name(name)
 

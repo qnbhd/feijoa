@@ -19,7 +19,7 @@ def test_grid_search():
     # needed n_trials = 36 but for coverage we take greater than 36
     # total experiments must be 36
 
-    job = create_job(space)
+    job = create_job(search_space=space)
     job.do(objective, n_trials=50, algo_list=['grid'])
 
     experiments_params = [e.params for e in job.experiments]

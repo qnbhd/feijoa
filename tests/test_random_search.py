@@ -36,7 +36,7 @@ def test_random_search(rr, ri, rc):
 
         return (1 - x) ** 2 + (1 - y) ** 2
 
-    job = create_job(space)
+    job = create_job(search_space=space)
     job.do(objective, n_trials=10, algo_list=['random'])
 
     assert job.best_parameters == {'w': 'foo', 'x': 0.8, 'y': 0.9, 'z': 0}
