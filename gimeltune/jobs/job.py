@@ -251,7 +251,12 @@ class Job:
 
         for experiment in self.experiments:
             dataframe_dict = experiment.dict()
-            metrics = dataframe_dict.pop('params')
+            params = dataframe_dict.pop('params')
+
+            if dataframe_dict['metrics']:
+                metrics = dataframe_dict.pop('metrics')
+            else:
+                metrics = dict()
 
             dataframe_dict['create_time'] = \
                 datetime.fromtimestamp(dataframe_dict['create_timestamp'])
@@ -262,7 +267,7 @@ class Job:
             del dataframe_dict['create_timestamp']
             del dataframe_dict['finish_timestamp']
 
-            container.append({**dataframe_dict, **metrics})
+            container.append({**dataframe_dict, **params, **metrics})
 
         return pd.DataFrame(container)
 
