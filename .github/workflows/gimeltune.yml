@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: GCC example tiny db
-          path: examples/gcc/*.json
+          path: examples/gcc/*.db
 
           
       - name: Publish codecov report

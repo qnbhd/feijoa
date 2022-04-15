@@ -28,6 +28,8 @@ __all__ = [
     'ExperimentNotFinishedError',
     'ParametersIncorrectInputValues',
     'InsertExperimentWithTheExistedId',
+    'InvalidStoragePassed',
+    'InvalidStorageRFC1738'
 ]
 
 
@@ -83,3 +85,12 @@ class InsertExperimentWithTheExistedId(GimeltuneError):
     Raises if the specified experiment with current id
     is already exists in db storage.
     """
+
+
+class InvalidStoragePassed(GimeltuneError):
+    """Raises if the specified object is not a storage."""
+
+
+class InvalidStorageRFC1738(GimeltuneError):
+    """Raises if could not parse rfc1738 URL
+    from specified string."""

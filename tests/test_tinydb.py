@@ -38,4 +38,20 @@ def test_insert_experiment_with_the_same_id():
     with pytest.raises(InsertExperimentWithTheExistedId):
         storage.insert_experiment(ex_duplicated)
 
-    assert storage.get_experiment_by_id(1000) is None
+    assert storage.get_experiment(0, 1000) is None
+
+
+def test_load_job_by_id():
+    storage = TinyDBStorage('simple.json')
+
+    class _Job:
+        def __init__(self, job_id, job_name):
+            self.id = job_id
+            self.name = job_name
+
+    job = _Job(0, 'foo')
+
+    storage.insert_job(job)
+
+    assert storage.get_job_id_by_name('foo') == 0
+

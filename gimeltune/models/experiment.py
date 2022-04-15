@@ -41,6 +41,9 @@ class Experiment(BaseModel):
     create_timestamp: float
     finish_timestamp: Optional[float]
 
+    class Config:
+        orm_mode = True
+
     def apply(self, result):
         # TODO (qnbhd): make safe operations
         self.objective_result = result

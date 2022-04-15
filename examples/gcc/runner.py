@@ -175,7 +175,7 @@ def objective(experiment: Experiment) -> float:
 
 
 def run_gcc():
-    job = create_job(SPACE)
+    job = create_job(search_space=SPACE)
     job.setup_default_algo()
 
     for i in range(10):
