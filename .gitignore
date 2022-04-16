@@ -177,3 +177,4 @@ examples/gcc/*.json
 /tests/test_job*.json
 .DS_Store/
 
+/examples/gcc/space_wided.yaml
