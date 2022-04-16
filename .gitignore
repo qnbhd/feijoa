@@ -178,3 +178,5 @@ examples/gcc/*.json
 .DS_Store/
 
 /examples/gcc/space_wided.yaml
+examples/.DS_Store
+examples/gcc/.DS_Store
