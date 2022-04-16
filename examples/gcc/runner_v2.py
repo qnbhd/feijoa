@@ -19,7 +19,7 @@ from executor import execute, ExternalCommandFailed
 init(verbose=True)
 
 SOURCE_FILE = os.path.join(dirname(abspath(__file__)), 'raytracer', 'raytracer.cpp')
-SPACE_FILE = os.path.join(dirname(abspath(__file__)), 'space_minimal.yaml')
+SPACE_FILE = os.path.join(dirname(abspath(__file__)), 'space_wided.yaml')
 SPACE = SearchSpace.from_yaml_file(SPACE_FILE)
 ERROR_RESULT = 1e10
 OBJECTIVE_METRIC = 'time'
@@ -202,7 +202,7 @@ def objective(experiment: Experiment):
 
 
 def run_gcc(n_trials):
-    job = create_job(SPACE)
+    job = create_job(search_space=SPACE)
     job.setup_default_algo()
 
     # Let's assume we can and run compile without errors baselines
