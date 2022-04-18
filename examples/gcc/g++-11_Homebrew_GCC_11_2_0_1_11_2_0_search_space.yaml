@@ -1,1032 +1,1028 @@
-- signature: align-loop-iterations
+- signature: --param=align-loop-iterations
   type: integer
   range: [0, 2147483648]
 
-- signature: align-threshold
+- signature: --param=align-threshold
   type: integer
   range: [1, 65536]
 
-- signature: analyzer-bb-explosion-factor
+- signature: --param=analyzer-bb-explosion-factor
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-max-constraints
+- signature: --param=analyzer-max-constraints
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-max-enodes-for-full-dump
+- signature: --param=analyzer-max-enodes-for-full-dump
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-max-enodes-per-program-point
+- signature: --param=analyzer-max-enodes-per-program-point
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-max-infeasible-edges
+- signature: --param=analyzer-max-infeasible-edges
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-max-recursion-depth
+- signature: --param=analyzer-max-recursion-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-max-svalue-depth
+- signature: --param=analyzer-max-svalue-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: analyzer-min-snodes-for-call-summary
+- signature: --param=analyzer-min-snodes-for-call-summary
   type: integer
   range: [0, 2147483648]
 
-- signature: asan-globals
+- signature: --param=asan-globals
   type: integer
   range: [0, 1]
 
-- signature: asan-instrument-allocas
+- signature: --param=asan-instrument-allocas
   type: integer
   range: [0, 1]
 
-- signature: asan-instrument-reads
+- signature: --param=asan-instrument-reads
   type: integer
   range: [0, 1]
 
-- signature: asan-instrument-writes
+- signature: --param=asan-instrument-writes
   type: integer
   range: [0, 1]
 
-- signature: asan-instrumentation-with-call-threshold
+- signature: --param=asan-instrumentation-with-call-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: asan-memintrin
+- signature: --param=asan-memintrin
   type: integer
   range: [0, 1]
 
-- signature: asan-stack
+- signature: --param=asan-stack
   type: integer
   range: [0, 1]
 
-- signature: asan-use-after-return
+- signature: --param=asan-use-after-return
   type: integer
   range: [0, 1]
 
-- signature: avg-loop-niter
+- signature: --param=avg-loop-niter
   type: integer
   range: [1, 65536]
 
-- signature: avoid-fma-max-bits
+- signature: --param=avoid-fma-max-bits
   type: integer
   range: [0, 512]
 
-- signature: builtin-expect-probability
+- signature: --param=builtin-expect-probability
   type: integer
   range: [0, 100]
 
-- signature: builtin-string-cmp-inline-length
+- signature: --param=builtin-string-cmp-inline-length
   type: integer
   range: [0, 100]
 
-- signature: case-values-threshold
+- signature: --param=case-values-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: comdat-sharing-probability
+- signature: --param=comdat-sharing-probability
   type: integer
   range: [0, 2147483648]
 
-- signature: cxx-max-namespaces-for-diagnostic-help
+- signature: --param=cxx-max-namespaces-for-diagnostic-help
   type: integer
   range: [0, 2147483648]
 
-- signature: dse-max-alias-queries-per-store
+- signature: --param=dse-max-alias-queries-per-store
   type: integer
   range: [0, 2147483648]
 
-- signature: dse-max-object-size
+- signature: --param=dse-max-object-size
   type: integer
   range: [0, 2147483648]
 
-- signature: early-inlining-insns
+- signature: --param=early-inlining-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: evrp-mode
+- signature: --param=evrp-mode
   type: integer
   range: [0, 2147483648]
 
-- signature: evrp-sparse-threshold
+- signature: --param=evrp-sparse-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: fsm-maximum-phi-arguments
+- signature: --param=fsm-maximum-phi-arguments
   type: integer
   range: [1, 999999]
 
-- signature: fsm-scale-path-blocks
+- signature: --param=fsm-scale-path-blocks
   type: integer
   range: [1, 10]
 
-- signature: fsm-scale-path-stmts
+- signature: --param=fsm-scale-path-stmts
   type: integer
   range: [1, 10]
 
-- signature: gcse-after-reload-critical-fraction
+- signature: --param=gcse-after-reload-critical-fraction
   type: integer
   range: [0, 2147483648]
 
-- signature: gcse-after-reload-partial-fraction
+- signature: --param=gcse-after-reload-partial-fraction
   type: integer
   range: [0, 2147483648]
 
-- signature: gcse-cost-distance-ratio
+- signature: --param=gcse-cost-distance-ratio
   type: integer
   range: [0, 2147483648]
 
-- signature: gcse-unrestricted-cost
+- signature: --param=gcse-unrestricted-cost
   type: integer
   range: [0, 2147483648]
 
-- signature: ggc-min-expand
+- signature: --param=ggc-min-expand
   type: integer
   range: [0, 2147483648]
 
-- signature: ggc-min-heapsize
+- signature: --param=ggc-min-heapsize
   type: integer
   range: [0, 2147483648]
 
-- signature: gimple-fe-computed-hot-bb-threshold
+- signature: --param=gimple-fe-computed-hot-bb-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: graphite-allow-codegen-errors
+- signature: --param=graphite-allow-codegen-errors
   type: integer
   range: [0, 1]
 
-- signature: graphite-max-arrays-per-scop
+- signature: --param=graphite-max-arrays-per-scop
   type: integer
   range: [0, 2147483648]
 
-- signature: graphite-max-nb-scop-params
+- signature: --param=graphite-max-nb-scop-params
   type: integer
   range: [0, 2147483648]
 
-- signature: hash-table-verification-limit
+- signature: --param=hash-table-verification-limit
   type: integer
   range: [0, 2147483648]
 
-- signature: hot-bb-count-fraction
+- signature: --param=hot-bb-count-fraction
   type: integer
   range: [0, 2147483648]
 
-- signature: hot-bb-count-ws-permille
+- signature: --param=hot-bb-count-ws-permille
   type: integer
   range: [0, 1000]
 
-- signature: hot-bb-frequency-fraction
+- signature: --param=hot-bb-frequency-fraction
   type: integer
   range: [0, 2147483648]
 
-- signature: hwasan-instrument-allocas
+- signature: --param=hwasan-instrument-allocas
   type: integer
   range: [0, 1]
 
-- signature: hwasan-instrument-mem-intrinsics
+- signature: --param=hwasan-instrument-mem-intrinsics
   type: integer
   range: [0, 1]
 
-- signature: hwasan-instrument-reads
+- signature: --param=hwasan-instrument-reads
   type: integer
   range: [0, 1]
 
-- signature: hwasan-instrument-stack
+- signature: --param=hwasan-instrument-stack
   type: integer
   range: [0, 1]
 
-- signature: hwasan-instrument-writes
+- signature: --param=hwasan-instrument-writes
   type: integer
   range: [0, 1]
 
-- signature: hwasan-random-frame-tag
+- signature: --param=hwasan-random-frame-tag
   type: integer
   range: [0, 1]
 
-- signature: inline-heuristics-hint-percent
+- signature: --param=inline-heuristics-hint-percent
   type: integer
   range: [100, 1000000]
 
-- signature: inline-min-speedup
+- signature: --param=inline-min-speedup
   type: integer
   range: [0, 100]
 
-- signature: inline-unit-growth
+- signature: --param=inline-unit-growth
   type: integer
   range: [0, 2147483648]
 
-- signature: integer-share-limit
+- signature: --param=integer-share-limit
   type: integer
   range: [2, 65536]
 
-- signature: ipa-cp-eval-threshold
+- signature: --param=ipa-cp-eval-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-cp-large-unit-insns
+- signature: --param=ipa-cp-large-unit-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-cp-loop-hint-bonus
+- signature: --param=ipa-cp-loop-hint-bonus
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-cp-max-recursive-depth
+- signature: --param=ipa-cp-max-recursive-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-cp-min-recursive-probability
+- signature: --param=ipa-cp-min-recursive-probability
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-cp-recursion-penalty
+- signature: --param=ipa-cp-recursion-penalty
   type: integer
   range: [0, 100]
 
-- signature: ipa-cp-single-call-penalty
+- signature: --param=ipa-cp-single-call-penalty
   type: integer
   range: [0, 100]
 
-- signature: ipa-cp-unit-growth
+- signature: --param=ipa-cp-unit-growth
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-cp-value-list-size
+- signature: --param=ipa-cp-value-list-size
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-jump-function-lookups
+- signature: --param=ipa-jump-function-lookups
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-max-aa-steps
+- signature: --param=ipa-max-aa-steps
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-max-agg-items
+- signature: --param=ipa-max-agg-items
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-max-loop-predicates
+- signature: --param=ipa-max-loop-predicates
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-max-param-expr-ops
+- signature: --param=ipa-max-param-expr-ops
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-max-switch-predicate-bounds
+- signature: --param=ipa-max-switch-predicate-bounds
   type: integer
   range: [0, 2147483648]
 
-- signature: ipa-sra-max-replacements
+- signature: --param=ipa-sra-max-replacements
   type: integer
   range: [0, 16]
 
-- signature: ipa-sra-ptr-growth-factor
+- signature: --param=ipa-sra-ptr-growth-factor
   type: integer
   range: [0, 2147483648]
 
-- signature: ira-loop-reserved-regs
+- signature: --param=ira-loop-reserved-regs
   type: integer
   range: [0, 2147483648]
 
-- signature: ira-max-conflict-table-size
+- signature: --param=ira-max-conflict-table-size
   type: integer
   range: [0, 2147483648]
 
-- signature: ira-max-loops-num
+- signature: --param=ira-max-loops-num
   type: integer
   range: [0, 2147483648]
 
-- signature: iv-always-prune-cand-set-bound
+- signature: --param=iv-always-prune-cand-set-bound
   type: integer
   range: [0, 2147483648]
 
-- signature: iv-consider-all-candidates-bound
+- signature: --param=iv-consider-all-candidates-bound
   type: integer
   range: [0, 2147483648]
 
-- signature: iv-max-considered-uses
+- signature: --param=iv-max-considered-uses
   type: integer
   range: [0, 2147483648]
 
-- signature: jump-table-max-growth-ratio-for-size
+- signature: --param=jump-table-max-growth-ratio-for-size
   type: integer
   range: [0, 2147483648]
 
-- signature: jump-table-max-growth-ratio-for-speed
+- signature: --param=jump-table-max-growth-ratio-for-speed
   type: integer
   range: [0, 2147483648]
 
-- signature: l1-cache-line-size
+- signature: --param=l1-cache-line-size
   type: integer
   range: [0, 2147483648]
 
-- signature: l1-cache-size
+- signature: --param=l1-cache-size
   type: integer
   range: [0, 2147483648]
 
-- signature: l2-cache-size
+- signature: --param=l2-cache-size
   type: integer
   range: [0, 2147483648]
 
-- signature: large-function-growth
+- signature: --param=large-function-growth
   type: integer
   range: [0, 2147483648]
 
-- signature: large-function-insns
+- signature: --param=large-function-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: large-stack-frame-growth
+- signature: --param=large-stack-frame-growth
   type: integer
   range: [0, 2147483648]
 
-- signature: large-stack-frame
+- signature: --param=large-stack-frame
   type: integer
   range: [0, 2147483648]
 
-- signature: large-unit-insns
+- signature: --param=large-unit-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: lazy-modules
+- signature: --param=lim-expensive
   type: integer
   range: [0, 2147483648]
 
-- signature: lim-expensive
+- signature: --param=loop-block-tile-size
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-block-tile-size
+- signature: --param=loop-interchange-max-num-stmts
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-interchange-max-num-stmts
+- signature: --param=loop-interchange-stride-ratio
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-interchange-stride-ratio
+- signature: --param=loop-invariant-max-bbs-in-loop
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-invariant-max-bbs-in-loop
+- signature: --param=loop-max-datarefs-for-datadeps
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-max-datarefs-for-datadeps
+- signature: --param=loop-versioning-max-inner-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-versioning-max-inner-insns
+- signature: --param=loop-versioning-max-outer-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: loop-versioning-max-outer-insns
-  type: integer
-  range: [0, 2147483648]
-
-- signature: lra-inheritance-ebb-probability-cutoff
+- signature: --param=lra-inheritance-ebb-probability-cutoff
   type: integer
   range: [0, 100]
 
-- signature: lra-max-considered-reload-pseudos
+- signature: --param=lra-max-considered-reload-pseudos
   type: integer
   range: [0, 2147483648]
 
-- signature: lto-max-partition
+- signature: --param=lto-max-partition
   type: integer
   range: [0, 2147483648]
 
-- signature: lto-max-streaming-parallelism
+- signature: --param=lto-max-streaming-parallelism
   type: integer
   range: [1, 65536]
 
-- signature: lto-min-partition
+- signature: --param=lto-min-partition
   type: integer
   range: [0, 2147483648]
 
-- signature: lto-partitions
+- signature: --param=lto-partitions
   type: integer
   range: [1, 65536]
 
-- signature: max-average-unrolled-insns
+- signature: --param=max-average-unrolled-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-combine-insns
+- signature: --param=max-combine-insns
   type: integer
   range: [2, 4]
 
-- signature: max-completely-peel-loop-nest-depth
+- signature: --param=max-completely-peel-loop-nest-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: max-completely-peel-times
+- signature: --param=max-completely-peel-times
   type: integer
   range: [0, 2147483648]
 
-- signature: max-completely-peeled-insns
+- signature: --param=max-completely-peeled-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-crossjump-edges
+- signature: --param=max-crossjump-edges
   type: integer
   range: [0, 2147483648]
 
-- signature: max-cse-insns
+- signature: --param=max-cse-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-cse-path-length
+- signature: --param=max-cse-path-length
   type: integer
   range: [1, 65536]
 
-- signature: max-cselib-memory-locations
+- signature: --param=max-cselib-memory-locations
   type: integer
   range: [0, 2147483648]
 
-- signature: max-debug-marker-count
+- signature: --param=max-debug-marker-count
   type: integer
   range: [0, 2147483648]
 
-- signature: max-delay-slot-insn-search
+- signature: --param=max-delay-slot-insn-search
   type: integer
   range: [0, 2147483648]
 
-- signature: max-delay-slot-live-search
+- signature: --param=max-delay-slot-live-search
   type: integer
   range: [0, 2147483648]
 
-- signature: max-dse-active-local-stores
+- signature: --param=max-dse-active-local-stores
   type: integer
   range: [0, 2147483648]
 
-- signature: max-early-inliner-iterations
+- signature: --param=max-early-inliner-iterations
   type: integer
   range: [0, 2147483648]
 
-- signature: max-fields-for-field-sensitive
+- signature: --param=max-fields-for-field-sensitive
   type: integer
   range: [0, 2147483648]
 
-- signature: max-find-base-term-values
+- signature: --param=max-find-base-term-values
   type: integer
   range: [0, 2147483648]
 
-- signature: max-fsm-thread-length
+- signature: --param=max-fsm-thread-length
   type: integer
   range: [1, 999999]
 
-- signature: max-fsm-thread-path-insns
+- signature: --param=max-fsm-thread-path-insns
   type: integer
   range: [1, 999999]
 
-- signature: max-fsm-thread-paths
+- signature: --param=max-fsm-thread-paths
   type: integer
   range: [1, 999999]
 
-- signature: max-gcse-insertion-ratio
+- signature: --param=max-gcse-insertion-ratio
   type: integer
   range: [0, 2147483648]
 
-- signature: max-gcse-memory
+- signature: --param=max-gcse-memory
   type: integer
   range: [0, 2147483648]
 
-- signature: max-goto-duplication-insns
+- signature: --param=max-goto-duplication-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-grow-copy-bb-insns
+- signature: --param=max-grow-copy-bb-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-hoist-depth
+- signature: --param=max-hoist-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-insns-auto
+- signature: --param=max-inline-insns-auto
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-insns-recursive-auto
+- signature: --param=max-inline-insns-recursive-auto
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-insns-recursive
+- signature: --param=max-inline-insns-recursive
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-insns-single
+- signature: --param=max-inline-insns-single
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-insns-size
+- signature: --param=max-inline-insns-size
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-insns-small
+- signature: --param=max-inline-insns-small
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-recursive-depth-auto
+- signature: --param=max-inline-recursive-depth-auto
   type: integer
   range: [0, 2147483648]
 
-- signature: max-inline-recursive-depth
+- signature: --param=max-inline-recursive-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: max-isl-operations
+- signature: --param=max-isl-operations
   type: integer
   range: [0, 2147483648]
 
-- signature: max-iterations-computation-cost
+- signature: --param=max-iterations-computation-cost
   type: integer
   range: [0, 2147483648]
 
-- signature: max-iterations-to-track
+- signature: --param=max-iterations-to-track
   type: integer
   range: [0, 2147483648]
 
-- signature: max-jump-thread-duplication-stmts
+- signature: --param=max-jump-thread-duplication-stmts
   type: integer
   range: [0, 2147483648]
 
-- signature: max-last-value-rtl
+- signature: --param=max-last-value-rtl
   type: integer
   range: [0, 2147483648]
 
-- signature: max-loop-header-insns
+- signature: --param=max-loop-header-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-modulo-backtrack-attempts
+- signature: --param=max-modulo-backtrack-attempts
   type: integer
   range: [0, 2147483648]
 
-- signature: max-partial-antic-length
+- signature: --param=max-partial-antic-length
   type: integer
   range: [0, 2147483648]
 
-- signature: max-peel-branches
+- signature: --param=max-peel-branches
   type: integer
   range: [0, 2147483648]
 
-- signature: max-peel-times
+- signature: --param=max-peel-times
   type: integer
   range: [0, 2147483648]
 
-- signature: max-peeled-insns
+- signature: --param=max-peeled-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-pending-list-length
+- signature: --param=max-pending-list-length
   type: integer
   range: [0, 2147483648]
 
-- signature: max-pipeline-region-blocks
+- signature: --param=max-pipeline-region-blocks
   type: integer
   range: [0, 2147483648]
 
-- signature: max-pipeline-region-insns
+- signature: --param=max-pipeline-region-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-pow-sqrt-depth
+- signature: --param=max-pow-sqrt-depth
   type: integer
   range: [1, 32]
 
-- signature: max-predicted-iterations
+- signature: --param=max-predicted-iterations
   type: integer
   range: [0, 65536]
 
-- signature: max-reload-search-insns
+- signature: --param=max-reload-search-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-rtl-if-conversion-insns
+- signature: --param=max-rtl-if-conversion-insns
   type: integer
   range: [0, 99]
 
-- signature: max-rtl-if-conversion-predictable-cost
+- signature: --param=max-rtl-if-conversion-predictable-cost
   type: integer
   range: [0, 200]
 
-- signature: max-rtl-if-conversion-unpredictable-cost
+- signature: --param=max-rtl-if-conversion-unpredictable-cost
   type: integer
   range: [0, 200]
 
-- signature: max-sched-extend-regions-iters
+- signature: --param=max-sched-extend-regions-iters
   type: integer
   range: [0, 2147483648]
 
-- signature: max-sched-insn-conflict-delay
+- signature: --param=max-sched-insn-conflict-delay
   type: integer
   range: [1, 10]
 
-- signature: max-sched-ready-insns
+- signature: --param=max-sched-ready-insns
   type: integer
   range: [1, 65536]
 
-- signature: max-sched-region-blocks
+- signature: --param=max-sched-region-blocks
   type: integer
   range: [0, 2147483648]
 
-- signature: max-sched-region-insns
+- signature: --param=max-sched-region-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-slsr-cand-scan
+- signature: --param=max-slsr-cand-scan
   type: integer
   range: [1, 999999]
 
-- signature: max-speculative-devirt-maydefs
+- signature: --param=max-speculative-devirt-maydefs
   type: integer
   range: [0, 2147483648]
 
-- signature: max-ssa-name-query-depth
+- signature: --param=max-ssa-name-query-depth
   type: integer
   range: [1, 10]
 
-- signature: max-store-chains-to-track
+- signature: --param=max-store-chains-to-track
   type: integer
   range: [1, 65536]
 
-- signature: max-stores-to-merge
+- signature: --param=max-stores-to-merge
   type: integer
   range: [2, 65536]
 
-- signature: max-stores-to-sink
+- signature: --param=max-stores-to-sink
   type: integer
   range: [0, 2147483648]
 
-- signature: max-stores-to-track
+- signature: --param=max-stores-to-track
   type: integer
   range: [2, 1048576]
 
-- signature: max-tail-merge-comparisons
+- signature: --param=max-tail-merge-comparisons
   type: integer
   range: [0, 2147483648]
 
-- signature: max-tail-merge-iterations
+- signature: --param=max-tail-merge-iterations
   type: integer
   range: [0, 2147483648]
 
-- signature: max-tracked-strlens
+- signature: --param=max-tracked-strlens
   type: integer
   range: [0, 2147483648]
 
-- signature: max-tree-if-conversion-phi-args
+- signature: --param=max-tree-if-conversion-phi-args
   type: integer
   range: [2, 65536]
 
-- signature: max-unroll-times
+- signature: --param=max-unroll-times
   type: integer
   range: [0, 2147483648]
 
-- signature: max-unrolled-insns
+- signature: --param=max-unrolled-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-unswitch-insns
+- signature: --param=max-unswitch-insns
   type: integer
   range: [0, 2147483648]
 
-- signature: max-unswitch-level
+- signature: --param=max-unswitch-level
   type: integer
   range: [0, 2147483648]
 
-- signature: max-variable-expansions-in-unroller
+- signature: --param=max-variable-expansions-in-unroller
   type: integer
   range: [0, 2147483648]
 
-- signature: max-vartrack-expr-depth
+- signature: --param=max-vartrack-expr-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: max-vartrack-reverse-op-size
+- signature: --param=max-vartrack-reverse-op-size
   type: integer
   range: [0, 2147483648]
 
-- signature: max-vartrack-size
+- signature: --param=max-vartrack-size
   type: integer
   range: [0, 2147483648]
 
-- signature: max-vrp-switch-assertions
+- signature: --param=max-vrp-switch-assertions
   type: integer
   range: [0, 2147483648]
 
-- signature: min-crossjump-insns
+- signature: --param=min-crossjump-insns
   type: integer
   range: [1, 65536]
 
-- signature: min-inline-recursive-probability
+- signature: --param=min-inline-recursive-probability
   type: integer
   range: [0, 2147483648]
 
-- signature: min-insn-to-prefetch-ratio
+- signature: --param=min-insn-to-prefetch-ratio
   type: integer
   range: [0, 2147483648]
 
-- signature: min-loop-cond-split-prob
+- signature: --param=min-loop-cond-split-prob
   type: integer
   range: [0, 100]
 
-- signature: min-nondebug-insn-uid
+- signature: --param=min-nondebug-insn-uid
   type: integer
   range: [0, 2147483648]
 
-- signature: min-size-for-stack-sharing
+- signature: --param=min-size-for-stack-sharing
   type: integer
   range: [0, 2147483648]
 
-- signature: min-spec-prob
+- signature: --param=min-spec-prob
   type: integer
   range: [0, 2147483648]
 
-- signature: min-vect-loop-bound
+- signature: --param=min-vect-loop-bound
   type: integer
   range: [0, 2147483648]
 
-- signature: modref-max-accesses
+- signature: --param=modref-max-accesses
   type: integer
   range: [0, 2147483648]
 
-- signature: modref-max-bases
+- signature: --param=modref-max-bases
   type: integer
   range: [0, 2147483648]
 
-- signature: modref-max-depth
+- signature: --param=modref-max-depth
   type: integer
   range: [0, 2147483648]
 
-- signature: modref-max-escape-points
+- signature: --param=modref-max-escape-points
   type: integer
   range: [0, 2147483648]
 
-- signature: modref-max-refs
+- signature: --param=modref-max-refs
   type: integer
   range: [0, 2147483648]
 
-- signature: modref-max-tests
+- signature: --param=modref-max-tests
   type: integer
   range: [0, 2147483648]
 
-- signature: openacc-kernels
+- signature: --param=openacc-kernels
   type: categorical
-  choices: [decompose, parloops]
+  choices: [--param=openacc-kernels=decompose, --param=openacc-kernels=parloops]
 
-- signature: parloops-chunk-size
+- signature: --param=parloops-chunk-size
   type: integer
   range: [0, 2147483648]
 
-- signature: parloops-min-per-thread
+- signature: --param=parloops-min-per-thread
   type: integer
   range: [2, 65536]
 
-- signature: parloops-schedule
+- signature: --param=parloops-schedule
   type: categorical
-  choices: [static, dynamic, guided, auto, runtime]
+  choices: [--param=parloops-schedule=static, --param=parloops-schedule=dynamic, --param=parloops-schedule=guided, --param=parloops-schedule=auto, --param=parloops-schedule=runtime]
 
-- signature: partial-inlining-entry-probability
+- signature: --param=partial-inlining-entry-probability
   type: integer
   range: [0, 100]
 
-- signature: predictable-branch-outcome
+- signature: --param=predictable-branch-outcome
   type: integer
   range: [0, 50]
 
-- signature: prefetch-dynamic-strides
+- signature: --param=prefetch-dynamic-strides
   type: integer
   range: [0, 1]
 
-- signature: prefetch-latency
+- signature: --param=prefetch-latency
   type: integer
   range: [0, 2147483648]
 
-- signature: prefetch-min-insn-to-mem-ratio
+- signature: --param=prefetch-min-insn-to-mem-ratio
   type: integer
   range: [0, 2147483648]
 
-- signature: profile-func-internal-id
+- signature: --param=profile-func-internal-id
   type: integer
   range: [0, 1]
 
-- signature: ranger-logical-depth
+- signature: --param=ranger-logical-depth
   type: integer
   range: [1, 999]
 
-- signature: rpo-vn-max-loop-depth
+- signature: --param=rpo-vn-max-loop-depth
   type: integer
   range: [2, 65536]
 
-- signature: sccvn-max-alias-queries-per-access
+- signature: --param=sccvn-max-alias-queries-per-access
   type: integer
   range: [0, 2147483648]
 
-- signature: scev-max-expr-complexity
+- signature: --param=scev-max-expr-complexity
   type: integer
   range: [0, 2147483648]
 
-- signature: scev-max-expr-size
+- signature: --param=scev-max-expr-size
   type: integer
   range: [0, 2147483648]
 
-- signature: sched-mem-true-dep-cost
+- signature: --param=sched-mem-true-dep-cost
   type: integer
   range: [0, 2147483648]
 
-- signature: sched-pressure-algorithm
+- signature: --param=sched-pressure-algorithm
   type: integer
   range: [1, 2]
 
-- signature: sched-spec-prob-cutoff
+- signature: --param=sched-spec-prob-cutoff
   type: integer
   range: [0, 100]
 
-- signature: sched-state-edge-prob-cutoff
+- signature: --param=sched-state-edge-prob-cutoff
   type: integer
   range: [0, 100]
 
-- signature: selsched-insns-to-rename
+- signature: --param=selsched-insns-to-rename
   type: integer
   range: [0, 2147483648]
 
-- signature: selsched-max-lookahead
+- signature: --param=selsched-max-lookahead
   type: integer
   range: [0, 2147483648]
 
-- signature: selsched-max-sched-times
+- signature: --param=selsched-max-sched-times
   type: integer
   range: [1, 65536]
 
-- signature: simultaneous-prefetches
+- signature: --param=simultaneous-prefetches
   type: integer
   range: [0, 2147483648]
 
-- signature: sink-frequency-threshold
+- signature: --param=sink-frequency-threshold
   type: integer
   range: [0, 100]
 
-- signature: sms-dfa-history
+- signature: --param=sms-dfa-history
   type: integer
   range: [0, 16]
 
-- signature: sms-loop-average-count-threshold
+- signature: --param=sms-loop-average-count-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: sms-max-ii-factor
+- signature: --param=sms-max-ii-factor
   type: integer
   range: [1, 16]
 
-- signature: sms-min-sc
+- signature: --param=sms-min-sc
   type: integer
   range: [1, 2]
 
-- signature: sra-max-propagations
+- signature: --param=sra-max-propagations
   type: integer
   range: [0, 2147483648]
 
-- signature: sra-max-scalarization-size-Osize
+- signature: --param=sra-max-scalarization-size-Osize
   type: integer
   range: [0, 2147483648]
 
-- signature: sra-max-scalarization-size-Ospeed
+- signature: --param=sra-max-scalarization-size-Ospeed
   type: integer
   range: [0, 2147483648]
 
-- signature: ssa-name-def-chain-limit
+- signature: --param=ssa-name-def-chain-limit
   type: integer
   range: [0, 2147483648]
 
-- signature: ssp-buffer-size
+- signature: --param=ssp-buffer-size
   type: integer
   range: [1, 65536]
 
-- signature: stack-clash-protection-guard-size
+- signature: --param=stack-clash-protection-guard-size
   type: integer
   range: [12, 30]
 
-- signature: stack-clash-protection-probe-interval
+- signature: --param=stack-clash-protection-probe-interval
   type: integer
   range: [10, 16]
 
-- signature: store-merging-allow-unaligned
+- signature: --param=store-merging-allow-unaligned
   type: integer
   range: [0, 1]
 
-- signature: store-merging-max-size
+- signature: --param=store-merging-max-size
   type: integer
   range: [1, 65536]
 
-- signature: switch-conversion-max-branch-ratio
+- signature: --param=switch-conversion-max-branch-ratio
   type: integer
   range: [1, 65536]
 
-- signature: tm-max-aggregate-size
+- signature: --param=tm-max-aggregate-size
   type: integer
   range: [0, 2147483648]
 
-- signature: tracer-dynamic-coverage-feedback
+- signature: --param=tracer-dynamic-coverage-feedback
   type: integer
   range: [0, 100]
 
-- signature: tracer-dynamic-coverage
+- signature: --param=tracer-dynamic-coverage
   type: integer
   range: [0, 100]
 
-- signature: tracer-max-code-growth
+- signature: --param=tracer-max-code-growth
   type: integer
   range: [0, 2147483648]
 
-- signature: tracer-min-branch-probability-feedback
+- signature: --param=tracer-min-branch-probability-feedback
   type: integer
   range: [0, 100]
 
-- signature: tracer-min-branch-probability
+- signature: --param=tracer-min-branch-probability
   type: integer
   range: [0, 100]
 
-- signature: tracer-min-branch-ratio
+- signature: --param=tracer-min-branch-ratio
   type: integer
   range: [0, 100]
 
-- signature: tree-reassoc-width
+- signature: --param=tree-reassoc-width
   type: integer
   range: [0, 2147483648]
 
-- signature: tsan-distinguish-volatile
+- signature: --param=tsan-distinguish-volatile
   type: integer
   range: [0, 1]
 
-- signature: tsan-instrument-func-entry-exit
+- signature: --param=tsan-instrument-func-entry-exit
   type: integer
   range: [0, 1]
 
-- signature: uninit-control-dep-attempts
+- signature: --param=uninit-control-dep-attempts
   type: integer
   range: [1, 65536]
 
-- signature: uninlined-function-insns
+- signature: --param=uninlined-function-insns
   type: integer
   range: [0, 1000000]
 
-- signature: uninlined-function-time
+- signature: --param=uninlined-function-time
   type: integer
   range: [0, 1000000]
 
-- signature: uninlined-thunk-insns
+- signature: --param=uninlined-thunk-insns
   type: integer
   range: [0, 1000000]
 
-- signature: uninlined-thunk-time
+- signature: --param=uninlined-thunk-time
   type: integer
   range: [0, 1000000]
 
-- signature: unlikely-bb-count-fraction
+- signature: --param=unlikely-bb-count-fraction
   type: integer
   range: [0, 2147483648]
 
-- signature: unroll-jam-max-unroll
+- signature: --param=unroll-jam-max-unroll
   type: integer
   range: [0, 2147483648]
 
-- signature: unroll-jam-min-percent
+- signature: --param=unroll-jam-min-percent
   type: integer
   range: [0, 100]
 
-- signature: use-after-scope-direct-emission-threshold
+- signature: --param=use-after-scope-direct-emission-threshold
   type: integer
   range: [0, 2147483648]
 
-- signature: use-canonical-types
+- signature: --param=use-canonical-types
   type: integer
   range: [0, 1]
 
-- signature: vect-epilogues-nomask
+- signature: --param=vect-epilogues-nomask
   type: integer
   range: [0, 1]
 
-- signature: vect-max-version-for-alias-checks
+- signature: --param=vect-max-version-for-alias-checks
   type: integer
   range: [0, 2147483648]
 
-- signature: vect-max-version-for-alignment-checks
+- signature: --param=vect-max-version-for-alignment-checks
   type: integer
   range: [0, 2147483648]
 
-- signature: vect-partial-vector-usage
+- signature: --param=vect-partial-vector-usage
   type: integer
   range: [0, 2]
 
@@ -1168,7 +1164,7 @@
 
 - signature: -fexcess-precision
   type: categorical
-  choices: [fast, standard]
+  choices: [-fexcess-precision=fast, -fexcess-precision=standard]
 
 - signature: -fexpensive-optimizations
   type: categorical
@@ -1196,7 +1192,7 @@
 
 - signature: -ffp-contract
   type: categorical
-  choices: [off, on, fast]
+  choices: [-ffp-contract=off, -ffp-contract=on, -ffp-contract=fast]
 
 - signature: -ffp-int-builtin-inexact
   type: categorical
@@ -1276,7 +1272,7 @@
 
 - signature: -fira-algorithm
   type: categorical
-  choices: [CB, priority]
+  choices: [-fira-algorithm=CB, -fira-algorithm=priority]
 
 - signature: -fira-hoist-pressure
   type: categorical
@@ -1288,7 +1284,7 @@
 
 - signature: -fira-region
   type: categorical
-  choices: [one, all, mixed]
+  choices: [-fira-region=one, -fira-region=all, -fira-region=mixed]
 
 - signature: -fira-share-save-slots
   type: categorical
@@ -1448,7 +1444,7 @@
 
 - signature: -freorder-blocks-algorithm
   type: categorical
-  choices: [simple, stc]
+  choices: [-freorder-blocks-algorithm=simple, -freorder-blocks-algorithm=stc]
 
 - signature: -freorder-blocks-and-partition
   type: categorical
@@ -1592,7 +1588,7 @@
 
 - signature: -fsimd-cost-model
   type: categorical
-  choices: [unlimited, dynamic, cheap, very-cheap]
+  choices: [-fsimd-cost-model=unlimited, -fsimd-cost-model=dynamic, -fsimd-cost-model=cheap, -fsimd-cost-model=very-cheap]
 
 - signature: -fsingle-precision-constant
   type: categorical
@@ -1628,7 +1624,7 @@
 
 - signature: -fstack-check
   type: categorical
-  choices: [no, generic, specific]
+  choices: [-fstack-check=no, -fstack-check=generic, -fstack-check=specific]
 
 - signature: -fstack-clash-protection
   type: categorical
@@ -1636,7 +1632,7 @@
 
 - signature: -fstack-reuse
   type: categorical
-  choices: [all, named_vars, none]
+  choices: [-fstack-reuse=all, -fstack-reuse=named_vars, -fstack-reuse=none]
 
 - signature: -fstdarg-opt
   type: categorical
@@ -1872,7 +1868,7 @@
 
 - signature: -fvect-cost-model
   type: categorical
-  choices: [unlimited, dynamic, cheap, very-cheap]
+  choices: [-fvect-cost-model=unlimited, -fvect-cost-model=dynamic, -fvect-cost-model=cheap, -fvect-cost-model=very-cheap]
 
 - signature: -fversion-loops-for-strides
   type: categorical

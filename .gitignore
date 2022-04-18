@@ -184,3 +184,4 @@ examples/gcc/.DS_Store
 /examples/*.db
 /examples/gcc/utils/*.outexamples/gcc/utils/.DS_Store
 examples/gcc/utils/.DS_Store
+/examples/gcc/a-raytracer.cpp.opt-record.json.gz

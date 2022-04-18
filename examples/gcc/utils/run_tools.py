@@ -3,6 +3,7 @@ import logging
 import os
 import platform
 import random
+from contextlib import suppress
 from functools import partial
 from os.path import dirname, abspath
 from typing import Union, Optional, Tuple
@@ -32,7 +33,7 @@ class GccRenderer(ParametersVisitor):
 
     def visit_common(self, p: Parameter) -> Optional[str]:
         value = self.get_value(p)
-        return f"--param={p.name}={value}" if value else None
+        return f"{p.name}={value}" if value else None
 
     def visit_integer(self, p: Integer) -> Optional[str]:
         return self.visit_common(p)
@@ -174,7 +175,8 @@ def objective(
     compile_result = compile_source(toolchain, source_file, rendered_opts, binary_out)
 
     if not compile_result:
-        os.remove(binary_out)
+        with suppress(FileNotFoundError):
+            os.remove(binary_out)
         return experiment.metrics[objective_metric]
 
     experiment.metrics['compile_time'] = compile_result

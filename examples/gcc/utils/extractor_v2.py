@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 APPLICATION = os.path.join(dirname(dirname(abspath(__file__))), 'raytracer', 'raytracer.cpp')
 
 
-def check_is_working_flag(flag):
-    cmd = f'g++-11 {APPLICATION} {flag} 2>&1'
+def check_is_working_flag(gcc_toolchain_path, flag):
+    cmd = f'{gcc_toolchain_path} {APPLICATION} {flag} 2>&1'
     try:
         result = executor.execute(cmd, capture=True)
     except executor.ExternalCommandFailed:
@@ -68,12 +68,12 @@ def parse_optimizers(gcc_toolchain_path):
             choices = []
             name = '-f' + m.group(1)
 
-            if check_is_working_flag(name):
+            if check_is_working_flag(gcc_toolchain_path, name):
                 choices.append(name)
 
             inverted = invert_gcc_flag(name)
 
-            if check_is_working_flag(inverted):
+            if check_is_working_flag(gcc_toolchain_path, inverted):
                 choices.append(inverted)
 
             choices.append(None)
@@ -90,12 +90,12 @@ def parse_optimizers(gcc_toolchain_path):
             choices = []
             name = '-f' + m.group(1)
 
-            if check_is_working_flag(name):
+            if check_is_working_flag(gcc_toolchain_path, name):
                 choices.append(name)
 
             inverted = invert_gcc_flag(name)
 
-            if check_is_working_flag(inverted):
+            if check_is_working_flag(gcc_toolchain_path, inverted):
                 choices.append(inverted)
 
             choices.append(None)
@@ -111,6 +111,7 @@ def parse_optimizers(gcc_toolchain_path):
         if m:
             name = '-f' + m.group(1)
             values = m.group(2).split('|')
+            values = [f'{name}={v}' for v in values]
             optimizers[name] = {
                 'type': 'categorical',
                 'choices': values
@@ -123,10 +124,11 @@ def parse_optimizers(gcc_toolchain_path):
             name = '-f' + m.group(1)
             minimum = int(m.group(2))
             maximum = int(m.group(3))
-            optimizers[name] = {
-                'type': 'integer',
-                'range': [minimum, maximum]
-            }
+            if minimum < maximum:
+                optimizers[name] = {
+                    'type': 'integer',
+                    'range': [minimum, maximum]
+                }
             return
 
         # -fflag=<number>
@@ -161,7 +163,7 @@ def parse_parameters(gcc_toolchain_path):
     param_interval_pat = re.compile("--param=([-a-zA-Z0-9]+)=<(-?[0-9]+),([0-9]+)>")
     param_number_pat = re.compile("--param=([-a-zA-Z0-9]+)=")
     param_old_interval_pat = re.compile(
-        "([-a-zA-Z0-9]+)\\s+default\\s+(-?\\d+)\\s+minimum\\s+(-?\\d+)\\s+maximum\\s+(-?\\d+)"
+        "\\s+([-a-zA-Z0-9]+)\\s+default\\s+(-?\\d+)\\s+minimum\\s+(-?\\d+)\\s+maximum\\s+(-?\\d+)"
     )
 
     params = {}
@@ -174,13 +176,17 @@ def parse_parameters(gcc_toolchain_path):
         if len(bits) <= 1:
             return
 
-        spec = bits[0]
+        if len(bits) > 2:
+            spec = line
+        else:
+            spec = bits[0]
 
         # --param=name=[a|b]
         m = param_enum_pat.fullmatch(spec)
         if m:
-            name = m.group(1)
+            name = '--param=' + m.group(1)
             values = m.group(2).split("|")
+            values = [f'{name}={v}' for v in values]
             params[name] = {
                 'type': 'categorical',
                 'choices': values
@@ -190,20 +196,21 @@ def parse_parameters(gcc_toolchain_path):
 
         m = param_interval_pat.fullmatch(spec)
         if m:
-            name = m.group(1)
+            name = '--param=' + m.group(1)
             minimum = int(m.group(2))
             maximum = int(m.group(3))
-            params[name] = {
-                'type': 'integer',
-                'range': [minimum, maximum]
-            }
+            if minimum < maximum:
+                params[name] = {
+                    'type': 'integer',
+                    'range': [minimum, maximum]
+                }
             log.info(f"Integer: {name} {minimum} {maximum}")
             return
 
         # --param=name=
         m = param_number_pat.fullmatch(spec)
         if m:
-            name = m.group(1)
+            name = '--param=' + m.group(1)
             minimum = 0
             maximum = 2 << 31 - 1
             params[name] = {
@@ -215,10 +222,10 @@ def parse_parameters(gcc_toolchain_path):
 
         m = param_old_interval_pat.fullmatch(spec)
         if m:
-            name = m.group(1)
+            name = '--param=' + m.group(1)
             minimum = int(m.group(3))
             maximum = int(m.group(4))
-            if minimum <= maximum:
+            if minimum < maximum:
                 params[name] = {
                     'type': 'integer',
                     'range': [minimum, maximum]
