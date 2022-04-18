@@ -1,31 +1,24 @@
-import logging
 import hashlib
+import logging
 import os
 import platform
 import random
-from os.path import abspath, dirname
-from typing import Type, Union, Dict, Optional, Tuple
+from functools import partial
+from os.path import dirname, abspath
+from typing import Union, Optional, Tuple
 
 import numpy
-
-from gimeltune import create_job
-from gimeltune.models.experiment import Experiment
-from gimeltune.search.parameters import ParametersVisitor, Parameter, Integer, Real, Categorical
-from gimeltune.search.space import from_yaml, SearchSpace
-from gimeltune.utils.logging import init
-from gimeltune.search.space import SearchSpace
 from executor import execute, ExternalCommandFailed
 
-init(verbose=True)
+from gimeltune import Experiment, SearchSpace, create_job, load_job
+from gimeltune.search import ParametersVisitor
+from gimeltune.search.parameters import Parameter, Integer, Real, Categorical
+from rich.progress import track
 
-SOURCE_FILE = os.path.join(dirname(abspath(__file__)), 'raytracer', 'raytracer.cpp')
-SPACE_FILE = os.path.join(dirname(abspath(__file__)), 'space_wided.yaml')
-SPACE = SearchSpace.from_yaml_file(SPACE_FILE)
-ERROR_RESULT = 1e10
-OBJECTIVE_METRIC = 'time'
-ITERATIONS = 20
 
 log = logging.getLogger(__name__)
+
+ERROR_RESULT = 1e10
 
 
 class GccRenderer(ParametersVisitor):
@@ -39,7 +32,7 @@ class GccRenderer(ParametersVisitor):
 
     def visit_common(self, p: Parameter) -> Optional[str]:
         value = self.get_value(p)
-        return f"--param {p.name}={value}" if value else None
+        return f"--param={p.name}={value}" if value else None
 
     def visit_integer(self, p: Integer) -> Optional[str]:
         return self.visit_common(p)
@@ -69,14 +62,14 @@ def render(experiment: Experiment, space: SearchSpace, renderer_cls) -> str:
 
 
 def run_command_and_capture_stdout(command: str) -> Optional[str]:
-    log.debug(f'RUN COMMAND:\n[cyan][bold]{command}')
+    log.debug(f'RUN COMMAND:\n{command}')
 
     try:
         output = execute(command, capture=True)
 
         decoded = output.strip()
         if decoded:
-            log.info(f'[yellow][bold]OUT: {decoded}')
+            log.info(f'OUT: {decoded}')
 
         return decoded
     except ExternalCommandFailed as e:
@@ -84,17 +77,17 @@ def run_command_and_capture_stdout(command: str) -> Optional[str]:
         return None
 
 
-def compile_source(source_file: str, rendered_opts, out_file: str) -> Optional[float]:
+def compile_source(toolchain: str, source_file: str, rendered_opts, out_file: str) -> Optional[float]:
 
     system_name = platform.system()
 
     if system_name == 'Linux':
-        compile_cmd = f'/usr/bin/time -f \'%e\' /usr/local/bin/g++-11 -o' \
+        compile_cmd = f'/usr/bin/time -f \'%e\' {toolchain} -o' \
                       f' {out_file} {source_file} {rendered_opts} 2>&1'
 
     elif system_name == 'Darwin':
         # gnu-time is required
-        compile_cmd = f'/usr/local/bin/gtime -f \'%e\' /usr/local/bin/g++-11 -o' \
+        compile_cmd = f'/usr/local/bin/gtime -f \'%e\' {toolchain} -o' \
                       f' {out_file} {source_file} {rendered_opts} 2>&1'
 
     else:
@@ -104,7 +97,7 @@ def compile_source(source_file: str, rendered_opts, out_file: str) -> Optional[f
 
     try:
         compile_time = float(stdout)
-    except ValueError:
+    except (ValueError, TypeError):
         return None
 
     return compile_time
@@ -150,7 +143,14 @@ def get_binary_size(binary_name) -> float:
     return int(size_out)
 
 
-def objective(experiment: Experiment):
+def objective(
+    experiment: Experiment,
+    toolchain: str,
+    search_space: SearchSpace,
+    source_file: str,
+    objective_metric: str,
+    iterations: int
+):
     metrics = {
         'compile_time': ERROR_RESULT,
         'time': ERROR_RESULT,
@@ -169,21 +169,21 @@ def objective(experiment: Experiment):
     binary_out = config_hash + str(random.randint(1, 99999)) + '.out'
     binary_out = os.path.join(dirname(abspath(__file__)), binary_out)
 
-    rendered_opts = render(experiment, SPACE, GccRenderer)
+    rendered_opts = render(experiment, search_space, GccRenderer)
 
-    compile_result = compile_source(SOURCE_FILE, rendered_opts, binary_out)
+    compile_result = compile_source(toolchain, source_file, rendered_opts, binary_out)
 
     if not compile_result:
-        # run_command_and_capture_stdout(f'rm {binary_out}')
-        return experiment.metrics[OBJECTIVE_METRIC]
+        os.remove(binary_out)
+        return experiment.metrics[objective_metric]
 
     experiment.metrics['compile_time'] = compile_result
 
-    run_result = run_binary(binary_out, ITERATIONS)
+    run_result = run_binary(binary_out, iterations)
 
     if not run_result:
-        run_command_and_capture_stdout(f'rm {binary_out}')
-        return experiment.metrics[OBJECTIVE_METRIC]
+        os.remove(binary_out)
+        return experiment.metrics[objective_metric]
 
     run_time, std, cv, low, high = run_result
 
@@ -197,29 +197,62 @@ def objective(experiment: Experiment):
 
     experiment.metrics['size'] = size
 
-    run_command_and_capture_stdout(f'rm {binary_out}')
-    return experiment.metrics[OBJECTIVE_METRIC]
+    os.remove(binary_out)
+    return experiment.metrics[objective_metric]
 
 
-def run_gcc(n_trials):
-    job = create_job(search_space=SPACE)
+def run_gcc(job, toolchain, iterations, n_trials, source_file, objective_metric):
     job.setup_default_algo()
 
     # Let's assume we can and run compile without errors baselines
-    compile_source(SOURCE_FILE, '-O3', os.path.join(dirname(abspath(__file__)), 'baselineO3.out'))
-    compile_source(SOURCE_FILE, '-O2', os.path.join(dirname(abspath(__file__)), 'baselineO2.out'))
-    compile_source(SOURCE_FILE, '-O1', os.path.join(dirname(abspath(__file__)), 'baselineO1.out'))
+    compile_source(toolchain, source_file, '-O3', os.path.join(dirname(abspath(__file__)), 'baselineO3.out'))
+    compile_source(toolchain, source_file, '-O2', os.path.join(dirname(abspath(__file__)), 'baselineO2.out'))
+    compile_source(toolchain, source_file, '-O1', os.path.join(dirname(abspath(__file__)), 'baselineO1.out'))
+
+    run_time_o3, std_o3, cv_o3, low_o3, high_o3 = run_binary(
+        os.path.join(dirname(abspath(__file__)), 'baselineO3.out'), iterations)
+    run_time_o2, std_o2, cv_o2, low_o2, high_o2 = run_binary(
+        os.path.join(dirname(abspath(__file__)), 'baselineO2.out'), iterations)
+    run_time_o1, std_o1, cv_o1, low_o1, high_o1 = run_binary(
+        os.path.join(dirname(abspath(__file__)), 'baselineO1.out'), iterations)
 
     baselines = {
-        'O3': run_binary(os.path.join(dirname(abspath(__file__)), 'baselineO3.out'), ITERATIONS),
-        'O2': run_binary(os.path.join(dirname(abspath(__file__)), 'baselineO2.out'), ITERATIONS),
-        'O1': run_binary(os.path.join(dirname(abspath(__file__)), 'baselineO1.out'), ITERATIONS),
+        'O3': {
+            'time': run_time_o3,
+            'std': std_o3,
+            'cv': cv_o3,
+            'low': low_o3,
+            'high': high_o3,
+        },
+        'O2': {
+            'time': run_time_o2,
+            'std': std_o2,
+            'cv': cv_o2,
+            'low': low_o2,
+            'high': high_o2,
+        },
+        'O1': {
+            'time': run_time_o1,
+            'std': std_o1,
+            'cv': cv_o1,
+            'low': low_o1,
+            'high': high_o1,
+        },
     }
 
-    for i in range(n_trials):
+    obj = partial(
+        objective,
+        search_space=job.search_space,
+        source_file=source_file,
+        objective_metric=objective_metric,
+        iterations=iterations,
+        toolchain=toolchain,
+    )
+
+    for _ in track(range(n_trials)):
         experiments = job.ask()
 
-        results = [objective(exp) for exp in experiments]
+        results = [obj(exp) for exp in experiments]
 
         for experiment, result in zip(experiments, results):
             experiment.apply(result)
@@ -235,6 +268,15 @@ def run_gcc(n_trials):
     return baselines, job
 
 
-if __name__ == '__main__':
-    baselines, job = run_gcc(10)
-    print(baselines)
+def run_job(toolchain, search_space_file, source_file, n_trials, iterations, storage, job_name, objective_metric):
+    space = SearchSpace.from_yaml_file(search_space_file)
+    job = create_job(search_space=space, storage=storage, name=job_name)
+    baselines, job = run_gcc(job, toolchain, iterations, n_trials, source_file, objective_metric)
+    return baselines, job
+
+
+def continue_job(toolchain, search_space_file, source_file, n_trials, iterations, storage, job_name, objective_metric):
+    space = SearchSpace.from_yaml_file(search_space_file)
+    job = load_job(search_space=space, storage=storage, name=job_name)
+    baselines, job = run_gcc(job, toolchain, iterations, n_trials, source_file, objective_metric)
+    return baselines, job

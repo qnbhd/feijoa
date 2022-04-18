@@ -28,3 +28,4 @@ class ExperimentModel(_Base):
     requestor = Column(String)
     create_timestamp = Column(Float)
     finish_timestamp = Column(Float)
+    metrics = Column(PickleType)

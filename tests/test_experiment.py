@@ -13,6 +13,8 @@ def test_experiment():
         params={'x': 0.0, 'y': 1.0}
     )
 
+    print(str(ex1))
+
     assert str(ex1) == '''Experiment({
     "id": 0,
     "job_id": 0,
@@ -25,7 +27,8 @@ def test_experiment():
     },
     "requestor": "foo",
     "create_timestamp": 0.0,
-    "finish_timestamp": null
+    "finish_timestamp": null,
+    "metrics": null
 })'''
 
     assert not ex1.is_finished()
