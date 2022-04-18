@@ -4,6 +4,7 @@ import logging
 import click
 from datetime import datetime
 
+from examples.gcc.utils.extractor_v2 import extract
 from examples.gcc.utils.run_tools import run_job, continue_job
 from gimeltune.utils.logging import init
 
@@ -56,8 +57,8 @@ def continue_cmd(toolchain, search_space, source_file, n_trials, iterations, sto
 @click.option('--toolchain', type=str, required=True)
 @click.option('--captured-cache', type=str)
 @click.option('--out-file', type=str, default='extracted_search_space.yaml')
-def extract_cmd():
-    pass
+def extract_cmd(toolchain, captured_cache, out_file):
+    extract(toolchain)
 
 
 cli.add_command(run_cmd)

@@ -201,10 +201,7 @@ def objective(
     return experiment.metrics[objective_metric]
 
 
-def run_gcc(job, toolchain, iterations, n_trials, source_file, objective_metric):
-    job.setup_default_algo()
-
-    # Let's assume we can and run compile without errors baselines
+def run_baselines(toolchain, source_file, iterations):
     compile_source(toolchain, source_file, '-O3', os.path.join(dirname(abspath(__file__)), 'baselineO3.out'))
     compile_source(toolchain, source_file, '-O2', os.path.join(dirname(abspath(__file__)), 'baselineO2.out'))
     compile_source(toolchain, source_file, '-O1', os.path.join(dirname(abspath(__file__)), 'baselineO1.out'))
@@ -239,6 +236,14 @@ def run_gcc(job, toolchain, iterations, n_trials, source_file, objective_metric)
             'high': high_o1,
         },
     }
+
+    return baselines
+
+
+def run_gcc(job, toolchain, iterations, n_trials, source_file, objective_metric):
+    job.setup_default_algo()
+
+    baselines = run_baselines(toolchain, source_file, iterations)
 
     obj = partial(
         objective,

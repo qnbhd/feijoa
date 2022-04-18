@@ -1,3 +1,1035 @@
+- signature: align-loop-iterations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: align-threshold
+  type: integer
+  range: [1, 65536]
+
+- signature: analyzer-bb-explosion-factor
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-max-constraints
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-max-enodes-for-full-dump
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-max-enodes-per-program-point
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-max-infeasible-edges
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-max-recursion-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-max-svalue-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: analyzer-min-snodes-for-call-summary
+  type: integer
+  range: [0, 2147483648]
+
+- signature: asan-globals
+  type: integer
+  range: [0, 1]
+
+- signature: asan-instrument-allocas
+  type: integer
+  range: [0, 1]
+
+- signature: asan-instrument-reads
+  type: integer
+  range: [0, 1]
+
+- signature: asan-instrument-writes
+  type: integer
+  range: [0, 1]
+
+- signature: asan-instrumentation-with-call-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: asan-memintrin
+  type: integer
+  range: [0, 1]
+
+- signature: asan-stack
+  type: integer
+  range: [0, 1]
+
+- signature: asan-use-after-return
+  type: integer
+  range: [0, 1]
+
+- signature: avg-loop-niter
+  type: integer
+  range: [1, 65536]
+
+- signature: avoid-fma-max-bits
+  type: integer
+  range: [0, 512]
+
+- signature: builtin-expect-probability
+  type: integer
+  range: [0, 100]
+
+- signature: builtin-string-cmp-inline-length
+  type: integer
+  range: [0, 100]
+
+- signature: case-values-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: comdat-sharing-probability
+  type: integer
+  range: [0, 2147483648]
+
+- signature: cxx-max-namespaces-for-diagnostic-help
+  type: integer
+  range: [0, 2147483648]
+
+- signature: dse-max-alias-queries-per-store
+  type: integer
+  range: [0, 2147483648]
+
+- signature: dse-max-object-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: early-inlining-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: evrp-mode
+  type: integer
+  range: [0, 2147483648]
+
+- signature: evrp-sparse-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: fsm-maximum-phi-arguments
+  type: integer
+  range: [1, 999999]
+
+- signature: fsm-scale-path-blocks
+  type: integer
+  range: [1, 10]
+
+- signature: fsm-scale-path-stmts
+  type: integer
+  range: [1, 10]
+
+- signature: gcse-after-reload-critical-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: gcse-after-reload-partial-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: gcse-cost-distance-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: gcse-unrestricted-cost
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ggc-min-expand
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ggc-min-heapsize
+  type: integer
+  range: [0, 2147483648]
+
+- signature: gimple-fe-computed-hot-bb-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: graphite-allow-codegen-errors
+  type: integer
+  range: [0, 1]
+
+- signature: graphite-max-arrays-per-scop
+  type: integer
+  range: [0, 2147483648]
+
+- signature: graphite-max-nb-scop-params
+  type: integer
+  range: [0, 2147483648]
+
+- signature: hash-table-verification-limit
+  type: integer
+  range: [0, 2147483648]
+
+- signature: hot-bb-count-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: hot-bb-count-ws-permille
+  type: integer
+  range: [0, 1000]
+
+- signature: hot-bb-frequency-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: hwasan-instrument-allocas
+  type: integer
+  range: [0, 1]
+
+- signature: hwasan-instrument-mem-intrinsics
+  type: integer
+  range: [0, 1]
+
+- signature: hwasan-instrument-reads
+  type: integer
+  range: [0, 1]
+
+- signature: hwasan-instrument-stack
+  type: integer
+  range: [0, 1]
+
+- signature: hwasan-instrument-writes
+  type: integer
+  range: [0, 1]
+
+- signature: hwasan-random-frame-tag
+  type: integer
+  range: [0, 1]
+
+- signature: inline-heuristics-hint-percent
+  type: integer
+  range: [100, 1000000]
+
+- signature: inline-min-speedup
+  type: integer
+  range: [0, 100]
+
+- signature: inline-unit-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: integer-share-limit
+  type: integer
+  range: [2, 65536]
+
+- signature: ipa-cp-eval-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-cp-large-unit-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-cp-loop-hint-bonus
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-cp-max-recursive-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-cp-min-recursive-probability
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-cp-recursion-penalty
+  type: integer
+  range: [0, 100]
+
+- signature: ipa-cp-single-call-penalty
+  type: integer
+  range: [0, 100]
+
+- signature: ipa-cp-unit-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-cp-value-list-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-jump-function-lookups
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-max-aa-steps
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-max-agg-items
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-max-loop-predicates
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-max-param-expr-ops
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-max-switch-predicate-bounds
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ipa-sra-max-replacements
+  type: integer
+  range: [0, 16]
+
+- signature: ipa-sra-ptr-growth-factor
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ira-loop-reserved-regs
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ira-max-conflict-table-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ira-max-loops-num
+  type: integer
+  range: [0, 2147483648]
+
+- signature: iv-always-prune-cand-set-bound
+  type: integer
+  range: [0, 2147483648]
+
+- signature: iv-consider-all-candidates-bound
+  type: integer
+  range: [0, 2147483648]
+
+- signature: iv-max-considered-uses
+  type: integer
+  range: [0, 2147483648]
+
+- signature: jump-table-max-growth-ratio-for-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: jump-table-max-growth-ratio-for-speed
+  type: integer
+  range: [0, 2147483648]
+
+- signature: l1-cache-line-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: l1-cache-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: l2-cache-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: large-function-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: large-function-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: large-stack-frame-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: large-stack-frame
+  type: integer
+  range: [0, 2147483648]
+
+- signature: large-unit-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: lazy-modules
+  type: integer
+  range: [0, 2147483648]
+
+- signature: lim-expensive
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-block-tile-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-interchange-max-num-stmts
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-interchange-stride-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-invariant-max-bbs-in-loop
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-max-datarefs-for-datadeps
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-versioning-max-inner-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: loop-versioning-max-outer-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: lra-inheritance-ebb-probability-cutoff
+  type: integer
+  range: [0, 100]
+
+- signature: lra-max-considered-reload-pseudos
+  type: integer
+  range: [0, 2147483648]
+
+- signature: lto-max-partition
+  type: integer
+  range: [0, 2147483648]
+
+- signature: lto-max-streaming-parallelism
+  type: integer
+  range: [1, 65536]
+
+- signature: lto-min-partition
+  type: integer
+  range: [0, 2147483648]
+
+- signature: lto-partitions
+  type: integer
+  range: [1, 65536]
+
+- signature: max-average-unrolled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-combine-insns
+  type: integer
+  range: [2, 4]
+
+- signature: max-completely-peel-loop-nest-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-completely-peel-times
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-completely-peeled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-crossjump-edges
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-cse-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-cse-path-length
+  type: integer
+  range: [1, 65536]
+
+- signature: max-cselib-memory-locations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-debug-marker-count
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-delay-slot-insn-search
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-delay-slot-live-search
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-dse-active-local-stores
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-early-inliner-iterations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-fields-for-field-sensitive
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-find-base-term-values
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-fsm-thread-length
+  type: integer
+  range: [1, 999999]
+
+- signature: max-fsm-thread-path-insns
+  type: integer
+  range: [1, 999999]
+
+- signature: max-fsm-thread-paths
+  type: integer
+  range: [1, 999999]
+
+- signature: max-gcse-insertion-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-gcse-memory
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-goto-duplication-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-grow-copy-bb-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-hoist-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-insns-auto
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-insns-recursive-auto
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-insns-recursive
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-insns-single
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-insns-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-insns-small
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-recursive-depth-auto
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-inline-recursive-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-isl-operations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-iterations-computation-cost
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-iterations-to-track
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-jump-thread-duplication-stmts
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-last-value-rtl
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-loop-header-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-modulo-backtrack-attempts
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-partial-antic-length
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-peel-branches
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-peel-times
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-peeled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-pending-list-length
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-pipeline-region-blocks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-pipeline-region-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-pow-sqrt-depth
+  type: integer
+  range: [1, 32]
+
+- signature: max-predicted-iterations
+  type: integer
+  range: [0, 65536]
+
+- signature: max-reload-search-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-rtl-if-conversion-insns
+  type: integer
+  range: [0, 99]
+
+- signature: max-rtl-if-conversion-predictable-cost
+  type: integer
+  range: [0, 200]
+
+- signature: max-rtl-if-conversion-unpredictable-cost
+  type: integer
+  range: [0, 200]
+
+- signature: max-sched-extend-regions-iters
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-sched-insn-conflict-delay
+  type: integer
+  range: [1, 10]
+
+- signature: max-sched-ready-insns
+  type: integer
+  range: [1, 65536]
+
+- signature: max-sched-region-blocks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-sched-region-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-slsr-cand-scan
+  type: integer
+  range: [1, 999999]
+
+- signature: max-speculative-devirt-maydefs
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-ssa-name-query-depth
+  type: integer
+  range: [1, 10]
+
+- signature: max-store-chains-to-track
+  type: integer
+  range: [1, 65536]
+
+- signature: max-stores-to-merge
+  type: integer
+  range: [2, 65536]
+
+- signature: max-stores-to-sink
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-stores-to-track
+  type: integer
+  range: [2, 1048576]
+
+- signature: max-tail-merge-comparisons
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-tail-merge-iterations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-tracked-strlens
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-tree-if-conversion-phi-args
+  type: integer
+  range: [2, 65536]
+
+- signature: max-unroll-times
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-unrolled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-unswitch-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-unswitch-level
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-variable-expansions-in-unroller
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-vartrack-expr-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-vartrack-reverse-op-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-vartrack-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: max-vrp-switch-assertions
+  type: integer
+  range: [0, 2147483648]
+
+- signature: min-crossjump-insns
+  type: integer
+  range: [1, 65536]
+
+- signature: min-inline-recursive-probability
+  type: integer
+  range: [0, 2147483648]
+
+- signature: min-insn-to-prefetch-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: min-loop-cond-split-prob
+  type: integer
+  range: [0, 100]
+
+- signature: min-nondebug-insn-uid
+  type: integer
+  range: [0, 2147483648]
+
+- signature: min-size-for-stack-sharing
+  type: integer
+  range: [0, 2147483648]
+
+- signature: min-spec-prob
+  type: integer
+  range: [0, 2147483648]
+
+- signature: min-vect-loop-bound
+  type: integer
+  range: [0, 2147483648]
+
+- signature: modref-max-accesses
+  type: integer
+  range: [0, 2147483648]
+
+- signature: modref-max-bases
+  type: integer
+  range: [0, 2147483648]
+
+- signature: modref-max-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: modref-max-escape-points
+  type: integer
+  range: [0, 2147483648]
+
+- signature: modref-max-refs
+  type: integer
+  range: [0, 2147483648]
+
+- signature: modref-max-tests
+  type: integer
+  range: [0, 2147483648]
+
+- signature: openacc-kernels
+  type: categorical
+  choices: [decompose, parloops]
+
+- signature: parloops-chunk-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: parloops-min-per-thread
+  type: integer
+  range: [2, 65536]
+
+- signature: parloops-schedule
+  type: categorical
+  choices: [static, dynamic, guided, auto, runtime]
+
+- signature: partial-inlining-entry-probability
+  type: integer
+  range: [0, 100]
+
+- signature: predictable-branch-outcome
+  type: integer
+  range: [0, 50]
+
+- signature: prefetch-dynamic-strides
+  type: integer
+  range: [0, 1]
+
+- signature: prefetch-latency
+  type: integer
+  range: [0, 2147483648]
+
+- signature: prefetch-min-insn-to-mem-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: profile-func-internal-id
+  type: integer
+  range: [0, 1]
+
+- signature: ranger-logical-depth
+  type: integer
+  range: [1, 999]
+
+- signature: rpo-vn-max-loop-depth
+  type: integer
+  range: [2, 65536]
+
+- signature: sccvn-max-alias-queries-per-access
+  type: integer
+  range: [0, 2147483648]
+
+- signature: scev-max-expr-complexity
+  type: integer
+  range: [0, 2147483648]
+
+- signature: scev-max-expr-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: sched-mem-true-dep-cost
+  type: integer
+  range: [0, 2147483648]
+
+- signature: sched-pressure-algorithm
+  type: integer
+  range: [1, 2]
+
+- signature: sched-spec-prob-cutoff
+  type: integer
+  range: [0, 100]
+
+- signature: sched-state-edge-prob-cutoff
+  type: integer
+  range: [0, 100]
+
+- signature: selsched-insns-to-rename
+  type: integer
+  range: [0, 2147483648]
+
+- signature: selsched-max-lookahead
+  type: integer
+  range: [0, 2147483648]
+
+- signature: selsched-max-sched-times
+  type: integer
+  range: [1, 65536]
+
+- signature: simultaneous-prefetches
+  type: integer
+  range: [0, 2147483648]
+
+- signature: sink-frequency-threshold
+  type: integer
+  range: [0, 100]
+
+- signature: sms-dfa-history
+  type: integer
+  range: [0, 16]
+
+- signature: sms-loop-average-count-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: sms-max-ii-factor
+  type: integer
+  range: [1, 16]
+
+- signature: sms-min-sc
+  type: integer
+  range: [1, 2]
+
+- signature: sra-max-propagations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: sra-max-scalarization-size-Osize
+  type: integer
+  range: [0, 2147483648]
+
+- signature: sra-max-scalarization-size-Ospeed
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ssa-name-def-chain-limit
+  type: integer
+  range: [0, 2147483648]
+
+- signature: ssp-buffer-size
+  type: integer
+  range: [1, 65536]
+
+- signature: stack-clash-protection-guard-size
+  type: integer
+  range: [12, 30]
+
+- signature: stack-clash-protection-probe-interval
+  type: integer
+  range: [10, 16]
+
+- signature: store-merging-allow-unaligned
+  type: integer
+  range: [0, 1]
+
+- signature: store-merging-max-size
+  type: integer
+  range: [1, 65536]
+
+- signature: switch-conversion-max-branch-ratio
+  type: integer
+  range: [1, 65536]
+
+- signature: tm-max-aggregate-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: tracer-dynamic-coverage-feedback
+  type: integer
+  range: [0, 100]
+
+- signature: tracer-dynamic-coverage
+  type: integer
+  range: [0, 100]
+
+- signature: tracer-max-code-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: tracer-min-branch-probability-feedback
+  type: integer
+  range: [0, 100]
+
+- signature: tracer-min-branch-probability
+  type: integer
+  range: [0, 100]
+
+- signature: tracer-min-branch-ratio
+  type: integer
+  range: [0, 100]
+
+- signature: tree-reassoc-width
+  type: integer
+  range: [0, 2147483648]
+
+- signature: tsan-distinguish-volatile
+  type: integer
+  range: [0, 1]
+
+- signature: tsan-instrument-func-entry-exit
+  type: integer
+  range: [0, 1]
+
+- signature: uninit-control-dep-attempts
+  type: integer
+  range: [1, 65536]
+
+- signature: uninlined-function-insns
+  type: integer
+  range: [0, 1000000]
+
+- signature: uninlined-function-time
+  type: integer
+  range: [0, 1000000]
+
+- signature: uninlined-thunk-insns
+  type: integer
+  range: [0, 1000000]
+
+- signature: uninlined-thunk-time
+  type: integer
+  range: [0, 1000000]
+
+- signature: unlikely-bb-count-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: unroll-jam-max-unroll
+  type: integer
+  range: [0, 2147483648]
+
+- signature: unroll-jam-min-percent
+  type: integer
+  range: [0, 100]
+
+- signature: use-after-scope-direct-emission-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: use-canonical-types
+  type: integer
+  range: [0, 1]
+
+- signature: vect-epilogues-nomask
+  type: integer
+  range: [0, 1]
+
+- signature: vect-max-version-for-alias-checks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: vect-max-version-for-alignment-checks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: vect-partial-vector-usage
+  type: integer
+  range: [0, 2]
+
 - signature: -O
   type: categorical
   choices: [-O0, -O1, -O2, -O3]
@@ -30,6 +1062,10 @@
   type: categorical
   choices: [-fallow-store-data-races, -fno-allow-store-data-races, null]
 
+- signature: -fassume-phsa
+  type: categorical
+  choices: [null]
+
 - signature: -fasynchronous-unwind-tables
   type: categorical
   choices: [-fasynchronous-unwind-tables, -fno-asynchronous-unwind-tables, null]
@@ -45,6 +1081,10 @@
 - signature: -fbranch-count-reg
   type: categorical
   choices: [-fbranch-count-reg, -fno-branch-count-reg, null]
+
+- signature: -fbranch-probabilities
+  type: categorical
+  choices: [-fno-branch-probabilities, null]
 
 - signature: -fcaller-saves
   type: categorical
@@ -94,6 +1134,10 @@
   type: categorical
   choices: [-fdefer-pop, -fno-defer-pop, null]
 
+- signature: -fdelayed-branch
+  type: categorical
+  choices: [-fno-delayed-branch, null]
+
 - signature: -fdelete-dead-exceptions
   type: categorical
   choices: [-fdelete-dead-exceptions, -fno-delete-dead-exceptions, null]
@@ -122,6 +1166,10 @@
   type: categorical
   choices: [-fexceptions, -fno-exceptions, null]
 
+- signature: -fexcess-precision
+  type: categorical
+  choices: [fast, standard]
+
 - signature: -fexpensive-optimizations
   type: categorical
   choices: [-fexpensive-optimizations, -fno-expensive-optimizations, null]
@@ -145,6 +1193,10 @@
 - signature: -fforward-propagate
   type: categorical
   choices: [-fforward-propagate, -fno-forward-propagate, null]
+
+- signature: -ffp-contract
+  type: categorical
+  choices: [off, on, fast]
 
 - signature: -ffp-int-builtin-inexact
   type: categorical
@@ -222,6 +1274,10 @@
   type: categorical
   choices: [-finline-small-functions, -fno-inline-small-functions, null]
 
+- signature: -fira-algorithm
+  type: categorical
+  choices: [CB, priority]
+
 - signature: -fira-hoist-pressure
   type: categorical
   choices: [-fira-hoist-pressure, -fno-ira-hoist-pressure, null]
@@ -229,6 +1285,10 @@
 - signature: -fira-loop-pressure
   type: categorical
   choices: [-fira-loop-pressure, -fno-ira-loop-pressure, null]
+
+- signature: -fira-region
+  type: categorical
+  choices: [one, all, mixed]
 
 - signature: -fira-share-save-slots
   type: categorical
@@ -259,8 +1319,8 @@
   choices: [-fkeep-gc-roots-live, -fno-keep-gc-roots-live, null]
 
 - signature: -flifetime-dse
-  type: categorical
-  choices: [-flifetime-dse, -fno-lifetime-dse, null]
+  type: integer
+  range: [0, 2]
 
 - signature: -flimit-function-alignment
   type: categorical
@@ -386,6 +1446,10 @@
   type: categorical
   choices: [-freorder-blocks, -fno-reorder-blocks, null]
 
+- signature: -freorder-blocks-algorithm
+  type: categorical
+  choices: [simple, stc]
+
 - signature: -freorder-blocks-and-partition
   type: categorical
   choices: [-freorder-blocks-and-partition, -fno-reorder-blocks-and-partition, null]
@@ -455,12 +1519,12 @@
   choices: [-fsched-spec-load-dangerous, -fno-sched-spec-load-dangerous, null]
 
 - signature: -fsched-stalled-insns
-  type: categorical
-  choices: [-fsched-stalled-insns, -fno-sched-stalled-insns, null]
+  type: integer
+  range: [0, 2147483648]
 
 - signature: -fsched-stalled-insns-dep
-  type: categorical
-  choices: [-fsched-stalled-insns-dep, -fno-sched-stalled-insns-dep, null]
+  type: integer
+  range: [0, 2147483648]
 
 - signature: -fsched2-use-superblocks
   type: categorical
@@ -477,6 +1541,10 @@
 - signature: -fschedule-insns2
   type: categorical
   choices: [-fschedule-insns2, -fno-schedule-insns2, null]
+
+- signature: -fsection-anchors
+  type: categorical
+  choices: [-fno-section-anchors, null]
 
 - signature: -fsel-sched-pipelining
   type: categorical
@@ -522,6 +1590,10 @@
   type: categorical
   choices: [-fsigned-zeros, -fno-signed-zeros, null]
 
+- signature: -fsimd-cost-model
+  type: categorical
+  choices: [unlimited, dynamic, cheap, very-cheap]
+
 - signature: -fsingle-precision-constant
   type: categorical
   choices: [-fsingle-precision-constant, -fno-single-precision-constant, null]
@@ -554,25 +1626,17 @@
   type: categorical
   choices: [-fssa-phiopt, -fno-ssa-phiopt, null]
 
+- signature: -fstack-check
+  type: categorical
+  choices: [no, generic, specific]
+
 - signature: -fstack-clash-protection
   type: categorical
   choices: [-fstack-clash-protection, -fno-stack-clash-protection, null]
 
-- signature: -fstack-protector
+- signature: -fstack-reuse
   type: categorical
-  choices: [-fstack-protector, -fno-stack-protector, null]
-
-- signature: -fstack-protector-all
-  type: categorical
-  choices: [-fstack-protector-all, null]
-
-- signature: -fstack-protector-explicit
-  type: categorical
-  choices: [-fstack-protector-explicit, null]
-
-- signature: -fstack-protector-strong
-  type: categorical
-  choices: [-fstack-protector-strong, null]
+  choices: [all, named_vars, none]
 
 - signature: -fstdarg-opt
   type: categorical
@@ -597,10 +1661,6 @@
 - signature: -fthread-jumps
   type: categorical
   choices: [-fthread-jumps, -fno-thread-jumps, null]
-
-- signature: -fno-threadsafe-statics
-  type: categorical
-  choices: [-fno-threadsafe-statics, -fthreadsafe-statics, null]
 
 - signature: -ftoplevel-reorder
   type: categorical
@@ -698,6 +1758,10 @@
   type: categorical
   choices: [-ftree-lrs, -fno-tree-lrs, null]
 
+- signature: -ftree-parallelize-loops
+  type: integer
+  range: [0, 2147483648]
+
 - signature: -ftree-partial-pre
   type: categorical
   choices: [-ftree-partial-pre, -fno-tree-partial-pre, null]
@@ -766,6 +1830,10 @@
   type: categorical
   choices: [-funroll-all-loops, -fno-unroll-all-loops, null]
 
+- signature: -funroll-completely-grow-size
+  type: categorical
+  choices: [null]
+
 - signature: -funroll-loops
   type: categorical
   choices: [-funroll-loops, -fno-unroll-loops, null]
@@ -782,6 +1850,10 @@
   type: categorical
   choices: [-funwind-tables, -fno-unwind-tables, null]
 
+- signature: -fvar-tracking
+  type: categorical
+  choices: [-fno-var-tracking, null]
+
 - signature: -fvar-tracking-assignments
   type: categorical
   choices: [-fvar-tracking-assignments, -fno-var-tracking-assignments, null]
@@ -790,9 +1862,17 @@
   type: categorical
   choices: [-fvar-tracking-assignments-toggle, -fno-var-tracking-assignments-toggle, null]
 
+- signature: -fvar-tracking-uninit
+  type: categorical
+  choices: [-fno-var-tracking-uninit, null]
+
 - signature: -fvariable-expansion-in-unroller
   type: categorical
   choices: [-fvariable-expansion-in-unroller, -fno-variable-expansion-in-unroller, null]
+
+- signature: -fvect-cost-model
+  type: categorical
+  choices: [unlimited, dynamic, cheap, very-cheap]
 
 - signature: -fversion-loops-for-strides
   type: categorical
@@ -813,164 +1893,4 @@
 - signature: -fwrapv-pointer
   type: categorical
   choices: [-fwrapv-pointer, -fno-wrapv-pointer, null]
-
-- signature: align-threshold
-  type: integer
-  range: [1, 65536]
-
-- signature: avg-loop-niter
-  type: integer
-  range: [1, 65536]
-
-- signature: fsm-maximum-phi-arguments
-  type: integer
-  range: [1, 999999]
-
-- signature: fsm-scale-path-blocks
-  type: integer
-  range: [1, 10]
-
-- signature: fsm-scale-path-stmts
-  type: integer
-  range: [1, 10]
-
-- signature: inline-heuristics-hint-percent
-  type: integer
-  range: [100, 1000000]
-
-- signature: integer-share-limit
-  type: integer
-  range: [2, 65536]
-
-- signature: lto-max-streaming-parallelism
-  type: integer
-  range: [1, 65536]
-
-- signature: lto-partitions
-  type: integer
-  range: [1, 65536]
-
-- signature: max-combine-insns
-  type: integer
-  range: [2, 4]
-
-- signature: max-cse-path-length
-  type: integer
-  range: [1, 65536]
-
-- signature: max-fsm-thread-length
-  type: integer
-  range: [1, 999999]
-
-- signature: max-fsm-thread-path-insns
-  type: integer
-  range: [1, 999999]
-
-- signature: max-fsm-thread-paths
-  type: integer
-  range: [1, 999999]
-
-- signature: max-pow-sqrt-depth
-  type: integer
-  range: [1, 32]
-
-- signature: max-sched-insn-conflict-delay
-  type: integer
-  range: [1, 10]
-
-- signature: max-sched-ready-insns
-  type: integer
-  range: [1, 65536]
-
-- signature: max-slsr-cand-scan
-  type: integer
-  range: [1, 999999]
-
-- signature: max-ssa-name-query-depth
-  type: integer
-  range: [1, 10]
-
-- signature: max-store-chains-to-track
-  type: integer
-  range: [1, 65536]
-
-- signature: max-stores-to-merge
-  type: integer
-  range: [2, 65536]
-
-- signature: max-stores-to-track
-  type: integer
-  range: [2, 1048576]
-
-- signature: max-tree-if-conversion-phi-args
-  type: integer
-  range: [2, 65536]
-
-- signature: min-crossjump-insns
-  type: integer
-  range: [1, 65536]
-
-- signature: min-nondebug-insn-uid
-  type: integer
-  range: [0, 1]
-
-- signature: min-vect-loop-bound
-  type: integer
-  range: [0, 1]
-
-- signature: parloops-min-per-thread
-  type: integer
-  range: [2, 65536]
-
-- signature: ranger-logical-depth
-  type: integer
-  range: [1, 999]
-
-- signature: rpo-vn-max-loop-depth
-  type: integer
-  range: [2, 65536]
-
-- signature: sched-pressure-algorithm
-  type: integer
-  range: [1, 2]
-
-- signature: selsched-max-sched-times
-  type: integer
-  range: [1, 65536]
-
-- signature: sms-max-ii-factor
-  type: integer
-  range: [1, 16]
-
-- signature: sms-min-sc
-  type: integer
-  range: [1, 2]
-
-- signature: ssp-buffer-size
-  type: integer
-  range: [1, 65536]
-
-- signature: stack-clash-protection-guard-size
-  type: integer
-  range: [12, 30]
-
-- signature: stack-clash-protection-probe-interval
-  type: integer
-  range: [10, 16]
-
-- signature: store-merging-max-size
-  type: integer
-  range: [1, 65536]
-
-- signature: switch-conversion-max-branch-ratio
-  type: integer
-  range: [1, 65536]
-
-- signature: uninit-control-dep-attempts
-  type: integer
-  range: [1, 65536]
-
-- signature: unlikely-bb-count-fraction
-  type: integer
-  range: [1, 10000]
 
