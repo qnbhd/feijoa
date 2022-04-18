@@ -10,6 +10,8 @@ from gimeltune.utils.logging import init
 
 now = datetime.now().strftime('%H:%M:%S_%m_%d_%Y')
 
+init(verbose=True)
+
 log = logging.getLogger(__name__)
 
 

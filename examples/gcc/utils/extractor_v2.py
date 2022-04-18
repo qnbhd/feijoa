@@ -181,12 +181,15 @@ def parse_parameters(gcc_toolchain_path):
         else:
             spec = bits[0]
 
+        spec = spec.strip()
+
         # --param=name=[a|b]
         m = param_enum_pat.fullmatch(spec)
         if m:
             name = '--param=' + m.group(1)
             values = m.group(2).split("|")
             values = [f'{name}={v}' for v in values]
+
             params[name] = {
                 'type': 'categorical',
                 'choices': values
@@ -213,6 +216,7 @@ def parse_parameters(gcc_toolchain_path):
             name = '--param=' + m.group(1)
             minimum = 0
             maximum = 2 << 31 - 1
+
             params[name] = {
                 'type': 'integer',
                 'range': [minimum, maximum]
@@ -232,6 +236,8 @@ def parse_parameters(gcc_toolchain_path):
                 }
                 log.info(f"Integer: {name} {minimum} {maximum}")
                 return
+            else:
+                log.info(f"Parameter {m.group(1)} has incorrect bounds.")
 
         log.warning(f'Unknown parameter {line}')
 
@@ -255,18 +261,30 @@ cc_black_list_chunks = [
     "stack-protector",
     "threadsafe-statics",
     "pack-struct",
+    "fstack-check",
+    "clash_protection",
+    "asan",
+
 ]
 
 
-def fix_parameters(all_params):
-    def keep(param):
+def fix_parameters(gcc_toolchain, all_params):
+    def keep(param, value):
         for bcc in cc_black_list_chunks:
             if bcc in param:
                 return False
+
+        if value['type'] == 'integer':
+            if not check_is_working_flag(gcc_toolchain, f'{param}={value["range"][0]}'):
+                return False
+        if value['type'] == 'categorical':
+            if not check_is_working_flag(gcc_toolchain, value["choices"][0]):
+                return False
+
         return True
 
     fixed = {
-        p: v for p, v in all_params.items() if keep(p)
+        p: v for p, v in all_params.items() if keep(p, v)
     }
 
     return fixed
@@ -307,7 +325,7 @@ def extract(gcc_toolchain_path):
 
     all_optimizations = {**params, **optimizers}
 
-    fixed = fix_parameters(all_optimizations)
+    fixed = fix_parameters(gcc_toolchain_path, all_optimizations)
 
     print(fixed)
 
