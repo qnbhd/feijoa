@@ -35,12 +35,12 @@ def sigmoid(x, alpha):
 class Perceptron3:
 
     def __init__(
-            self,
-            network_shape: tuple,
-            n_epochs: int = 500,
-            alpha: float = 1,
-            nu: float = 0.2,
-            ad: float = 1
+        self,
+        network_shape: tuple,
+        n_epochs: int = 500,
+        alpha: float = 1,
+        nu: float = 0.2,
+        ad: float = 1
     ):
 
         self.n_epochs = n_epochs
@@ -176,8 +176,8 @@ class Perceptron3:
         return output
 
 
-def run(h1: int, h2: int, alpha: float, nu: float, ad: float):
-    clf = Perceptron3((35, h1, h2, 4), alpha=alpha, nu=nu, ad=ad)
+def run(h1: int, h2: int, alpha: float):
+    clf = Perceptron3((35, h1, h2, 4), alpha=alpha, nu=0.5, ad=10)
 
     study = [
         np.array([
@@ -265,19 +265,11 @@ doc = '''
 - signature: alpha
   type: real
   range: [0.0, 20.0]
-
-- signature: nu
-  type: real
-  range: [0.01, 1.0]
-  
-- signature: ad
-  type: real
-  range: [0.0, 20.0]
 '''
 
-logging.init()
+logging.init(verbose=True)
 
-log = logging.logging.getLogger()
+log = logging.logging.getLogger(__name__)
 
 
 def objective(experiment):
@@ -286,6 +278,9 @@ def objective(experiment):
     log.info(f'RESULTS: {results}')
     mean = results.mean()
     log.info(f'MEAN: {mean}')
+    experiment.metrics = {
+        'std': results.std()
+    }
     return mean
 
 
@@ -295,15 +290,11 @@ def run_training():
     numpy.random.seed(10)
 
     space = SearchSpace.from_yaml(doc)
-    # job = create_job(space, 'perceptron_17_03_2021_0')
-    job = load_job(space, 'perceptron_17_03_2021_0', 'perceptron_17_03_2021_0')
-    # job.add_seed({'h1': 29, 'h2': 29, 'alpha': 0.21211437782438394,
-    #               'nu': 0.09183165276421158, 'ad': 4.777997825616462})
+    job = create_job(search_space=space, storage='sqlite:///perceptron.db')
 
-    # job.do(objective, n_trials=100, n_proc=5)
+    job.do(objective, n_trials=100)
 
-    print(job.best_value)
-    print(job.best_parameters)
+    return job
 
 
 if __name__ == '__main__':

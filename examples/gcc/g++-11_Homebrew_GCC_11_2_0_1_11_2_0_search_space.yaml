@@ -110,14 +110,6 @@
   type: integer
   range: [0, 2147483648]
 
-- signature: --param=evrp-mode
-  type: integer
-  range: [0, 2147483648]
-
-- signature: --param=evrp-sparse-threshold
-  type: integer
-  range: [0, 2147483648]
-
 - signature: --param=fsm-maximum-phi-arguments
   type: integer
   range: [1, 999999]
@@ -1162,10 +1154,6 @@
   type: categorical
   choices: [-fexceptions, -fno-exceptions, null]
 
-- signature: -fexcess-precision
-  type: categorical
-  choices: [-fexcess-precision=fast, -fexcess-precision=standard]
-
 - signature: -fexpensive-optimizations
   type: categorical
   choices: [-fexpensive-optimizations, -fno-expensive-optimizations, null]
@@ -1621,18 +1609,6 @@
 - signature: -fssa-phiopt
   type: categorical
   choices: [-fssa-phiopt, -fno-ssa-phiopt, null]
-
-- signature: -fstack-check
-  type: categorical
-  choices: [-fstack-check=no, -fstack-check=generic, -fstack-check=specific]
-
-- signature: -fstack-clash-protection
-  type: categorical
-  choices: [-fstack-clash-protection, -fno-stack-clash-protection, null]
-
-- signature: -fstack-reuse
-  type: categorical
-  choices: [-fstack-reuse=all, -fstack-reuse=named_vars, -fstack-reuse=none]
 
 - signature: -fstdarg-opt
   type: categorical
