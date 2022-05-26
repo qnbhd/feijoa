@@ -40,6 +40,7 @@ class Experiment(BaseModel):
     requestor: str
     create_timestamp: float
     finish_timestamp: Optional[float]
+    metrics: Optional[dict]
 
     class Config:
         orm_mode = True

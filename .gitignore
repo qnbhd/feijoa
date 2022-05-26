@@ -177,9 +177,18 @@ examples/gcc/*.json
 /tests/test_job*.json
 .DS_Store/
 
-/examples/gcc/space_wided.yaml
 examples/.DS_Store
 examples/gcc/.DS_Store
 /examples/gcc/*.db
+/examples/gcc/utils/*.db
+/examples/*.db
+/examples/gcc/utils/*.outexamples/gcc/utils/.DS_Store
+examples/gcc/utils/.DS_Store
+/examples/gcc/a-raytracer.cpp.opt-record.json.gz
+/examples/gcc_matrixmultiply.ipynb
+/examples/gcc_raytracer.ipynb
+/examples/notebooks/aecli.db
+/examples/notebooks/mlp_tuning.ipynb
+/examples/notebooks/perceptron.db
 /examples/notebooks/*.db
 /examples/*.db

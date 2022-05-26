@@ -1,0 +1,1868 @@
+- signature: --param=align-loop-iterations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=align-threshold
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=analyzer-bb-explosion-factor
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-max-constraints
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-max-enodes-for-full-dump
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-max-enodes-per-program-point
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-max-infeasible-edges
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-max-recursion-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-max-svalue-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=analyzer-min-snodes-for-call-summary
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=asan-globals
+  type: integer
+  range: [0, 1]
+
+- signature: --param=asan-instrument-allocas
+  type: integer
+  range: [0, 1]
+
+- signature: --param=asan-instrument-reads
+  type: integer
+  range: [0, 1]
+
+- signature: --param=asan-instrument-writes
+  type: integer
+  range: [0, 1]
+
+- signature: --param=asan-instrumentation-with-call-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=asan-memintrin
+  type: integer
+  range: [0, 1]
+
+- signature: --param=asan-stack
+  type: integer
+  range: [0, 1]
+
+- signature: --param=asan-use-after-return
+  type: integer
+  range: [0, 1]
+
+- signature: --param=avg-loop-niter
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=avoid-fma-max-bits
+  type: integer
+  range: [0, 512]
+
+- signature: --param=builtin-expect-probability
+  type: integer
+  range: [0, 100]
+
+- signature: --param=builtin-string-cmp-inline-length
+  type: integer
+  range: [0, 100]
+
+- signature: --param=case-values-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=comdat-sharing-probability
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=cxx-max-namespaces-for-diagnostic-help
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=dse-max-alias-queries-per-store
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=dse-max-object-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=early-inlining-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=fsm-maximum-phi-arguments
+  type: integer
+  range: [1, 999999]
+
+- signature: --param=fsm-scale-path-blocks
+  type: integer
+  range: [1, 10]
+
+- signature: --param=fsm-scale-path-stmts
+  type: integer
+  range: [1, 10]
+
+- signature: --param=gcse-after-reload-critical-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=gcse-after-reload-partial-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=gcse-cost-distance-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=gcse-unrestricted-cost
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ggc-min-expand
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ggc-min-heapsize
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=gimple-fe-computed-hot-bb-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=graphite-allow-codegen-errors
+  type: integer
+  range: [0, 1]
+
+- signature: --param=graphite-max-arrays-per-scop
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=graphite-max-nb-scop-params
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=hash-table-verification-limit
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=hot-bb-count-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=hot-bb-count-ws-permille
+  type: integer
+  range: [0, 1000]
+
+- signature: --param=hot-bb-frequency-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=hwasan-instrument-allocas
+  type: integer
+  range: [0, 1]
+
+- signature: --param=hwasan-instrument-mem-intrinsics
+  type: integer
+  range: [0, 1]
+
+- signature: --param=hwasan-instrument-reads
+  type: integer
+  range: [0, 1]
+
+- signature: --param=hwasan-instrument-stack
+  type: integer
+  range: [0, 1]
+
+- signature: --param=hwasan-instrument-writes
+  type: integer
+  range: [0, 1]
+
+- signature: --param=hwasan-random-frame-tag
+  type: integer
+  range: [0, 1]
+
+- signature: --param=inline-heuristics-hint-percent
+  type: integer
+  range: [100, 1000000]
+
+- signature: --param=inline-min-speedup
+  type: integer
+  range: [0, 100]
+
+- signature: --param=inline-unit-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=integer-share-limit
+  type: integer
+  range: [2, 65536]
+
+- signature: --param=ipa-cp-eval-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-cp-large-unit-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-cp-loop-hint-bonus
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-cp-max-recursive-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-cp-min-recursive-probability
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-cp-recursion-penalty
+  type: integer
+  range: [0, 100]
+
+- signature: --param=ipa-cp-single-call-penalty
+  type: integer
+  range: [0, 100]
+
+- signature: --param=ipa-cp-unit-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-cp-value-list-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-jump-function-lookups
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-max-aa-steps
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-max-agg-items
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-max-loop-predicates
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-max-param-expr-ops
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-max-switch-predicate-bounds
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ipa-sra-max-replacements
+  type: integer
+  range: [0, 16]
+
+- signature: --param=ipa-sra-ptr-growth-factor
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ira-loop-reserved-regs
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ira-max-conflict-table-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ira-max-loops-num
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=iv-always-prune-cand-set-bound
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=iv-consider-all-candidates-bound
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=iv-max-considered-uses
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=jump-table-max-growth-ratio-for-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=jump-table-max-growth-ratio-for-speed
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=l1-cache-line-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=l1-cache-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=l2-cache-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=large-function-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=large-function-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=large-stack-frame-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=large-stack-frame
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=large-unit-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=lim-expensive
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-block-tile-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-interchange-max-num-stmts
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-interchange-stride-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-invariant-max-bbs-in-loop
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-max-datarefs-for-datadeps
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-versioning-max-inner-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=loop-versioning-max-outer-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=lra-inheritance-ebb-probability-cutoff
+  type: integer
+  range: [0, 100]
+
+- signature: --param=lra-max-considered-reload-pseudos
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=lto-max-partition
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=lto-max-streaming-parallelism
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=lto-min-partition
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=lto-partitions
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=max-average-unrolled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-combine-insns
+  type: integer
+  range: [2, 4]
+
+- signature: --param=max-completely-peel-loop-nest-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-completely-peel-times
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-completely-peeled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-crossjump-edges
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-cse-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-cse-path-length
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=max-cselib-memory-locations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-debug-marker-count
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-delay-slot-insn-search
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-delay-slot-live-search
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-dse-active-local-stores
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-early-inliner-iterations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-fields-for-field-sensitive
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-find-base-term-values
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-fsm-thread-length
+  type: integer
+  range: [1, 999999]
+
+- signature: --param=max-fsm-thread-path-insns
+  type: integer
+  range: [1, 999999]
+
+- signature: --param=max-fsm-thread-paths
+  type: integer
+  range: [1, 999999]
+
+- signature: --param=max-gcse-insertion-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-gcse-memory
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-goto-duplication-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-grow-copy-bb-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-hoist-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-insns-auto
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-insns-recursive-auto
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-insns-recursive
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-insns-single
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-insns-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-insns-small
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-recursive-depth-auto
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-inline-recursive-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-isl-operations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-iterations-computation-cost
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-iterations-to-track
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-jump-thread-duplication-stmts
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-last-value-rtl
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-loop-header-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-modulo-backtrack-attempts
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-partial-antic-length
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-peel-branches
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-peel-times
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-peeled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-pending-list-length
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-pipeline-region-blocks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-pipeline-region-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-pow-sqrt-depth
+  type: integer
+  range: [1, 32]
+
+- signature: --param=max-predicted-iterations
+  type: integer
+  range: [0, 65536]
+
+- signature: --param=max-reload-search-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-rtl-if-conversion-insns
+  type: integer
+  range: [0, 99]
+
+- signature: --param=max-rtl-if-conversion-predictable-cost
+  type: integer
+  range: [0, 200]
+
+- signature: --param=max-rtl-if-conversion-unpredictable-cost
+  type: integer
+  range: [0, 200]
+
+- signature: --param=max-sched-extend-regions-iters
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-sched-insn-conflict-delay
+  type: integer
+  range: [1, 10]
+
+- signature: --param=max-sched-ready-insns
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=max-sched-region-blocks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-sched-region-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-slsr-cand-scan
+  type: integer
+  range: [1, 999999]
+
+- signature: --param=max-speculative-devirt-maydefs
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-ssa-name-query-depth
+  type: integer
+  range: [1, 10]
+
+- signature: --param=max-store-chains-to-track
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=max-stores-to-merge
+  type: integer
+  range: [2, 65536]
+
+- signature: --param=max-stores-to-sink
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-stores-to-track
+  type: integer
+  range: [2, 1048576]
+
+- signature: --param=max-tail-merge-comparisons
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-tail-merge-iterations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-tracked-strlens
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-tree-if-conversion-phi-args
+  type: integer
+  range: [2, 65536]
+
+- signature: --param=max-unroll-times
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-unrolled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-unswitch-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-unswitch-level
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-variable-expansions-in-unroller
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-vartrack-expr-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-vartrack-reverse-op-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-vartrack-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=max-vrp-switch-assertions
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=min-crossjump-insns
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=min-inline-recursive-probability
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=min-insn-to-prefetch-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=min-loop-cond-split-prob
+  type: integer
+  range: [0, 100]
+
+- signature: --param=min-nondebug-insn-uid
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=min-size-for-stack-sharing
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=min-spec-prob
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=min-vect-loop-bound
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=modref-max-accesses
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=modref-max-bases
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=modref-max-depth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=modref-max-escape-points
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=modref-max-refs
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=modref-max-tests
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=openacc-kernels
+  type: categorical
+  choices: [--param=openacc-kernels=decompose, --param=openacc-kernels=parloops]
+
+- signature: --param=parloops-chunk-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=parloops-min-per-thread
+  type: integer
+  range: [2, 65536]
+
+- signature: --param=parloops-schedule
+  type: categorical
+  choices: [--param=parloops-schedule=static, --param=parloops-schedule=dynamic, --param=parloops-schedule=guided, --param=parloops-schedule=auto, --param=parloops-schedule=runtime]
+
+- signature: --param=partial-inlining-entry-probability
+  type: integer
+  range: [0, 100]
+
+- signature: --param=predictable-branch-outcome
+  type: integer
+  range: [0, 50]
+
+- signature: --param=prefetch-dynamic-strides
+  type: integer
+  range: [0, 1]
+
+- signature: --param=prefetch-latency
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=prefetch-min-insn-to-mem-ratio
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=profile-func-internal-id
+  type: integer
+  range: [0, 1]
+
+- signature: --param=ranger-logical-depth
+  type: integer
+  range: [1, 999]
+
+- signature: --param=rpo-vn-max-loop-depth
+  type: integer
+  range: [2, 65536]
+
+- signature: --param=sccvn-max-alias-queries-per-access
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=scev-max-expr-complexity
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=scev-max-expr-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=sched-mem-true-dep-cost
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=sched-pressure-algorithm
+  type: integer
+  range: [1, 2]
+
+- signature: --param=sched-spec-prob-cutoff
+  type: integer
+  range: [0, 100]
+
+- signature: --param=sched-state-edge-prob-cutoff
+  type: integer
+  range: [0, 100]
+
+- signature: --param=selsched-insns-to-rename
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=selsched-max-lookahead
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=selsched-max-sched-times
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=simultaneous-prefetches
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=sink-frequency-threshold
+  type: integer
+  range: [0, 100]
+
+- signature: --param=sms-dfa-history
+  type: integer
+  range: [0, 16]
+
+- signature: --param=sms-loop-average-count-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=sms-max-ii-factor
+  type: integer
+  range: [1, 16]
+
+- signature: --param=sms-min-sc
+  type: integer
+  range: [1, 2]
+
+- signature: --param=sra-max-propagations
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=sra-max-scalarization-size-Osize
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=sra-max-scalarization-size-Ospeed
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ssa-name-def-chain-limit
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=ssp-buffer-size
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=stack-clash-protection-guard-size
+  type: integer
+  range: [12, 30]
+
+- signature: --param=stack-clash-protection-probe-interval
+  type: integer
+  range: [10, 16]
+
+- signature: --param=store-merging-allow-unaligned
+  type: integer
+  range: [0, 1]
+
+- signature: --param=store-merging-max-size
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=switch-conversion-max-branch-ratio
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=tm-max-aggregate-size
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=tracer-dynamic-coverage-feedback
+  type: integer
+  range: [0, 100]
+
+- signature: --param=tracer-dynamic-coverage
+  type: integer
+  range: [0, 100]
+
+- signature: --param=tracer-max-code-growth
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=tracer-min-branch-probability-feedback
+  type: integer
+  range: [0, 100]
+
+- signature: --param=tracer-min-branch-probability
+  type: integer
+  range: [0, 100]
+
+- signature: --param=tracer-min-branch-ratio
+  type: integer
+  range: [0, 100]
+
+- signature: --param=tree-reassoc-width
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=tsan-distinguish-volatile
+  type: integer
+  range: [0, 1]
+
+- signature: --param=tsan-instrument-func-entry-exit
+  type: integer
+  range: [0, 1]
+
+- signature: --param=uninit-control-dep-attempts
+  type: integer
+  range: [1, 65536]
+
+- signature: --param=uninlined-function-insns
+  type: integer
+  range: [0, 1000000]
+
+- signature: --param=uninlined-function-time
+  type: integer
+  range: [0, 1000000]
+
+- signature: --param=uninlined-thunk-insns
+  type: integer
+  range: [0, 1000000]
+
+- signature: --param=uninlined-thunk-time
+  type: integer
+  range: [0, 1000000]
+
+- signature: --param=unlikely-bb-count-fraction
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=unroll-jam-max-unroll
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=unroll-jam-min-percent
+  type: integer
+  range: [0, 100]
+
+- signature: --param=use-after-scope-direct-emission-threshold
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=use-canonical-types
+  type: integer
+  range: [0, 1]
+
+- signature: --param=vect-epilogues-nomask
+  type: integer
+  range: [0, 1]
+
+- signature: --param=vect-max-version-for-alias-checks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=vect-max-version-for-alignment-checks
+  type: integer
+  range: [0, 2147483648]
+
+- signature: --param=vect-partial-vector-usage
+  type: integer
+  range: [0, 2]
+
+- signature: -O
+  type: categorical
+  choices: [-O0, -O1, -O2, -O3]
+
+- signature: -faggressive-loop-optimizations
+  type: categorical
+  choices: [-faggressive-loop-optimizations, -fno-aggressive-loop-optimizations, null]
+
+- signature: -falign-functions
+  type: categorical
+  choices: [-falign-functions, -fno-align-functions, null]
+
+- signature: -falign-jumps
+  type: categorical
+  choices: [-falign-jumps, -fno-align-jumps, null]
+
+- signature: -falign-labels
+  type: categorical
+  choices: [-falign-labels, -fno-align-labels, null]
+
+- signature: -falign-loops
+  type: categorical
+  choices: [-falign-loops, -fno-align-loops, null]
+
+- signature: -fallocation-dce
+  type: categorical
+  choices: [-fallocation-dce, -fno-allocation-dce, null]
+
+- signature: -fallow-store-data-races
+  type: categorical
+  choices: [-fallow-store-data-races, -fno-allow-store-data-races, null]
+
+- signature: -fassume-phsa
+  type: categorical
+  choices: [null]
+
+- signature: -fasynchronous-unwind-tables
+  type: categorical
+  choices: [-fasynchronous-unwind-tables, -fno-asynchronous-unwind-tables, null]
+
+- signature: -fauto-inc-dec
+  type: categorical
+  choices: [-fauto-inc-dec, -fno-auto-inc-dec, null]
+
+- signature: -fbit-tests
+  type: categorical
+  choices: [-fbit-tests, -fno-bit-tests, null]
+
+- signature: -fbranch-count-reg
+  type: categorical
+  choices: [-fbranch-count-reg, -fno-branch-count-reg, null]
+
+- signature: -fbranch-probabilities
+  type: categorical
+  choices: [-fno-branch-probabilities, null]
+
+- signature: -fcaller-saves
+  type: categorical
+  choices: [-fcaller-saves, -fno-caller-saves, null]
+
+- signature: -fcode-hoisting
+  type: categorical
+  choices: [-fcode-hoisting, -fno-code-hoisting, null]
+
+- signature: -fcombine-stack-adjustments
+  type: categorical
+  choices: [-fcombine-stack-adjustments, -fno-combine-stack-adjustments, null]
+
+- signature: -fcompare-elim
+  type: categorical
+  choices: [-fcompare-elim, -fno-compare-elim, null]
+
+- signature: -fconserve-stack
+  type: categorical
+  choices: [-fconserve-stack, -fno-conserve-stack, null]
+
+- signature: -fcprop-registers
+  type: categorical
+  choices: [-fcprop-registers, -fno-cprop-registers, null]
+
+- signature: -fcrossjumping
+  type: categorical
+  choices: [-fcrossjumping, -fno-crossjumping, null]
+
+- signature: -fcse-follow-jumps
+  type: categorical
+  choices: [-fcse-follow-jumps, -fno-cse-follow-jumps, null]
+
+- signature: -fcx-fortran-rules
+  type: categorical
+  choices: [-fcx-fortran-rules, -fno-cx-fortran-rules, null]
+
+- signature: -fcx-limited-range
+  type: categorical
+  choices: [-fcx-limited-range, -fno-cx-limited-range, null]
+
+- signature: -fdce
+  type: categorical
+  choices: [-fdce, -fno-dce, null]
+
+- signature: -fdefer-pop
+  type: categorical
+  choices: [-fdefer-pop, -fno-defer-pop, null]
+
+- signature: -fdelayed-branch
+  type: categorical
+  choices: [-fno-delayed-branch, null]
+
+- signature: -fdelete-dead-exceptions
+  type: categorical
+  choices: [-fdelete-dead-exceptions, -fno-delete-dead-exceptions, null]
+
+- signature: -fdelete-null-pointer-checks
+  type: categorical
+  choices: [-fdelete-null-pointer-checks, -fno-delete-null-pointer-checks, null]
+
+- signature: -fdevirtualize
+  type: categorical
+  choices: [-fdevirtualize, -fno-devirtualize, null]
+
+- signature: -fdevirtualize-speculatively
+  type: categorical
+  choices: [-fdevirtualize-speculatively, -fno-devirtualize-speculatively, null]
+
+- signature: -fdse
+  type: categorical
+  choices: [-fdse, -fno-dse, null]
+
+- signature: -fearly-inlining
+  type: categorical
+  choices: [-fearly-inlining, -fno-early-inlining, null]
+
+- signature: -fexceptions
+  type: categorical
+  choices: [-fexceptions, -fno-exceptions, null]
+
+- signature: -fexpensive-optimizations
+  type: categorical
+  choices: [-fexpensive-optimizations, -fno-expensive-optimizations, null]
+
+- signature: -ffast-math
+  type: categorical
+  choices: [-ffast-math, -fno-fast-math, null]
+
+- signature: -ffinite-loops
+  type: categorical
+  choices: [-ffinite-loops, -fno-finite-loops, null]
+
+- signature: -ffinite-math-only
+  type: categorical
+  choices: [-ffinite-math-only, -fno-finite-math-only, null]
+
+- signature: -ffloat-store
+  type: categorical
+  choices: [-ffloat-store, -fno-float-store, null]
+
+- signature: -fforward-propagate
+  type: categorical
+  choices: [-fforward-propagate, -fno-forward-propagate, null]
+
+- signature: -ffp-contract
+  type: categorical
+  choices: [-ffp-contract=off, -ffp-contract=on, -ffp-contract=fast]
+
+- signature: -ffp-int-builtin-inexact
+  type: categorical
+  choices: [-ffp-int-builtin-inexact, -fno-fp-int-builtin-inexact, null]
+
+- signature: -ffunction-cse
+  type: categorical
+  choices: [-ffunction-cse, -fno-function-cse, null]
+
+- signature: -fgcse
+  type: categorical
+  choices: [-fgcse, -fno-gcse, null]
+
+- signature: -fgcse-after-reload
+  type: categorical
+  choices: [-fgcse-after-reload, -fno-gcse-after-reload, null]
+
+- signature: -fgcse-las
+  type: categorical
+  choices: [-fgcse-las, -fno-gcse-las, null]
+
+- signature: -fgcse-lm
+  type: categorical
+  choices: [-fgcse-lm, -fno-gcse-lm, null]
+
+- signature: -fgcse-sm
+  type: categorical
+  choices: [-fgcse-sm, -fno-gcse-sm, null]
+
+- signature: -fgraphite
+  type: categorical
+  choices: [-fgraphite, -fno-graphite, null]
+
+- signature: -fgraphite-identity
+  type: categorical
+  choices: [-fgraphite-identity, -fno-graphite-identity, null]
+
+- signature: -fguess-branch-probability
+  type: categorical
+  choices: [-fguess-branch-probability, -fno-guess-branch-probability, null]
+
+- signature: -fhoist-adjacent-loads
+  type: categorical
+  choices: [-fhoist-adjacent-loads, -fno-hoist-adjacent-loads, null]
+
+- signature: -fif-conversion
+  type: categorical
+  choices: [-fif-conversion, -fno-if-conversion, null]
+
+- signature: -fif-conversion2
+  type: categorical
+  choices: [-fif-conversion2, -fno-if-conversion2, null]
+
+- signature: -findirect-inlining
+  type: categorical
+  choices: [-findirect-inlining, -fno-indirect-inlining, null]
+
+- signature: -finline
+  type: categorical
+  choices: [-finline, -fno-inline, null]
+
+- signature: -finline-atomics
+  type: categorical
+  choices: [-finline-atomics, -fno-inline-atomics, null]
+
+- signature: -finline-functions
+  type: categorical
+  choices: [-finline-functions, -fno-inline-functions, null]
+
+- signature: -finline-functions-called-once
+  type: categorical
+  choices: [-finline-functions-called-once, -fno-inline-functions-called-once, null]
+
+- signature: -finline-small-functions
+  type: categorical
+  choices: [-finline-small-functions, -fno-inline-small-functions, null]
+
+- signature: -fira-algorithm
+  type: categorical
+  choices: [-fira-algorithm=CB, -fira-algorithm=priority]
+
+- signature: -fira-hoist-pressure
+  type: categorical
+  choices: [-fira-hoist-pressure, -fno-ira-hoist-pressure, null]
+
+- signature: -fira-loop-pressure
+  type: categorical
+  choices: [-fira-loop-pressure, -fno-ira-loop-pressure, null]
+
+- signature: -fira-region
+  type: categorical
+  choices: [-fira-region=one, -fira-region=all, -fira-region=mixed]
+
+- signature: -fira-share-save-slots
+  type: categorical
+  choices: [-fira-share-save-slots, -fno-ira-share-save-slots, null]
+
+- signature: -fira-share-spill-slots
+  type: categorical
+  choices: [-fira-share-spill-slots, -fno-ira-share-spill-slots, null]
+
+- signature: -fisolate-erroneous-paths-attribute
+  type: categorical
+  choices: [-fisolate-erroneous-paths-attribute, -fno-isolate-erroneous-paths-attribute, null]
+
+- signature: -fisolate-erroneous-paths-dereference
+  type: categorical
+  choices: [-fisolate-erroneous-paths-dereference, -fno-isolate-erroneous-paths-dereference, null]
+
+- signature: -fivopts
+  type: categorical
+  choices: [-fivopts, -fno-ivopts, null]
+
+- signature: -fjump-tables
+  type: categorical
+  choices: [-fjump-tables, -fno-jump-tables, null]
+
+- signature: -fkeep-gc-roots-live
+  type: categorical
+  choices: [-fkeep-gc-roots-live, -fno-keep-gc-roots-live, null]
+
+- signature: -flifetime-dse
+  type: integer
+  range: [0, 2]
+
+- signature: -flimit-function-alignment
+  type: categorical
+  choices: [-flimit-function-alignment, -fno-limit-function-alignment, null]
+
+- signature: -floop-interchange
+  type: categorical
+  choices: [-floop-interchange, -fno-loop-interchange, null]
+
+- signature: -floop-nest-optimize
+  type: categorical
+  choices: [-floop-nest-optimize, -fno-loop-nest-optimize, null]
+
+- signature: -floop-parallelize-all
+  type: categorical
+  choices: [-floop-parallelize-all, -fno-loop-parallelize-all, null]
+
+- signature: -floop-unroll-and-jam
+  type: categorical
+  choices: [-floop-unroll-and-jam, -fno-loop-unroll-and-jam, null]
+
+- signature: -flra-remat
+  type: categorical
+  choices: [-flra-remat, -fno-lra-remat, null]
+
+- signature: -fmath-errno
+  type: categorical
+  choices: [-fmath-errno, -fno-math-errno, null]
+
+- signature: -fmodulo-sched
+  type: categorical
+  choices: [-fmodulo-sched, -fno-modulo-sched, null]
+
+- signature: -fmodulo-sched-allow-regmoves
+  type: categorical
+  choices: [-fmodulo-sched-allow-regmoves, -fno-modulo-sched-allow-regmoves, null]
+
+- signature: -fmove-loop-invariants
+  type: categorical
+  choices: [-fmove-loop-invariants, -fno-move-loop-invariants, null]
+
+- signature: -fnon-call-exceptions
+  type: categorical
+  choices: [-fnon-call-exceptions, -fno-non-call-exceptions, null]
+
+- signature: -fnothrow-opt
+  type: categorical
+  choices: [-fnothrow-opt, -fno-nothrow-opt, null]
+
+- signature: -fomit-frame-pointer
+  type: categorical
+  choices: [-fomit-frame-pointer, -fno-omit-frame-pointer, null]
+
+- signature: -fopt-info
+  type: categorical
+  choices: [-fopt-info, -fno-opt-info, null]
+
+- signature: -foptimize-sibling-calls
+  type: categorical
+  choices: [-foptimize-sibling-calls, -fno-optimize-sibling-calls, null]
+
+- signature: -foptimize-strlen
+  type: categorical
+  choices: [-foptimize-strlen, -fno-optimize-strlen, null]
+
+- signature: -fpartial-inlining
+  type: categorical
+  choices: [-fpartial-inlining, -fno-partial-inlining, null]
+
+- signature: -fpeel-loops
+  type: categorical
+  choices: [-fpeel-loops, -fno-peel-loops, null]
+
+- signature: -fpeephole
+  type: categorical
+  choices: [-fpeephole, -fno-peephole, null]
+
+- signature: -fpeephole2
+  type: categorical
+  choices: [-fpeephole2, -fno-peephole2, null]
+
+- signature: -fplt
+  type: categorical
+  choices: [-fplt, -fno-plt, null]
+
+- signature: -fpredictive-commoning
+  type: categorical
+  choices: [-fpredictive-commoning, -fno-predictive-commoning, null]
+
+- signature: -fprefetch-loop-arrays
+  type: categorical
+  choices: [-fprefetch-loop-arrays, -fno-prefetch-loop-arrays, null]
+
+- signature: -fprintf-return-value
+  type: categorical
+  choices: [-fprintf-return-value, -fno-printf-return-value, null]
+
+- signature: -fprofile-partial-training
+  type: categorical
+  choices: [-fprofile-partial-training, -fno-profile-partial-training, null]
+
+- signature: -fprofile-reorder-functions
+  type: categorical
+  choices: [-fprofile-reorder-functions, -fno-profile-reorder-functions, null]
+
+- signature: -freciprocal-math
+  type: categorical
+  choices: [-freciprocal-math, -fno-reciprocal-math, null]
+
+- signature: -free
+  type: categorical
+  choices: [-free, -fno-ree, null]
+
+- signature: -freg-struct-return
+  type: categorical
+  choices: [-freg-struct-return, -fno-reg-struct-return, null]
+
+- signature: -frename-registers
+  type: categorical
+  choices: [-frename-registers, -fno-rename-registers, null]
+
+- signature: -freorder-blocks
+  type: categorical
+  choices: [-freorder-blocks, -fno-reorder-blocks, null]
+
+- signature: -freorder-blocks-algorithm
+  type: categorical
+  choices: [-freorder-blocks-algorithm=simple, -freorder-blocks-algorithm=stc]
+
+- signature: -freorder-blocks-and-partition
+  type: categorical
+  choices: [-freorder-blocks-and-partition, -fno-reorder-blocks-and-partition, null]
+
+- signature: -freorder-functions
+  type: categorical
+  choices: [-freorder-functions, -fno-reorder-functions, null]
+
+- signature: -frerun-cse-after-loop
+  type: categorical
+  choices: [-frerun-cse-after-loop, -fno-rerun-cse-after-loop, null]
+
+- signature: -freschedule-modulo-scheduled-loops
+  type: categorical
+  choices: [-freschedule-modulo-scheduled-loops, -fno-reschedule-modulo-scheduled-loops, null]
+
+- signature: -frounding-math
+  type: categorical
+  choices: [-frounding-math, -fno-rounding-math, null]
+
+- signature: -frtti
+  type: categorical
+  choices: [-frtti, -fno-rtti, null]
+
+- signature: -fsched-critical-path-heuristic
+  type: categorical
+  choices: [-fsched-critical-path-heuristic, -fno-sched-critical-path-heuristic, null]
+
+- signature: -fsched-dep-count-heuristic
+  type: categorical
+  choices: [-fsched-dep-count-heuristic, -fno-sched-dep-count-heuristic, null]
+
+- signature: -fsched-group-heuristic
+  type: categorical
+  choices: [-fsched-group-heuristic, -fno-sched-group-heuristic, null]
+
+- signature: -fsched-interblock
+  type: categorical
+  choices: [-fsched-interblock, -fno-sched-interblock, null]
+
+- signature: -fsched-last-insn-heuristic
+  type: categorical
+  choices: [-fsched-last-insn-heuristic, -fno-sched-last-insn-heuristic, null]
+
+- signature: -fsched-pressure
+  type: categorical
+  choices: [-fsched-pressure, -fno-sched-pressure, null]
+
+- signature: -fsched-rank-heuristic
+  type: categorical
+  choices: [-fsched-rank-heuristic, -fno-sched-rank-heuristic, null]
+
+- signature: -fsched-spec
+  type: categorical
+  choices: [-fsched-spec, -fno-sched-spec, null]
+
+- signature: -fsched-spec-insn-heuristic
+  type: categorical
+  choices: [-fsched-spec-insn-heuristic, -fno-sched-spec-insn-heuristic, null]
+
+- signature: -fsched-spec-load
+  type: categorical
+  choices: [-fsched-spec-load, -fno-sched-spec-load, null]
+
+- signature: -fsched-spec-load-dangerous
+  type: categorical
+  choices: [-fsched-spec-load-dangerous, -fno-sched-spec-load-dangerous, null]
+
+- signature: -fsched-stalled-insns
+  type: integer
+  range: [0, 2147483648]
+
+- signature: -fsched-stalled-insns-dep
+  type: integer
+  range: [0, 2147483648]
+
+- signature: -fsched2-use-superblocks
+  type: categorical
+  choices: [-fsched2-use-superblocks, -fno-sched2-use-superblocks, null]
+
+- signature: -fschedule-fusion
+  type: categorical
+  choices: [-fschedule-fusion, -fno-schedule-fusion, null]
+
+- signature: -fschedule-insns
+  type: categorical
+  choices: [-fschedule-insns, -fno-schedule-insns, null]
+
+- signature: -fschedule-insns2
+  type: categorical
+  choices: [-fschedule-insns2, -fno-schedule-insns2, null]
+
+- signature: -fsection-anchors
+  type: categorical
+  choices: [-fno-section-anchors, null]
+
+- signature: -fsel-sched-pipelining
+  type: categorical
+  choices: [-fsel-sched-pipelining, -fno-sel-sched-pipelining, null]
+
+- signature: -fsel-sched-pipelining-outer-loops
+  type: categorical
+  choices: [-fsel-sched-pipelining-outer-loops, -fno-sel-sched-pipelining-outer-loops, null]
+
+- signature: -fsel-sched-reschedule-pipelined
+  type: categorical
+  choices: [-fsel-sched-reschedule-pipelined, -fno-sel-sched-reschedule-pipelined, null]
+
+- signature: -fselective-scheduling
+  type: categorical
+  choices: [-fselective-scheduling, -fno-selective-scheduling, null]
+
+- signature: -fselective-scheduling2
+  type: categorical
+  choices: [-fselective-scheduling2, -fno-selective-scheduling2, null]
+
+- signature: -fshort-enums
+  type: categorical
+  choices: [-fshort-enums, -fno-short-enums, null]
+
+- signature: -fshort-wchar
+  type: categorical
+  choices: [-fshort-wchar, -fno-short-wchar, null]
+
+- signature: -fshrink-wrap
+  type: categorical
+  choices: [-fshrink-wrap, -fno-shrink-wrap, null]
+
+- signature: -fshrink-wrap-separate
+  type: categorical
+  choices: [-fshrink-wrap-separate, -fno-shrink-wrap-separate, null]
+
+- signature: -fsignaling-nans
+  type: categorical
+  choices: [-fsignaling-nans, -fno-signaling-nans, null]
+
+- signature: -fsigned-zeros
+  type: categorical
+  choices: [-fsigned-zeros, -fno-signed-zeros, null]
+
+- signature: -fsimd-cost-model
+  type: categorical
+  choices: [-fsimd-cost-model=unlimited, -fsimd-cost-model=dynamic, -fsimd-cost-model=cheap, -fsimd-cost-model=very-cheap]
+
+- signature: -fsingle-precision-constant
+  type: categorical
+  choices: [-fsingle-precision-constant, -fno-single-precision-constant, null]
+
+- signature: -fsplit-ivs-in-unroller
+  type: categorical
+  choices: [-fsplit-ivs-in-unroller, -fno-split-ivs-in-unroller, null]
+
+- signature: -fsplit-loops
+  type: categorical
+  choices: [-fsplit-loops, -fno-split-loops, null]
+
+- signature: -fsplit-paths
+  type: categorical
+  choices: [-fsplit-paths, -fno-split-paths, null]
+
+- signature: -fsplit-wide-types
+  type: categorical
+  choices: [-fsplit-wide-types, -fno-split-wide-types, null]
+
+- signature: -fsplit-wide-types-early
+  type: categorical
+  choices: [-fsplit-wide-types-early, -fno-split-wide-types-early, null]
+
+- signature: -fssa-backprop
+  type: categorical
+  choices: [-fssa-backprop, -fno-ssa-backprop, null]
+
+- signature: -fssa-phiopt
+  type: categorical
+  choices: [-fssa-phiopt, -fno-ssa-phiopt, null]
+
+- signature: -fstdarg-opt
+  type: categorical
+  choices: [-fstdarg-opt, -fno-stdarg-opt, null]
+
+- signature: -fstore-merging
+  type: categorical
+  choices: [-fstore-merging, -fno-store-merging, null]
+
+- signature: -fstrict-aliasing
+  type: categorical
+  choices: [-fstrict-aliasing, -fno-strict-aliasing, null]
+
+- signature: -fstrict-enums
+  type: categorical
+  choices: [-fstrict-enums, -fno-strict-enums, null]
+
+- signature: -fstrict-volatile-bitfields
+  type: categorical
+  choices: [-fstrict-volatile-bitfields, -fno-strict-volatile-bitfields, null]
+
+- signature: -fthread-jumps
+  type: categorical
+  choices: [-fthread-jumps, -fno-thread-jumps, null]
+
+- signature: -ftoplevel-reorder
+  type: categorical
+  choices: [-ftoplevel-reorder, -fno-toplevel-reorder, null]
+
+- signature: -ftracer
+  type: categorical
+  choices: [-ftracer, -fno-tracer, null]
+
+- signature: -ftrapping-math
+  type: categorical
+  choices: [-ftrapping-math, -fno-trapping-math, null]
+
+- signature: -ftrapv
+  type: categorical
+  choices: [-ftrapv, -fno-trapv, null]
+
+- signature: -ftree-bit-ccp
+  type: categorical
+  choices: [-ftree-bit-ccp, -fno-tree-bit-ccp, null]
+
+- signature: -ftree-builtin-call-dce
+  type: categorical
+  choices: [-ftree-builtin-call-dce, -fno-tree-builtin-call-dce, null]
+
+- signature: -ftree-ccp
+  type: categorical
+  choices: [-ftree-ccp, -fno-tree-ccp, null]
+
+- signature: -ftree-ch
+  type: categorical
+  choices: [-ftree-ch, -fno-tree-ch, null]
+
+- signature: -ftree-coalesce-vars
+  type: categorical
+  choices: [-ftree-coalesce-vars, -fno-tree-coalesce-vars, null]
+
+- signature: -ftree-copy-prop
+  type: categorical
+  choices: [-ftree-copy-prop, -fno-tree-copy-prop, null]
+
+- signature: -ftree-cselim
+  type: categorical
+  choices: [-ftree-cselim, -fno-tree-cselim, null]
+
+- signature: -ftree-dce
+  type: categorical
+  choices: [-ftree-dce, -fno-tree-dce, null]
+
+- signature: -ftree-dominator-opts
+  type: categorical
+  choices: [-ftree-dominator-opts, -fno-tree-dominator-opts, null]
+
+- signature: -ftree-dse
+  type: categorical
+  choices: [-ftree-dse, -fno-tree-dse, null]
+
+- signature: -ftree-forwprop
+  type: categorical
+  choices: [-ftree-forwprop, -fno-tree-forwprop, null]
+
+- signature: -ftree-fre
+  type: categorical
+  choices: [-ftree-fre, -fno-tree-fre, null]
+
+- signature: -ftree-loop-distribute-patterns
+  type: categorical
+  choices: [-ftree-loop-distribute-patterns, -fno-tree-loop-distribute-patterns, null]
+
+- signature: -ftree-loop-distribution
+  type: categorical
+  choices: [-ftree-loop-distribution, -fno-tree-loop-distribution, null]
+
+- signature: -ftree-loop-if-convert
+  type: categorical
+  choices: [-ftree-loop-if-convert, -fno-tree-loop-if-convert, null]
+
+- signature: -ftree-loop-im
+  type: categorical
+  choices: [-ftree-loop-im, -fno-tree-loop-im, null]
+
+- signature: -ftree-loop-ivcanon
+  type: categorical
+  choices: [-ftree-loop-ivcanon, -fno-tree-loop-ivcanon, null]
+
+- signature: -ftree-loop-optimize
+  type: categorical
+  choices: [-ftree-loop-optimize, -fno-tree-loop-optimize, null]
+
+- signature: -ftree-loop-vectorize
+  type: categorical
+  choices: [-ftree-loop-vectorize, -fno-tree-loop-vectorize, null]
+
+- signature: -ftree-lrs
+  type: categorical
+  choices: [-ftree-lrs, -fno-tree-lrs, null]
+
+- signature: -ftree-parallelize-loops
+  type: integer
+  range: [0, 2147483648]
+
+- signature: -ftree-partial-pre
+  type: categorical
+  choices: [-ftree-partial-pre, -fno-tree-partial-pre, null]
+
+- signature: -ftree-phiprop
+  type: categorical
+  choices: [-ftree-phiprop, -fno-tree-phiprop, null]
+
+- signature: -ftree-pre
+  type: categorical
+  choices: [-ftree-pre, -fno-tree-pre, null]
+
+- signature: -ftree-pta
+  type: categorical
+  choices: [-ftree-pta, -fno-tree-pta, null]
+
+- signature: -ftree-reassoc
+  type: categorical
+  choices: [-ftree-reassoc, -fno-tree-reassoc, null]
+
+- signature: -ftree-scev-cprop
+  type: categorical
+  choices: [-ftree-scev-cprop, -fno-tree-scev-cprop, null]
+
+- signature: -ftree-sink
+  type: categorical
+  choices: [-ftree-sink, -fno-tree-sink, null]
+
+- signature: -ftree-slp-vectorize
+  type: categorical
+  choices: [-ftree-slp-vectorize, -fno-tree-slp-vectorize, null]
+
+- signature: -ftree-slsr
+  type: categorical
+  choices: [-ftree-slsr, -fno-tree-slsr, null]
+
+- signature: -ftree-sra
+  type: categorical
+  choices: [-ftree-sra, -fno-tree-sra, null]
+
+- signature: -ftree-switch-conversion
+  type: categorical
+  choices: [-ftree-switch-conversion, -fno-tree-switch-conversion, null]
+
+- signature: -ftree-tail-merge
+  type: categorical
+  choices: [-ftree-tail-merge, -fno-tree-tail-merge, null]
+
+- signature: -ftree-ter
+  type: categorical
+  choices: [-ftree-ter, -fno-tree-ter, null]
+
+- signature: -ftree-vectorize
+  type: categorical
+  choices: [-ftree-vectorize, -fno-tree-vectorize, null]
+
+- signature: -ftree-vrp
+  type: categorical
+  choices: [-ftree-vrp, -fno-tree-vrp, null]
+
+- signature: -funconstrained-commons
+  type: categorical
+  choices: [-funconstrained-commons, -fno-unconstrained-commons, null]
+
+- signature: -funroll-all-loops
+  type: categorical
+  choices: [-funroll-all-loops, -fno-unroll-all-loops, null]
+
+- signature: -funroll-completely-grow-size
+  type: categorical
+  choices: [null]
+
+- signature: -funroll-loops
+  type: categorical
+  choices: [-funroll-loops, -fno-unroll-loops, null]
+
+- signature: -funsafe-math-optimizations
+  type: categorical
+  choices: [-funsafe-math-optimizations, -fno-unsafe-math-optimizations, null]
+
+- signature: -funswitch-loops
+  type: categorical
+  choices: [-funswitch-loops, -fno-unswitch-loops, null]
+
+- signature: -funwind-tables
+  type: categorical
+  choices: [-funwind-tables, -fno-unwind-tables, null]
+
+- signature: -fvar-tracking
+  type: categorical
+  choices: [-fno-var-tracking, null]
+
+- signature: -fvar-tracking-assignments
+  type: categorical
+  choices: [-fvar-tracking-assignments, -fno-var-tracking-assignments, null]
+
+- signature: -fvar-tracking-assignments-toggle
+  type: categorical
+  choices: [-fvar-tracking-assignments-toggle, -fno-var-tracking-assignments-toggle, null]
+
+- signature: -fvar-tracking-uninit
+  type: categorical
+  choices: [-fno-var-tracking-uninit, null]
+
+- signature: -fvariable-expansion-in-unroller
+  type: categorical
+  choices: [-fvariable-expansion-in-unroller, -fno-variable-expansion-in-unroller, null]
+
+- signature: -fvect-cost-model
+  type: categorical
+  choices: [-fvect-cost-model=unlimited, -fvect-cost-model=dynamic, -fvect-cost-model=cheap, -fvect-cost-model=very-cheap]
+
+- signature: -fversion-loops-for-strides
+  type: categorical
+  choices: [-fversion-loops-for-strides, -fno-version-loops-for-strides, null]
+
+- signature: -fvpt
+  type: categorical
+  choices: [-fvpt, -fno-vpt, null]
+
+- signature: -fweb
+  type: categorical
+  choices: [-fweb, -fno-web, null]
+
+- signature: -fwrapv
+  type: categorical
+  choices: [-fwrapv, -fno-wrapv, null]
+
+- signature: -fwrapv-pointer
+  type: categorical
+  choices: [-fwrapv-pointer, -fno-wrapv-pointer, null]
+

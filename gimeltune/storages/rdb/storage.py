@@ -40,6 +40,7 @@ class RDBStorage(Storage):
             requestor=experiment.requestor,
             create_timestamp=experiment.create_timestamp,
             finish_timestamp=experiment.finish_timestamp,
+            metrics=experiment.metrics
         )
         self.session.add(experiment_model)
         self.session.commit()
