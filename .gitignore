@@ -180,3 +180,6 @@ examples/gcc/*.json
 /examples/gcc/space_wided.yaml
 examples/.DS_Store
 examples/gcc/.DS_Store
+/examples/gcc/*.db
+/examples/notebooks/*.db
+/examples/*.db

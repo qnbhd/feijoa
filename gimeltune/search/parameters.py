@@ -86,7 +86,7 @@ class Real(Parameter):
         self.high = high
 
     def __repr__(self):
-        return f"Real('{self.name}', {self.low=}, {self.high=}]"
+        return f"Real('{self.name}', {self.low=}, {self.high=})"
 
     def accept(self, v):
         return v.visit_real(self)
@@ -102,6 +102,9 @@ class Categorical(Parameter):
         if not choices:
             raise ParametersIncorrectInputValues('Choices for Categorical'
                                                  ' parameter must be not empty.')
+        if len(choices) != len(set(choices)):
+            raise ParametersIncorrectInputValues('Choices for Categorical'
+                                                 ' parameter must unique.')
         self.choices = choices
 
     def __repr__(self):
