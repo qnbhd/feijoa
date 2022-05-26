@@ -51,6 +51,7 @@ class RandomSearch(SearchAlgorithm):
         self.search_space = search_space
         self.experiments_factory = experiments_factory
         self.randomizer = Randomizer()
+        self._ask_gen = self._ask()
 
     @property
     def per_emit_count(self):
@@ -58,7 +59,7 @@ class RandomSearch(SearchAlgorithm):
         return 1
 
     def ask(self) -> Optional[List[Experiment]]:
-        return next(self._ask())
+        return next(self._ask_gen)
 
     def _ask(self):
 
