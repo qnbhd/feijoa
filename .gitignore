@@ -190,3 +190,5 @@ examples/gcc/utils/.DS_Store
 /examples/notebooks/aecli.db
 /examples/notebooks/mlp_tuning.ipynb
 /examples/notebooks/perceptron.db
+/examples/notebooks/*.db
+/examples/*.db

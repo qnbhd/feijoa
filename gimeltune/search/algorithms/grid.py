@@ -64,6 +64,7 @@ class GridSearch(SearchAlgorithm):
         ]
 
         self.prod_iter = product(*grids)
+        self._ask_gen = self._ask()
 
     @property
     def per_emit_count(self):
@@ -71,7 +72,7 @@ class GridSearch(SearchAlgorithm):
         return 1
 
     def ask(self) -> Optional[List[Experiment]]:
-        return next(self._ask())
+        return next(self._ask_gen)
 
     def _ask(self):
 
