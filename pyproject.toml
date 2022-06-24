@@ -23,6 +23,9 @@ pandas = "^1.4.2"
 pytest-cov = "^3.0.0"
 SQLAlchemy = "^1.4.35"
 tqdm = "^4.64.0"
+pydeps = "^1.10.18"
+seaborn = "^0.11.2"
+sklearn = "^0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"

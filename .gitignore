@@ -192,3 +192,5 @@ examples/gcc/utils/.DS_Store
 /examples/notebooks/perceptron.db
 /examples/notebooks/*.db
 /examples/*.db
+.DS_Store
+.vscode

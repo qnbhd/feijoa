@@ -278,7 +278,7 @@ class Job:
         self.seeds.append(seed)
 
 
-def _load_storage(storage_or_name: Union[str, Optional[Storage]]):
+def _load_storage(storage_or_name: Union[str, Optional[Storage]]) -> Storage:
     if storage_or_name is None:
         return RDBStorage('sqlite:///:memory:')
 
