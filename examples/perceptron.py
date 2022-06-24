@@ -290,11 +290,13 @@ def run_training():
     numpy.random.seed(10)
 
     space = SearchSpace.from_yaml(doc)
-    job = create_job(search_space=space, storage='sqlite:///perceptron.db')
-
-    job.do(objective, n_trials=100)
+    job = load_job(name='job14_45_33_04_22_2022', search_space=space, storage='sqlite:///perceptron.db')
 
     return job
+
+    # job.do(objective, n_trials=100)
+    #
+    # return job
 
 
 if __name__ == '__main__':

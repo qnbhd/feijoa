@@ -1,8 +1,32 @@
+import json
+
+from sqlalchemy import TypeDecorator, types
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, Float, String, ForeignKey, PickleType
 from sqlalchemy.orm import relationship
 
 _Base = declarative_base()
+
+
+class Json(TypeDecorator):
+
+    @property
+    def python_type(self):
+        return object
+
+    impl = types.String
+
+    def process_bind_param(self, value, dialect):
+        return json.dumps(value)
+
+    def process_literal_param(self, value, dialect):
+        return value
+
+    def process_result_value(self, value, dialect):
+        try:
+            return json.loads(value)
+        except (ValueError, TypeError):
+            return None
 
 
 class JobModel(_Base):
@@ -24,8 +48,8 @@ class ExperimentModel(_Base):
     state = Column(String)
     hash = Column(String)
     objective_result = Column(Float)
-    params = Column(PickleType)
+    params = Column(Json)
     requestor = Column(String)
     create_timestamp = Column(Float)
     finish_timestamp = Column(Float)
-    metrics = Column(PickleType)
+    metrics = Column(Json)
