@@ -24,13 +24,10 @@ from typing import List, Optional
 
 from gimeltune.models import Experiment
 
-__all__ = [
-    'SearchAlgorithm'
-]
+__all__ = ["SearchAlgorithm"]
 
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def ask(self) -> Optional[List[Experiment]]:
         raise NotImplementedError()

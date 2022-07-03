@@ -27,12 +27,9 @@ import numpy
 
 from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms import SearchAlgorithm
-from gimeltune.search.parameters import (Categorical, Integer,
-                                        ParametersVisitor, Real)
+from gimeltune.search.parameters import Categorical, Integer, ParametersVisitor, Real
 
-__all__ = [
-    'GridSearch'
-]
+__all__ = ["GridSearch"]
 
 
 class GridMaker(ParametersVisitor):
@@ -46,29 +43,26 @@ class GridMaker(ParametersVisitor):
         return range(p.low, p.high + 1)
 
     def visit_real(self, p: Real):
-        return numpy.round(numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS), 2)
+        return numpy.round(
+            numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS), 2)
 
     def visit_categorical(self, p: Categorical):
         return p.choices
 
 
 class GridSearch(SearchAlgorithm):
-
-    def __init__(self, search_space, experiments_factory):
+    def __init__(self, search_space, experiments_factory, **kwargs):
         self.search_space = search_space
         self.experiments_factory = experiments_factory
 
-        grids = [
-            p.accept(GridMaker())
-            for p in self.search_space.params
-        ]
+        grids = [p.accept(GridMaker()) for p in self.search_space.params]
 
         self.prod_iter = product(*grids)
         self._ask_gen = self._ask()
 
     @property
     def per_emit_count(self):
-        warnings.warn('Per emit count not implemented.')
+        warnings.warn("Per emit count not implemented.")
         return 1
 
     def ask(self) -> Optional[List[Experiment]]:

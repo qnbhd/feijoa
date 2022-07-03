@@ -36,30 +36,29 @@ sklearn.utils.fixes.MaskedArray = MaskedArray
 # noinspection PyPackageRequirements
 import skopt
 
-__all__ = [
-    'SkoptBayesianAlgorithm'
-]
+__all__ = ["SkoptBayesianAlgorithm"]
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):
     def __init__(self, search_space: SearchSpace,
-                 experiment_factory: ExperimentsFactory, **kwargs):
+                 experiments_factory: ExperimentsFactory, **kwargs):
 
         super().__init__(**kwargs)
 
         self.skopt_space = self._make_space(search_space)
-        self.experiment_factory = experiment_factory
+        self.experiments_factory = experiments_factory
         self.optimizer_instance = skopt.Optimizer(self.skopt_space, "GBRT")
 
         self.ask_generator = self._ask()
 
     @property
     def per_emit_count(self):
-        is_warned = getattr(self, '_warned', False)
+        is_warned = getattr(self, "_warned", False)
         if not is_warned:
-            warnings.warn('Now per-emit count in skopt technique implemented not correctly.'
-                          ' Per-emit count is property, return default value (1).')
-            setattr(self, '_warned', True)
+            warnings.warn(
+                "Now per-emit count in skopt technique implemented not correctly."
+                " Per-emit count is property, return default value (1).")
+            setattr(self, "_warned", True)
         return 1
 
     @staticmethod
@@ -68,13 +67,14 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
         for p in space.params:
             if isinstance(p, Integer):
-                params.append(skopt.space.Integer(name=p.name, low=p.low, high=p.high))
+                params.append(
+                    skopt.space.Integer(name=p.name, low=p.low, high=p.high))
             elif isinstance(p, Real):
-                params.append(skopt.space.Real(name=p.name, low=p.low, high=p.high))
+                params.append(
+                    skopt.space.Real(name=p.name, low=p.low, high=p.high))
             elif isinstance(p, Categorical):
                 params.append(
-                    skopt.space.Categorical(name=p.name, categories=p.choices)
-                )
+                    skopt.space.Categorical(name=p.name, categories=p.choices))
 
         return params
 
@@ -100,7 +100,7 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
                     potentially_cfg[k] = v
 
-                cfg = self.experiment_factory.create(potentially_cfg)
+                cfg = self.experiments_factory.create(potentially_cfg)
                 asked.append(cfg)
 
             yield asked
@@ -109,7 +109,5 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
         return next(self.ask_generator)
 
     def tell(self, experiment: Experiment):
-        self.optimizer_instance.tell(
-            list(experiment.params.values()),
-            experiment.objective_result
-        )
+        self.optimizer_instance.tell(list(experiment.params.values()),
+                                     experiment.objective_result)

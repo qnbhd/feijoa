@@ -19,35 +19,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import random
 import warnings
 from typing import List, Optional
 
 from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms import SearchAlgorithm
-from gimeltune.search.parameters import (Categorical, Integer,
-                                        ParametersVisitor, Real)
+from gimeltune.search.visitors import Randomizer
 
-__all__ = [
-    'RandomSearch'
-]
-
-
-class Randomizer(ParametersVisitor):
-
-    def visit_integer(self, p: Integer):
-        return random.randint(p.low, p.high)
-
-    def visit_real(self, p: Real):
-        return (p.high - p.low) * random.random() + p.low
-
-    def visit_categorical(self, p: Categorical):
-        return random.choice(p.choices)
+__all__ = ["RandomSearch"]
 
 
 class RandomSearch(SearchAlgorithm):
-
-    def __init__(self, search_space, experiments_factory):
+    def __init__(self, search_space, experiments_factory, **kwargs):
         self.search_space = search_space
         self.experiments_factory = experiments_factory
         self.randomizer = Randomizer()
@@ -55,7 +38,7 @@ class RandomSearch(SearchAlgorithm):
 
     @property
     def per_emit_count(self):
-        warnings.warn('Per emit count not implemented.')
+        warnings.warn("Per emit count not implemented.")
         return 1
 
     def ask(self) -> Optional[List[Experiment]]:

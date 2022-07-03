@@ -21,13 +21,7 @@
 # SOFTWARE.
 import abc
 
-__all__ = [
-    'Parameter',
-    'Integer',
-    'Real',
-    'Categorical',
-    'ParametersVisitor'
-]
+__all__ = ["Parameter", "Integer", "Real", "Categorical", "ParametersVisitor"]
 
 from gimeltune.exceptions import ParametersIncorrectInputValues
 
@@ -50,15 +44,26 @@ class Parameter(metaclass=abc.ABCMeta):
     def seed(self):
         raise NotImplementedError()
 
+    @abc.abstractmethod
+    def is_primitive(self):
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def get_unit_value(self, value):
+        raise NotImplementedError()
+
 
 class Integer(Parameter):
     def __init__(self, name: str, *, low: int, high: int):
         super().__init__(name)
 
         if not isinstance(low, int) or not isinstance(high, int):
-            raise ParametersIncorrectInputValues('Low and High bounds for'
-                                                 ' Integer parameter'
-                                                 ' must be ints.')
+            raise ParametersIncorrectInputValues("Low and High bounds for"
+                                                 " Integer parameter"
+                                                 " must be ints.")
+        if low > high:
+            raise ParametersIncorrectInputValues("High bound must"
+                                                 " be greater than low bound.")
 
         self.low = low
         self.high = high
@@ -72,15 +77,27 @@ class Integer(Parameter):
     def seed(self):
         return self.low
 
+    def is_primitive(self):
+        return True
+
+    def get_unit_value(self, value):
+        return float(value -
+                     (self.low - 0.4999)) / float((self.high + 0.4999) -
+                                                  (self.low - 0.4999))
+
 
 class Real(Parameter):
     def __init__(self, name: str, *, low: float, high: float):
         super().__init__(name)
 
         if not isinstance(low, float) or not isinstance(high, float):
-            raise ParametersIncorrectInputValues('Low and High bounds for'
-                                                 ' Float parameter'
-                                                 ' must be floats.')
+            raise ParametersIncorrectInputValues("Low and High bounds for"
+                                                 " Float parameter"
+                                                 " must be floats.")
+
+        if low > high:
+            raise ParametersIncorrectInputValues("High bound must"
+                                                 " be greater than low bound.")
 
         self.low = low
         self.high = high
@@ -94,17 +111,24 @@ class Real(Parameter):
     def seed(self):
         return self.low
 
+    def is_primitive(self):
+        return True
+
+    def get_unit_value(self, value):
+        return float(value - self.low) / float(self.high - self.low)
+
 
 class Categorical(Parameter):
     def __init__(self, name: str, *, choices):
         super().__init__(name)
 
         if not choices:
-            raise ParametersIncorrectInputValues('Choices for Categorical'
-                                                 ' parameter must be not empty.')
+            raise ParametersIncorrectInputValues(
+                "Choices for Categorical"
+                " parameter must be not empty.")
         if len(choices) != len(set(choices)):
-            raise ParametersIncorrectInputValues('Choices for Categorical'
-                                                 ' parameter must unique.')
+            raise ParametersIncorrectInputValues("Choices for Categorical"
+                                                 " parameter must unique.")
         self.choices = choices
 
     def __repr__(self):
@@ -116,9 +140,14 @@ class Categorical(Parameter):
     def seed(self):
         return self.choices[0]
 
+    def is_primitive(self):
+        return False
+
+    def get_unit_value(self, value):
+        raise NotImplementedError()
+
 
 class ParametersVisitor(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def visit_integer(self, p: Integer):
         raise NotImplementedError()

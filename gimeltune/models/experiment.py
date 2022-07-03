@@ -1,19 +1,17 @@
 import datetime
 import hashlib
 import json
-from asyncio import Queue
 from enum import Enum
-from functools import partial
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
 
 class ExperimentState(str, Enum):
-    OK = 'OK'
-    WIP = 'WIP'
-    ERROR = 'ERROR'
-    SEMI = 'SEMI'
+    OK = "OK"
+    WIP = "WIP"
+    ERROR = "ERROR"
+    SEMI = "SEMI"
 
 
 class Experiment(BaseModel):
@@ -53,8 +51,7 @@ class Experiment(BaseModel):
         self.state = ExperimentState.ERROR
 
     def is_finished(self):
-        return self.state == ExperimentState.OK or \
-               self.state == ExperimentState.ERROR
+        return self.state == ExperimentState.OK or self.state == ExperimentState.ERROR
 
     def _calculate_hash(self):
         params_dumped = json.dumps(self.params, sort_keys=True)
@@ -81,14 +78,13 @@ class Experiment(BaseModel):
         self._finish(ExperimentState.ERROR)
 
     def __repr__(self):
-        return f'Experiment({json.dumps(self.dict(), indent=4)})'
+        return f"Experiment({json.dumps(self.dict(), indent=4)})"
 
     def __str__(self):
         return repr(self)
 
 
 class ExperimentsFactory:
-
     def __init__(self, job):
         self.job = job
         self.pending_experiments = 0
@@ -99,8 +95,11 @@ class ExperimentsFactory:
 
         result = Experiment(
             id=self.job.experiments_count + self.pending_experiments + 1,
-            job_id=self.job.id, state=ExperimentState.WIP,
-            requestor='UNKNOWN', create_timestamp=timestamp, params=params
+            job_id=self.job.id,
+            state=ExperimentState.WIP,
+            requestor="UNKNOWN",
+            create_timestamp=timestamp,
+            params=params,
         )
 
         self.pending_experiments += 1

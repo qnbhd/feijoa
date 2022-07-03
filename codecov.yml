@@ -1,2 +1,3 @@
 ignore:
   - "gimeltune/utils/logging.py"
+  - "gimeltune/storages/rdb/models.py"

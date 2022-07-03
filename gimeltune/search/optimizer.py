@@ -28,13 +28,10 @@ from gimeltune.search.space import SearchSpace
 
 log = logging.getLogger(__name__)
 
-__all__ = [
-    'Optimizer'
-]
+__all__ = ["Optimizer"]
 
 
 class Optimizer:
-
     """
     Experiment's optimizer class.
 
@@ -44,12 +41,8 @@ class Optimizer:
         - space
         - experiments_factory
     """
-
-    def __init__(
-        self,
-        space: SearchSpace,
-        experiments_factory: ExperimentsFactory
-    ):
+    def __init__(self, space: SearchSpace,
+                 experiments_factory: ExperimentsFactory):
         self.space = space
         self.experiments_factory = experiments_factory
         self.algorithms: List[SearchAlgorithm] = list()
@@ -83,7 +76,7 @@ class Optimizer:
 
     def _ask(self) -> Generator:
 
-        assert self.algorithms, 'Algorithms must be in list'
+        assert self.algorithms, "Algorithms must be in list"
 
         while self.algorithms:
 

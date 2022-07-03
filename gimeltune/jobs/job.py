@@ -19,8 +19,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import random
-from urllib.parse import urlparse
 import warnings
 from datetime import datetime
 from typing import Any, Callable, List, Optional, Type, Union
@@ -30,32 +28,41 @@ import pandas as pd
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
 
-from gimeltune.exceptions import DuplicatedJobError, JobNotFoundError, ExperimentNotFinishedError, \
-    SearchAlgorithmNotFoundedError, InvalidStoragePassed, InvalidStorageRFC1738
+from gimeltune.exceptions import (
+    DuplicatedJobError,
+    ExperimentNotFinishedError,
+    InvalidStoragePassed,
+    InvalidStorageRFC1738,
+    JobNotFoundError,
+    SearchAlgorithmNotFoundedError,
+)
 from gimeltune.models import Experiment, ExperimentsFactory
 from gimeltune.search import Optimizer, SearchSpace
-from gimeltune.search.algorithms import (GridSearch, RandomSearch,
-                                         SearchAlgorithm, SeedAlgorithm,
-                                         SkoptBayesianAlgorithm, get_algo)
+from gimeltune.search.algorithms import (
+    SearchAlgorithm,
+    SeedAlgorithm,
+    SkoptBayesianAlgorithm,
+    get_algo,
+)
 from gimeltune.storages import Storage, TinyDBStorage
 
-__all__ = [
-    'create_job',
-    'load_job'
-]
+__all__ = ["create_job", "load_job"]
 
 from gimeltune.storages.rdb.storage import RDBStorage
 
 
 class Job:
-
     """
     Facade of framework.
     """
-
-    def __init__(self, name: str, storage: Storage,
-                 search_space: SearchSpace, job_id: int,
-                 pruners: Any = None):
+    def __init__(
+        self,
+        name: str,
+        storage: Storage,
+        search_space: SearchSpace,
+        job_id: int,
+        pruners: Any = None,
+    ):
 
         self.name = name
         self.storage = storage
@@ -81,8 +88,7 @@ class Job:
         :return: the best parameters' dict.
         """
 
-        return self.best_experiment.params \
-            if self.best_experiment else None
+        return self.best_experiment.params if self.best_experiment else None
 
     @property
     def best_value(self) -> Optional[Any]:
@@ -92,8 +98,7 @@ class Job:
         :return: float best value.
         """
 
-        return self.best_experiment.objective_result \
-            if self.best_experiment else None
+        return self.best_experiment.objective_result if self.best_experiment else None
 
     @property
     def best_experiment(self) -> Optional[Experiment]:
@@ -136,12 +141,16 @@ class Job:
 
     def setup_default_algo(self):
         self.add_algorithm(
-            SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+            SkoptBayesianAlgorithm(self.search_space,
+                                   self.experiments_factory))
 
-    def do(self, objective: Callable,
-           n_trials: int = 100, n_proc: int = 1,
-           algo_list: List[Union[str, Type[SearchAlgorithm]]] = None):
-
+    def do(
+        self,
+        objective: Callable,
+        n_trials: int = 100,
+        n_proc: int = 1,
+        algo_list: List[Union[str, Type[SearchAlgorithm]]] = None,
+    ):
         """
         :param objective: objective function
         :param n_trials: count of max trials.
@@ -158,7 +167,8 @@ class Job:
 
         if not algo_list:
             self.add_algorithm(
-                SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
+                SkoptBayesianAlgorithm(self.search_space,
+                                       self.experiments_factory))
         else:
             for algo in algo_list:
                 if isinstance(algo, str):
@@ -171,25 +181,15 @@ class Job:
                     continue
                 elif issubclass(algo, SearchAlgorithm):
                     algo_cls = algo
-
-                # TODO (qnbhd): fix 'Local variable 'algo_cls'
-                #  might be referenced before assignment'
-                if algo_cls == SkoptBayesianAlgorithm:
-
-                    self.add_algorithm(
-                        SkoptBayesianAlgorithm(self.search_space, self.experiments_factory))
-
-                elif algo_cls == RandomSearch:
-
-                    self.add_algorithm(
-                        RandomSearch(self.search_space, self.experiments_factory))
-
-                elif algo_cls == GridSearch:
-
-                    self.add_algorithm(
-                        GridSearch(self.search_space, self.experiments_factory))
                 else:
                     raise SearchAlgorithmNotFoundedError()
+
+                # noinspection PyArgumentList
+                self.add_algorithm(
+                    algo_cls(
+                        search_space=self.search_space,
+                        experiments_factory=self.experiments_factory,
+                    ))
 
         trials = 0
 
@@ -198,7 +198,7 @@ class Job:
             configurations = self.ask()
 
             if not configurations:
-                warnings.warn('No new configurations.')
+                warnings.warn("No new configurations.")
                 # TODO (qnbhd): make closing
                 break
 
@@ -251,21 +251,21 @@ class Job:
 
         for experiment in self.experiments:
             dataframe_dict = experiment.dict()
-            params = dataframe_dict.pop('params')
+            params = dataframe_dict.pop("params")
 
-            if dataframe_dict['metrics']:
-                metrics = dataframe_dict.pop('metrics')
+            if dataframe_dict["metrics"]:
+                metrics = dataframe_dict.pop("metrics")
             else:
                 metrics = dict()
 
-            dataframe_dict['create_time'] = \
-                datetime.fromtimestamp(dataframe_dict['create_timestamp'])
+            dataframe_dict["create_time"] = datetime.fromtimestamp(
+                dataframe_dict["create_timestamp"])
 
-            dataframe_dict['finish_time'] = \
-                datetime.fromtimestamp(dataframe_dict['finish_timestamp'])
+            dataframe_dict["finish_time"] = datetime.fromtimestamp(
+                dataframe_dict["finish_timestamp"])
 
-            del dataframe_dict['create_timestamp']
-            del dataframe_dict['finish_timestamp']
+            del dataframe_dict["create_timestamp"]
+            del dataframe_dict["finish_timestamp"]
 
             container.append({**dataframe_dict, **params, **metrics})
 
@@ -280,7 +280,7 @@ class Job:
 
 def _load_storage(storage_or_name: Union[str, Optional[Storage]]) -> Storage:
     if storage_or_name is None:
-        return RDBStorage('sqlite:///:memory:')
+        return RDBStorage("sqlite:///:memory:")
 
     if issubclass(type(storage_or_name), Storage):
         return storage_or_name
@@ -295,15 +295,18 @@ def _load_storage(storage_or_name: Union[str, Optional[Storage]]) -> Storage:
 
     assert url.database
 
-    if url.drivername == 'tinydb':
+    if url.drivername == "tinydb":
         return TinyDBStorage(str(url.database))
 
     return RDBStorage(storage_or_name)
 
 
-def create_job(*, search_space: SearchSpace, name: str = None,
-               storage: Union[str, Optional[Storage]] = None):
-
+def create_job(
+    *,
+    search_space: SearchSpace,
+    name: str = None,
+    storage: Union[str, Optional[Storage]] = None,
+):
     """
 
     :param search_space:
@@ -312,7 +315,7 @@ def create_job(*, search_space: SearchSpace, name: str = None,
     :return:
     """
 
-    name = name or 'job' + datetime.now().strftime('%H_%M_%S_%m_%d_%Y')
+    name = name or "job" + datetime.now().strftime("%H_%M_%S_%m_%d_%Y")
 
     storage = _load_storage(storage)
 
@@ -320,14 +323,13 @@ def create_job(*, search_space: SearchSpace, name: str = None,
     assert isinstance(search_space, SearchSpace)
 
     if storage.is_job_name_exists(name):
-        raise DuplicatedJobError(f'Job {name} is already exists.')
+        raise DuplicatedJobError(f"Job {name} is already exists.")
 
     return Job(name, storage, search_space, storage.jobs_count + 1)
 
 
-def load_job(*, search_space: SearchSpace, name: str,
-             storage: Union[str, Storage]):
-
+def load_job(*, search_space: SearchSpace, name: str, storage: Union[str,
+                                                                     Storage]):
     """
 
     :param search_space:
@@ -341,7 +343,7 @@ def load_job(*, search_space: SearchSpace, name: str,
     job_id = storage.get_job_id_by_name(name)
 
     if not job_id:
-        raise JobNotFoundError(f'Job {name} not found is storage.')
+        raise JobNotFoundError(f"Job {name} not found is storage.")
 
     experiments = storage.get_experiments_by_job_id(job_id)
 

@@ -23,14 +23,18 @@
 import os
 from os.path import abspath, dirname
 
-__version__ = '0.1.0'
-__poly_folder__ = os.path.join(dirname(abspath(__file__)))
-__project_folder__ = dirname(__poly_folder__)
+__version__ = "0.1.0"
+__gimeltune_folder__ = os.path.join(dirname(abspath(__file__)))
+__project_folder__ = dirname(__gimeltune_folder__)
 
 from .jobs import create_job, load_job
 from .models import Experiment
 from .search import Categorical, Integer, Real, SearchSpace
-from .search.algorithms import (SearchAlgorithm, SeedAlgorithm,
-                                SkoptBayesianAlgorithm, GridSearch,
-                                RandomSearch)
+from .search.algorithms import (
+    GridSearch,
+    RandomSearch,
+    SearchAlgorithm,
+    SeedAlgorithm,
+    SkoptBayesianAlgorithm,
+)
 from .storages import Storage, TinyDBStorage

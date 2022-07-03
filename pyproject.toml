@@ -26,6 +26,7 @@ tqdm = "^4.64.0"
 pydeps = "^1.10.18"
 seaborn = "^0.11.2"
 sklearn = "^0.0"
+imageio = "^2.19.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"

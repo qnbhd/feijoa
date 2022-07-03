@@ -24,13 +24,10 @@ from typing import List, Optional
 
 from gimeltune.models import Experiment
 
-__all__ = [
-    'Storage'
-]
+__all__ = ["Storage"]
 
 
 class Storage(metaclass=abc.ABCMeta):
-
     def insert_job(self, job):
         """
 
@@ -141,4 +138,3 @@ class Storage(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def version(self):
         raise NotImplementedError()
-

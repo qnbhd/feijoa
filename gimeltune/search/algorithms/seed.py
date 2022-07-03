@@ -26,7 +26,6 @@ from gimeltune.search.algorithms import SearchAlgorithm
 
 
 class SeedAlgorithm(SearchAlgorithm):
-
     def __init__(self, experiments_factory, *seeds):
         self.experiments_factory = experiments_factory
         self.seeds: list = list(seeds)
@@ -36,8 +35,7 @@ class SeedAlgorithm(SearchAlgorithm):
 
         if not self.is_emitted:
             cfgs = [
-                self.experiments_factory.create(seed)
-                for seed in self.seeds
+                self.experiments_factory.create(seed) for seed in self.seeds
             ]
             self.is_emitted = True
             return cfgs
@@ -47,4 +45,3 @@ class SeedAlgorithm(SearchAlgorithm):
     def tell(self, experiment: Experiment):
         # Tell no needed
         pass
-

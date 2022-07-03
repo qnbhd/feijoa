@@ -21,15 +21,15 @@
 # SOFTWARE.
 
 __all__ = [
-    'DBVersionError',
-    'SearchAlgorithmNotFoundedError',
-    'DuplicatedJobError',
-    'JobNotFoundError',
-    'ExperimentNotFinishedError',
-    'ParametersIncorrectInputValues',
-    'InsertExperimentWithTheExistedId',
-    'InvalidStoragePassed',
-    'InvalidStorageRFC1738'
+    "DBVersionError",
+    "SearchAlgorithmNotFoundedError",
+    "DuplicatedJobError",
+    "JobNotFoundError",
+    "ExperimentNotFinishedError",
+    "ParametersIncorrectInputValues",
+    "InsertExperimentWithTheExistedId",
+    "InvalidStoragePassed",
+    "InvalidStorageRFC1738",
 ]
 
 
@@ -92,5 +92,5 @@ class InvalidStoragePassed(GimeltuneError):
 
 
 class InvalidStorageRFC1738(GimeltuneError):
-    """Raises if could not parse rfc1738 URL
+    """Raises if you could not parse rfc1738 URL
     from specified string."""
