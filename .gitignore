@@ -194,3 +194,5 @@ examples/gcc/utils/.DS_Store
 /examples/*.db
 .DS_Store
 .vscode
+/tests/images/
+/examples/bo.ipynb

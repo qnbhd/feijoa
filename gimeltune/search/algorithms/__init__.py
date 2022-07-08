@@ -20,12 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from ...exceptions import SearchAlgorithmNotFoundedError
 from .algorithm import SearchAlgorithm
+from .bayesian import BayesianAlgorithm
 from .grid import GridSearch
 from .randomized import RandomSearch
 from .seed import SeedAlgorithm
 from .skopt import SkoptBayesianAlgorithm
-from ...exceptions import SearchAlgorithmNotFoundedError
+from .templatesearch import TemplateSearchAlgorithm
 
 registry = {}
 
@@ -37,14 +39,13 @@ def register(algo_name, algo_cls, *algo_aliases):
         registry[alias] = algo_cls
 
 
-register('skopt', SkoptBayesianAlgorithm,
-         'Skopt', 'Bayesian')
-register('seed', SeedAlgorithm,
-         'Seed')
-register('random', RandomSearch,
-         'Random', 'RandomSearch')
-register('grid', GridSearch,
-         'Grid', 'GridSearch')
+register("skopt", SkoptBayesianAlgorithm, "Skopt")
+register("bayesian", BayesianAlgorithm, "bayes, Bayesian")
+register("seed", SeedAlgorithm, "Seed")
+register("random", RandomSearch, "Random", "RandomSearch")
+register("grid", GridSearch, "Grid", "GridSearch")
+register("template", TemplateSearchAlgorithm, "template-search",
+         "basic-template")
 
 
 def get_algo(algo_name):

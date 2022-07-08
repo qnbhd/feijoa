@@ -26,14 +26,11 @@ import yaml
 
 from gimeltune.search.parameters import Categorical, Integer, Parameter, Real
 
-__all__ = [
-    'SearchSpace'
-]
+__all__ = ["SearchSpace"]
 
 
 class SearchSpace:
     """Search (observation) space class"""
-
     def __init__(self):
         self.params: List[Parameter] = list()
         self.name2param = dict()
@@ -47,18 +44,21 @@ class SearchSpace:
         return self.name2param.get(item, default)
 
     def __repr__(self) -> str:
-        buff = ['SearchSpace:']
+        buff = ["SearchSpace:"]
 
         for p in self.params:
-            buff.append(f'\t{p}')
+            buff.append(f"\t{p}")
 
-        return '\n'.join(buff)
+        return "\n".join(buff)
 
     def __str__(self):
         return repr(self)
 
     def __iter__(self):
         return iter(self.params)
+
+    def __len__(self):
+        return len(self.params)
 
     @classmethod
     def from_yaml(cls, yaml_string):
@@ -84,18 +84,18 @@ def parameter_factory(**kwargs):
     param_signature = kwargs["signature"]
 
     if kwargs["type"] == "integer":
-        param_potentially_range = kwargs.get('range', None)
+        param_potentially_range = kwargs.get("range", None)
         if param_potentially_range is not None:
             low, high = param_potentially_range
         else:
-            low, high = kwargs['low'], kwargs['high']
+            low, high = kwargs["low"], kwargs["high"]
         return Integer(param_signature, low=low, high=high)
     elif kwargs["type"] == "real":
-        param_potentially_range = kwargs.get('range', None)
+        param_potentially_range = kwargs.get("range", None)
         if param_potentially_range is not None:
             low, high = param_potentially_range
         else:
-            low, high = kwargs['low'], kwargs['high']
+            low, high = kwargs["low"], kwargs["high"]
         return Real(param_signature, low=low, high=high)
     elif kwargs["type"] == "categorical":
         return Categorical(param_signature, choices=kwargs["choices"])
@@ -106,9 +106,11 @@ def parameter_factory(**kwargs):
 def from_yaml(yaml_file: str) -> SearchSpace:
     """Load search space from yaml file."""
 
-    warnings.warn('Function `from_yaml` is deprecated.'
-                  'Use SearchSpace.from_yaml instead.',
-                  DeprecationWarning)
+    warnings.warn(
+        "Function `from_yaml` is deprecated."
+        "Use SearchSpace.from_yaml instead.",
+        DeprecationWarning,
+    )
 
     with open(yaml_file) as f:
         space_dumped = yaml.safe_load(f)

@@ -5,7 +5,7 @@ from gimeltune.search.space import from_yaml
 
 
 def test_space_from_yaml():
-    yaml = '''- signature: -O
+    yaml = """- signature: -O
   type: categorical
   choices: [-O1, -O2, -O3, null]
 
@@ -30,42 +30,43 @@ def test_space_from_yaml():
 - signature: zoo
   type: real
   range: [0.0, 10.0]
-'''
+"""
 
     space = SearchSpace.from_yaml(yaml)
 
-    assert space.get('boo').name == 'boo'
+    assert space.get("boo").name == "boo"
 
-    with open('foo.yaml', 'w') as yf:
+    with open("foo.yaml", "w") as yf:
         yf.write(yaml)
 
     with pytest.deprecated_call():
-        from_yaml('foo.yaml')
+        # noinspection PyDeprecation
+        from_yaml("foo.yaml")
 
-    space_from_file = SearchSpace.from_yaml_file('foo.yaml')
+    space_from_file = SearchSpace.from_yaml_file("foo.yaml")
 
-    assert str(space) == '''SearchSpace:
+    assert (str(space) == """SearchSpace:
 	Categorical('-O', choices=['-O1', '-O2', '-O3', None])
 	Categorical('align-functions', choices=['-falign-functions', '-fno-align-functions', None])
 	Integer('iv-max-considered-uses, low=0, high=1000)
 	Integer('foo, low=0, high=1000)
 	Real('boo', self.low=0.0, self.high=1.0)
-	Real('zoo', self.low=0.0, self.high=10.0)'''
+	Real('zoo', self.low=0.0, self.high=10.0)""")
 
-    assert str(space_from_file) == '''SearchSpace:
+    assert (str(space_from_file) == """SearchSpace:
 	Categorical('-O', choices=['-O1', '-O2', '-O3', None])
 	Categorical('align-functions', choices=['-falign-functions', '-fno-align-functions', None])
 	Integer('iv-max-considered-uses, low=0, high=1000)
 	Integer('foo, low=0, high=1000)
 	Real('boo', self.low=0.0, self.high=1.0)
-	Real('zoo', self.low=0.0, self.high=10.0)'''
+	Real('zoo', self.low=0.0, self.high=10.0)""")
 
 
 def test_incorrect_yaml_parameter_type():
-    doc = '''- signature: foo
+    doc = """- signature: foo
   type: unknown
   low: 0
-  high: 1000'''
+  high: 1000"""
 
     with pytest.raises(TypeError):
         SearchSpace.from_yaml(doc)

@@ -28,38 +28,36 @@ from gimeltune.exceptions import DBVersionError, InsertExperimentWithTheExistedI
 from gimeltune.models import Experiment
 from gimeltune.storages.storage import Storage
 
-__all__ = [
-    'TinyDBStorage'
-]
+__all__ = ["TinyDBStorage"]
 
 
 # noinspection PyTypeChecker
 class TinyDBStorage(Storage):
 
-    __version__ = '0.1.0'
+    __version__ = "0.1.0"
 
     def __init__(self, json_file: str):
         self.json_file = json_file
         self.tiny_db = TinyDB(json_file)
 
-        db_version_table = self.tiny_db.table('version')
+        db_version_table = self.tiny_db.table("version")
 
         if not len(db_version_table.all()):
             # New table
-            db_version_table.insert({'version': self.version})
+            db_version_table.insert({"version": self.version})
         else:
             ver_record, *_ = db_version_table.all()
-            ver = ver_record['version']
+            ver = ver_record["version"]
             if ver < self.version:
                 raise DBVersionError()
 
-        self.jobs_table = self.tiny_db.table('job')
-        self.experiments_table = self.tiny_db.table('experiment')
+        self.jobs_table = self.tiny_db.table("job")
+        self.experiments_table = self.tiny_db.table("experiment")
 
     def insert_job(self, job):
         doc = {
-            'name': job.name,
-            'id': job.id,
+            "name": job.name,
+            "id": job.id,
         }
         self.jobs_table.insert(doc)
 
@@ -73,7 +71,7 @@ class TinyDBStorage(Storage):
 
         job, *_ = jobs
 
-        return job['id']
+        return job["id"]
 
     def is_job_name_exists(self, name):
         jobs = self.jobs_table.search(Query().name == name)
@@ -89,10 +87,8 @@ class TinyDBStorage(Storage):
         self.experiments_table.insert(doc)
 
     def get_experiment(self, job_id, experiment_id):
-        q = self.experiments_table.search(
-            (Query().id == experiment_id) &
-            (Query().job_id == job_id)
-        )
+        q = self.experiments_table.search((Query().id == experiment_id)
+                                          & (Query().job_id == job_id))
 
         if not q:
             return None

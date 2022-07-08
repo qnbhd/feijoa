@@ -1,15 +1,14 @@
 from typing import List, Optional
 
-from gimeltune.models import Experiment
-from gimeltune.storages.rdb.models import JobModel, ExperimentModel, _Base
-from gimeltune.storages.storage import Storage
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from gimeltune.models import Experiment
+from gimeltune.storages.rdb.models import ExperimentModel, JobModel, _Base
+from gimeltune.storages.storage import Storage
+
 
 class RDBStorage(Storage):
-
     def __init__(self, url):
         self.engine = create_engine(url)
         _Base.metadata.create_all(self.engine)
@@ -40,24 +39,27 @@ class RDBStorage(Storage):
             requestor=experiment.requestor,
             create_timestamp=experiment.create_timestamp,
             finish_timestamp=experiment.finish_timestamp,
-            metrics=experiment.metrics
+            metrics=experiment.metrics,
         )
         self.session.add(experiment_model)
         self.session.commit()
 
     def get_experiment(self, job_id, experiment_id):
-        experiment_model = self.session.query(ExperimentModel).filter_by(id=experiment_id, job_id=job_id).one()
+        experiment_model = (self.session.query(ExperimentModel).filter_by(
+            id=experiment_id, job_id=job_id).one())
         return Experiment.from_orm(experiment_model)
 
     def get_experiments_by_job_id(self, job_id) -> List[Experiment]:
-        experiments_models = self.session.query(ExperimentModel).filter_by(job_id=job_id).all()
+        experiments_models = (self.session.query(ExperimentModel).filter_by(
+            job_id=job_id).all())
         experiments = []
         for exp in experiments_models:
             experiments.append(Experiment.from_orm(exp))
         return experiments
 
     def get_experiments_count(self, job_id) -> int:
-        experiments_models = self.session.query(ExperimentModel).filter_by(job_id=job_id).all()
+        experiments_models = (self.session.query(ExperimentModel).filter_by(
+            job_id=job_id).all())
         return len(experiments_models)
 
     @property
@@ -65,10 +67,7 @@ class RDBStorage(Storage):
         jobs_models = self.session.query(JobModel).all()
         jobs = []
         for job_m in jobs_models:
-            jobs.append({
-                'id': job_m.id,
-                'name': job_m.name
-            })
+            jobs.append({"id": job_m.id, "name": job_m.name})
         return jobs
 
     @property

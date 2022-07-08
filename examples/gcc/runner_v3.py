@@ -1,14 +1,14 @@
 import json
 import logging
-
-import click
 from datetime import datetime
 
+import click
+
 from examples.gcc.utils.extractor_v2 import extract
-from examples.gcc.utils.run_tools import run_job, continue_job
+from examples.gcc.utils.run_tools import continue_job, run_job
 from gimeltune.utils.logging import init
 
-now = datetime.now().strftime('%H:%M:%S_%m_%d_%Y')
+now = datetime.now().strftime("%H:%M:%S_%m_%d_%Y")
 
 init(verbose=True)
 
@@ -20,45 +20,61 @@ def cli():
     pass
 
 
-@click.command(name='run')
-@click.option('--toolchain', type=str, required=True)
-@click.option('--search-space', type=str, required=True)
-@click.option('--source-file', type=str, required=True)
-@click.option('--iterations', type=int, default=5)
-@click.option('--n-trials', type=int, default=100)
-@click.option('--storage', type=str, default=f'sqlite:///{now}.db')
-@click.option('--job-name', type=str, default=now)
-def run_cmd(toolchain, search_space, source_file, n_trials, iterations, storage, job_name):
+@click.command(name="run")
+@click.option("--toolchain", type=str, required=True)
+@click.option("--search-space", type=str, required=True)
+@click.option("--source-file", type=str, required=True)
+@click.option("--iterations", type=int, default=5)
+@click.option("--n-trials", type=int, default=100)
+@click.option("--storage", type=str, default=f"sqlite:///{now}.db")
+@click.option("--job-name", type=str, default=now)
+def run_cmd(toolchain, search_space, source_file, n_trials, iterations,
+            storage, job_name):
     init(verbose=True)
     baselines, job = run_job(
-        toolchain, search_space,
-        source_file, n_trials, iterations, storage, job_name, 'time')
-    log.info('Baselines:')
+        toolchain,
+        search_space,
+        source_file,
+        n_trials,
+        iterations,
+        storage,
+        job_name,
+        "time",
+    )
+    log.info("Baselines:")
     log.info(json.dumps(baselines, indent=2))
     print(job.dataframe)
 
 
-@click.command(name='continue')
-@click.option('--toolchain', type=str, required=True)
-@click.option('--search-space', type=str, required=True)
-@click.option('--source-file', type=str, required=True)
-@click.option('--iterations', type=int, default=5)
-@click.option('--storage', type=str, required=True)
-@click.option('--job-name', type=str, required=True)
-def continue_cmd(toolchain, search_space, source_file, n_trials, iterations, storage, job_name):
+@click.command(name="continue")
+@click.option("--toolchain", type=str, required=True)
+@click.option("--search-space", type=str, required=True)
+@click.option("--source-file", type=str, required=True)
+@click.option("--iterations", type=int, default=5)
+@click.option("--storage", type=str, required=True)
+@click.option("--job-name", type=str, required=True)
+def continue_cmd(toolchain, search_space, source_file, n_trials, iterations,
+                 storage, job_name):
     init(verbose=True)
     baselines, job = continue_job(
-        toolchain, search_space,
-        source_file, n_trials, iterations, storage, job_name, 'time')
-    log.info('Baselines:')
+        toolchain,
+        search_space,
+        source_file,
+        n_trials,
+        iterations,
+        storage,
+        job_name,
+        "time",
+    )
+    log.info("Baselines:")
     log.info(baselines)
     print(job.dataframe)
 
 
-@click.command(name='extract')
-@click.option('--toolchain', type=str, required=True)
-@click.option('--captured-cache', type=str)
-@click.option('--out-file', type=str, default='extracted_search_space.yaml')
+@click.command(name="extract")
+@click.option("--toolchain", type=str, required=True)
+@click.option("--captured-cache", type=str)
+@click.option("--out-file", type=str, default="extracted_search_space.yaml")
 def extract_cmd(toolchain, captured_cache, out_file):
     extract(toolchain)
 
@@ -67,6 +83,5 @@ cli.add_command(run_cmd)
 cli.add_command(continue_cmd)
 cli.add_command(extract_cmd)
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
