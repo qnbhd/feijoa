@@ -22,21 +22,18 @@ Install with `pip` or your favourite PyPI package manager.
 from gimeltune import create_job, Experiment, SearchSpace, Real
 from math import sin
 
-space = SearchSpace()
-space.insert(Real('x', low=0.0, high=2.0))
-space.insert(Real('y', low=0.0, high=2.0))
-
 
 def objective(experiment: Experiment):
     x = experiment.params.get('x')
     y = experiment.params.get('y')
 
     return sin(x * y)
+    
+space = SearchSpace()
+space.insert(Real('x', low=0.0, high=2.0))
+space.insert(Real('y', low=0.0, high=2.0))
 
-job = create_job(space)
+job = create_job(search_space=space)
 job.do(objective)
-
-df = job.dataframe
-print(df)
 ```
 
