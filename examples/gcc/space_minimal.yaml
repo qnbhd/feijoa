@@ -22,19 +22,15 @@
   type: categorical
   choices: [-fbranch-count-reg, -fno-branch-count-reg, null]
 
-- signature: branch-probabilities
-  type: categorical
-  choices: [-fbranch-probabilities, -fno-branch-probabilities, null]
-
-- signature: early-inlining-insns
+- signature: --param=early-inlining-insns
   type: integer
   range: [0, 1000]
 
-- signature: gcse-cost-distance-ratio
+- signature: --param=gcse-cost-distance-ratio
   type: integer
   range: [0, 100]
 
-- signature: iv-max-considered-uses
+- signature: --param=iv-max-considered-uses
   type: integer
   range: [0, 1000]
 

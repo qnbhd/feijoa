@@ -1,4 +1,5 @@
 from gimeltune import Categorical, Integer, Real, SearchSpace, create_job
+from gimeltune.models import Result
 from gimeltune.search.algorithms import BayesianAlgorithm
 
 
@@ -38,19 +39,16 @@ def test_specify_acq_bayesian_search():
     job = create_job(search_space=space, storage="tinydb:///foo.json")
 
     a_ei = BayesianAlgorithm(search_space=job.search_space,
-                             experiments_factory=job.experiments_factory,
                              acq_function='ei')
 
-    job.do(objective, n_trials=5, algo_list=[a_ei])
+    job.do(objective, n_trials=10, algo_list=[a_ei])
 
     a_poi = BayesianAlgorithm(search_space=job.search_space,
-                              experiments_factory=job.experiments_factory,
                               acq_function='poi')
 
-    job.do(objective, n_trials=5, algo_list=[a_poi])
+    job.do(objective, n_trials=10, algo_list=[a_poi])
 
     a_ucb = BayesianAlgorithm(search_space=job.search_space,
-                              experiments_factory=job.experiments_factory,
                               acq_function='ucb')
 
-    job.do(objective, n_trials=5, algo_list=[a_ucb])
+    job.do(objective, n_trials=10, algo_list=[a_ucb])

@@ -35,7 +35,6 @@ class Experiment(BaseModel):
     hash: Optional[str]
     objective_result: Optional[Any]
     params: Dict[str, Any]
-    requestor: str
     create_timestamp: float
     finish_timestamp: Optional[float]
     metrics: Optional[dict]
@@ -51,7 +50,8 @@ class Experiment(BaseModel):
         self.state = ExperimentState.ERROR
 
     def is_finished(self):
-        return self.state == ExperimentState.OK or self.state == ExperimentState.ERROR
+        return (self.state == ExperimentState.OK
+                or self.state == ExperimentState.ERROR)
 
     def _calculate_hash(self):
         params_dumped = json.dumps(self.params, sort_keys=True)
@@ -82,30 +82,3 @@ class Experiment(BaseModel):
 
     def __str__(self):
         return repr(self)
-
-
-class ExperimentsFactory:
-    def __init__(self, job):
-        self.job = job
-        self.pending_experiments = 0
-
-    def create(self, params):
-        time = datetime.datetime.now()
-        timestamp = datetime.datetime.timestamp(time)
-
-        result = Experiment(
-            id=self.job.experiments_count + self.pending_experiments + 1,
-            job_id=self.job.id,
-            state=ExperimentState.WIP,
-            requestor="UNKNOWN",
-            create_timestamp=timestamp,
-            params=params,
-        )
-
-        self.pending_experiments += 1
-
-        return result
-
-    def experiment_is_done(self):
-        self.pending_experiments -= 1
-        assert self.pending_experiments >= 0

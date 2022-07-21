@@ -46,4 +46,4 @@ def test_random_search(rr, ri, rc):
     job.do(objective, n_trials=10, algo_list=["random"])
 
     assert job.best_parameters == {"w": "foo", "x": 0.8, "y": 0.9, "z": 0}
-    assert job.best_experiment.requestor == "RandomSearch"
+

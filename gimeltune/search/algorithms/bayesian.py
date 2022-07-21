@@ -12,9 +12,8 @@ from gimeltune.search.visitors import Randomizer
 
 # noinspection PyPep8Naming
 class BayesianAlgorithm(SearchAlgorithm):
-    def __init__(self, search_space, experiments_factory, acq_function='ei', **kwargs):
+    def __init__(self, search_space, acq_function='ei', **kwargs):
         self.search_space = search_space
-        self.experiments_factory = experiments_factory
         self._ask_gen = self._ask()
         self.model = GaussianProcessRegressor()
 
@@ -72,9 +71,8 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         randomizer = Randomizer()
         random_samples = [
-            self.experiments_factory.create(
-                {p.name: p.accept(randomizer)
-                 for p in self.search_space}) for _ in range(self.n_warmup)
+            {p.name: p.accept(randomizer)
+             for p in self.search_space}for _ in range(self.n_warmup)
         ]
 
         yield random_samples
@@ -82,7 +80,7 @@ class BayesianAlgorithm(SearchAlgorithm):
         while True:
             x = self.opt_acquisition()
             cfg = self._to_gt_config(x)
-            yield [self.experiments_factory.create(cfg)]
+            yield [cfg]
             self.model.fit(self.X, self.y)
 
     def surrogate(self, X):
@@ -117,8 +115,8 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         return minima_x
 
-    def tell(self, experiment: Experiment):
-        vec = np.array(self._to_gp_config(experiment.params))
+    def tell(self, config, result):
+        vec = np.array(self._to_gp_config(config))
 
         self.X = np.concatenate([self.X, vec.reshape(1, -1)])
-        self.y = np.concatenate([self.y, [experiment.objective_result]])
+        self.y = np.concatenate([self.y, [result]])

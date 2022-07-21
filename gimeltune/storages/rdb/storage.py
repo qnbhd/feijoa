@@ -36,7 +36,6 @@ class RDBStorage(Storage):
             hash=experiment.hash,
             objective_result=experiment.objective_result,
             params=experiment.params,
-            requestor=experiment.requestor,
             create_timestamp=experiment.create_timestamp,
             finish_timestamp=experiment.finish_timestamp,
             metrics=experiment.metrics,

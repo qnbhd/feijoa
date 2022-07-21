@@ -30,9 +30,8 @@ __all__ = ["RandomSearch"]
 
 
 class RandomSearch(SearchAlgorithm):
-    def __init__(self, search_space, experiments_factory, **kwargs):
+    def __init__(self, search_space, **kwargs):
         self.search_space = search_space
-        self.experiments_factory = experiments_factory
         self.randomizer = Randomizer()
         self._ask_gen = self._ask()
 
@@ -41,7 +40,7 @@ class RandomSearch(SearchAlgorithm):
         warnings.warn("Per emit count not implemented.")
         return 1
 
-    def ask(self) -> Optional[List[Experiment]]:
+    def ask(self) -> Optional[List[dict]]:
         return next(self._ask_gen)
 
     def _ask(self):
@@ -57,11 +56,10 @@ class RandomSearch(SearchAlgorithm):
                 for p in self.search_space:
                     cfg[p.name] = p.accept(self.randomizer)
 
-                prepared = self.experiments_factory.create(cfg)
-                cfgs.append(prepared)
+                cfgs.append(cfg)
 
             yield cfgs
 
-    def tell(self, experiment: Experiment):
+    def tell(self, config, result):
         # no needed
         pass

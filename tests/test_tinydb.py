@@ -26,7 +26,6 @@ def test_insert_experiment_with_the_same_id():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,
@@ -38,7 +37,6 @@ def test_insert_experiment_with_the_same_id():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,

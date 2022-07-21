@@ -20,6 +20,7 @@ from gimeltune.exceptions import (
     SearchAlgorithmNotFoundedError,
 )
 from gimeltune.jobs.job import _load_storage
+from gimeltune.models import Result
 from gimeltune.models.experiment import ExperimentState
 
 
@@ -48,12 +49,14 @@ def test_create_load_job():
         x = params.get("x")
         y = params.get("y")
 
-        experiment.metrics = {
+        metrics = {
             "foo": 1.0,
             "bar": 2.0,
         }
 
-        return (1 - x)**2 + (1 - y)**2
+        obj = (1 - x)**2 + (1 - y)**2
+
+        return Result(objective_result=obj, metrics=metrics)
 
     job = create_job(search_space=space,
                      name="foo",
@@ -63,6 +66,8 @@ def test_create_load_job():
     assert isinstance(job.experiments, list) and len(job.experiments) == 10
     assert job.experiments_count == 10
     assert len(job.top_experiments(100)) == 10
+
+    print(job.dataframe)
 
     job2 = load_job(search_space=SearchSpace(),
                     name="foo",
@@ -104,7 +109,7 @@ def test_correct_algo_subclass_passed():
         def ask(self) -> Optional[List[Experiment]]:
             pass
 
-        def tell(self, experiment: Experiment):
+        def tell(self, config, result):
             pass
 
     job.do(lambda: 1, algo_list=[CorrectAlgo])
@@ -118,7 +123,7 @@ def test_no_configurations_warning():
         def ask(self) -> Optional[List[Experiment]]:
             return None
 
-        def tell(self, experiment: Experiment):
+        def tell(self, config, result):
             pass
 
     with pytest.warns(UserWarning, match="No new configurations."):
@@ -133,7 +138,6 @@ def test_not_finished_experiment_tell():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,
@@ -142,7 +146,7 @@ def test_not_finished_experiment_tell():
     )
 
     with pytest.raises(ExperimentNotFinishedError):
-        job.tell(ex)
+        job.tell(ex, 1.0)
 
 
 def test_job_duplicated_error():

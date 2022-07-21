@@ -22,7 +22,7 @@
 import logging
 from typing import Generator, List, Optional
 
-from gimeltune.models.experiment import Experiment, ExperimentsFactory
+from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms.algorithm import SearchAlgorithm
 from gimeltune.search.space import SearchSpace
 
@@ -41,10 +41,8 @@ class Optimizer:
         - space
         - experiments_factory
     """
-    def __init__(self, space: SearchSpace,
-                 experiments_factory: ExperimentsFactory):
+    def __init__(self, space: SearchSpace):
         self.space = space
-        self.experiments_factory = experiments_factory
         self.algorithms: List[SearchAlgorithm] = list()
         self._ask_generator = None
 
@@ -87,16 +85,13 @@ class Optimizer:
             if not configs:
                 continue
 
-            for c in configs:
-                c.requestor = algorithm.__class__.__name__
-
             # Round Robin
             self.algorithms.append(algorithm)
 
             yield configs
 
-    def tell(self, experiment: Experiment) -> None:
+    def tell(self, config, result) -> None:
         """Tell results to all search algorithms"""
 
         for algo in self.algorithms:
-            algo.tell(experiment)
+            algo.tell(config, result)
