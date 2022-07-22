@@ -282,15 +282,13 @@ def run_gcc(job, toolchain, iterations, n_trials, source_file,
         results = [obj(exp) for exp in experiments]
 
         for experiment, result in zip(experiments, results):
-            experiment.apply(result)
-
             if abs(result - ERROR_RESULT) < 1e-8:
                 log.info(f"Experiments {experiment} has inf result.")
                 experiment.error_finish()
             else:
                 experiment.success_finish()
 
-            job.tell(experiment)
+            job.tell(experiment, result)
 
     return baselines, job
 

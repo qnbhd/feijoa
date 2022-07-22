@@ -11,7 +11,6 @@ def test_experiment():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,
@@ -31,7 +30,6 @@ def test_experiment():
         "x": 0.0,
         "y": 1.0
     },
-    "requestor": "foo",
     "create_timestamp": 0.0,
     "finish_timestamp": null,
     "metrics": null
@@ -58,7 +56,6 @@ def test_experiment():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,

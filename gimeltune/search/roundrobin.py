@@ -19,6 +19,40 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from .roundrobin import RoundRobinMeta
-from .parameters import Categorical, Integer, ParametersVisitor, Real
-from .space import SearchSpace
+import logging
+from collections import deque
+from typing import Generator, List, Optional
+
+from gimeltune.models.experiment import Experiment
+from gimeltune.search.algorithms.algorithm import SearchAlgorithm
+from gimeltune.search.meta import MetaSearchAlgorithm
+from gimeltune.search.space import SearchSpace
+
+log = logging.getLogger(__name__)
+
+__all__ = ["RoundRobinMeta"]
+
+
+class RoundRobinMeta(MetaSearchAlgorithm):
+    """
+    Experiment's optimizer class.
+
+    Optimizer has two main methods:
+
+    Parameters:
+        - space
+        - experiments_factory
+    """
+
+    def __init__(self, *algorithms):
+        super().__init__(*algorithms)
+        self.algo_deq = None
+
+    @property
+    def order(self):
+        # noinspection PyUnresolvedReferences
+        if not self.algo_deq:
+            self.algo_deq = deque(self.algorithms)
+
+        self.algo_deq.rotate(1)
+        return self.algo_deq

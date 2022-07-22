@@ -20,8 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import warnings
-from typing import List, Optional
+from typing import List, Optional, Generator
 
+from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms import SearchAlgorithm
 from gimeltune.search.visitors import Randomizer
@@ -30,9 +31,9 @@ __all__ = ["RandomSearch"]
 
 
 class RandomSearch(SearchAlgorithm):
-    def __init__(self, search_space, experiments_factory, **kwargs):
+    def __init__(self, search_space, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.search_space = search_space
-        self.experiments_factory = experiments_factory
         self.randomizer = Randomizer()
         self._ask_gen = self._ask()
 
@@ -41,10 +42,10 @@ class RandomSearch(SearchAlgorithm):
         warnings.warn("Per emit count not implemented.")
         return 1
 
-    def ask(self) -> Optional[List[Experiment]]:
+    def ask(self) -> Optional[List[Configuration]]:
         return next(self._ask_gen)
 
-    def _ask(self):
+    def _ask(self) -> Generator:
 
         while True:
 
@@ -57,11 +58,10 @@ class RandomSearch(SearchAlgorithm):
                 for p in self.search_space:
                     cfg[p.name] = p.accept(self.randomizer)
 
-                prepared = self.experiments_factory.create(cfg)
-                cfgs.append(prepared)
+                cfgs.append(Configuration(cfg, requestor=self.name))
 
             yield cfgs
 
-    def tell(self, experiment: Experiment):
+    def tell(self, config, result):
         # no needed
         pass

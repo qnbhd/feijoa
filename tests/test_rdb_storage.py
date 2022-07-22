@@ -1,4 +1,5 @@
 from gimeltune import Experiment, Real, SearchSpace, create_job
+from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import ExperimentState
 from gimeltune.storages.rdb.storage import RDBStorage
 
@@ -15,24 +16,22 @@ def test_rdb_storage():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
-        params={
+        params=Configuration({
             "x": 0.0,
             "y": 1.0
-        },
+        }),
     )
 
     ex_2 = Experiment(
         id=0,
         job_id=1,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
-        params={
+        params=Configuration({
             "x": 0.0,
             "y": 1.0
-        },
+        }),
     )
 
     mock_job = _Job(0, "foo")

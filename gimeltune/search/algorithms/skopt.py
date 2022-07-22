@@ -26,11 +26,12 @@ import sklearn.utils.fixes
 from numpy import float64, int64
 from numpy.ma import MaskedArray
 
-from gimeltune.models import Experiment, ExperimentsFactory
+from gimeltune.models import Experiment
 from gimeltune.search.parameters import Categorical, Integer, Real
 from gimeltune.search.space import SearchSpace
 
 from . import SearchAlgorithm
+from ...models.configuration import Configuration
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 # noinspection PyPackageRequirements
@@ -40,13 +41,11 @@ __all__ = ["SkoptBayesianAlgorithm"]
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):
-    def __init__(self, search_space: SearchSpace,
-                 experiments_factory: ExperimentsFactory, **kwargs):
+    def __init__(self, search_space: SearchSpace, **kwargs):
 
         super().__init__(**kwargs)
 
         self.skopt_space = self._make_space(search_space)
-        self.experiments_factory = experiments_factory
         self.optimizer_instance = skopt.Optimizer(self.skopt_space, "GBRT")
 
         self.ask_generator = self._ask()
@@ -56,7 +55,8 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
         is_warned = getattr(self, "_warned", False)
         if not is_warned:
             warnings.warn(
-                "Now per-emit count in skopt technique implemented not correctly."
+                "Now per-emit count in skopt"
+                " technique implemented not correctly."
                 " Per-emit count is property, return default value (1).")
             setattr(self, "_warned", True)
         return 1
@@ -100,14 +100,13 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
                     potentially_cfg[k] = v
 
-                cfg = self.experiments_factory.create(potentially_cfg)
-                asked.append(cfg)
+                asked.append(Configuration(potentially_cfg, requestor=self.name))
 
             yield asked
 
-    def ask(self) -> Optional[List[Experiment]]:
+    def ask(self) -> Optional[List[Configuration]]:
         return next(self.ask_generator)
 
-    def tell(self, experiment: Experiment):
-        self.optimizer_instance.tell(list(experiment.params.values()),
-                                     experiment.objective_result)
+    def tell(self, config, result):
+        self.optimizer_instance.tell(list(config.values()),
+                                     result)

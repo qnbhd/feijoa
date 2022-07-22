@@ -1,1 +1,2 @@
-from .experiment import Experiment, ExperimentsFactory
+from .experiment import Experiment
+from .result import Result

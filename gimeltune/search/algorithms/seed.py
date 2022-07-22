@@ -19,29 +19,29 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from functools import partial
 from typing import List, Optional
 
 from gimeltune.models import Experiment
+from gimeltune.models.configuration import Configuration
 from gimeltune.search.algorithms import SearchAlgorithm
 
 
 class SeedAlgorithm(SearchAlgorithm):
-    def __init__(self, experiments_factory, *seeds):
-        self.experiments_factory = experiments_factory
+    def __init__(self, *seeds, **kwargs):
+        super().__init__(*seeds, **kwargs)
         self.seeds: list = list(seeds)
         self.is_emitted = False
 
-    def ask(self) -> Optional[List[Experiment]]:
+    def ask(self) -> Optional[List[Configuration]]:
+        cf = partial(Configuration, requestor=self.name)
 
         if not self.is_emitted:
-            cfgs = [
-                self.experiments_factory.create(seed) for seed in self.seeds
-            ]
             self.is_emitted = True
-            return cfgs
+            return [cf(s) for s in self.seeds]
         else:
             return None
 
-    def tell(self, experiment: Experiment):
+    def tell(self, config, result):
         # Tell no needed
         pass

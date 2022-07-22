@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from gimeltune.models import Experiment
+from gimeltune.models.configuration import Configuration
 from gimeltune.storages.rdb.models import ExperimentModel, JobModel, _Base
 from gimeltune.storages.storage import Storage
 
@@ -36,7 +37,7 @@ class RDBStorage(Storage):
             hash=experiment.hash,
             objective_result=experiment.objective_result,
             params=experiment.params,
-            requestor=experiment.requestor,
+            requestor=experiment.params.requestor,
             create_timestamp=experiment.create_timestamp,
             finish_timestamp=experiment.finish_timestamp,
             metrics=experiment.metrics,
@@ -54,6 +55,7 @@ class RDBStorage(Storage):
             job_id=job_id).all())
         experiments = []
         for exp in experiments_models:
+            exp.params = Configuration(exp.params, requestor=exp.requestor)
             experiments.append(Experiment.from_orm(exp))
         return experiments
 

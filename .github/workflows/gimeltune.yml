@@ -1,6 +1,12 @@
 name: test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
 
 jobs:
   test:
@@ -56,15 +62,17 @@ jobs:
       - name: Run python tests
         run: |
           source .venv/bin/activate
-          pytest --cov=gimeltune --cov-report=xml tests/
+          pytest --log-level=INFO --cov=gimeltune --cov-report=xml tests/
           
 
       - name: Run functional tests
         run: |
           source .venv/bin/activate
           cd examples/gcc
-          python runner.py
-          
+          ls -ahl
+          python runner.py run --toolchain=g++ --search-space=space_minimal.yaml \
+            --source-file=matrixmultiply/matrixmultiply.cpp \
+            --iterations=2 --n-trials=10
 
       - name: Archive gcc runner db
         uses: actions/upload-artifact@v3
