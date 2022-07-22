@@ -196,3 +196,6 @@ examples/gcc/utils/.DS_Store
 .vscode
 /tests/images/
 /examples/bo.ipynb
+
+**/catboost_info
+**/*.out

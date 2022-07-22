@@ -15,7 +15,6 @@ def test_rdb_storage():
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,
@@ -27,7 +26,6 @@ def test_rdb_storage():
         id=0,
         job_id=1,
         state=ExperimentState.WIP,
-        requestor="foo",
         create_timestamp=0.0,
         params={
             "x": 0.0,

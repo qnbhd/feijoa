@@ -1,206 +1,87 @@
-# MIT License
-#
-# Copyright (c) 2021 Templin Konstantin
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-import hashlib
+import json
 import logging
-import os
-import platform
-import random
-from os.path import abspath, dirname
-from typing import Dict, Type, Union
+from datetime import datetime
 
-import numpy
-from executor import execute
+import click
 
-from gimeltune import create_job
-from gimeltune.models.experiment import Experiment
-from gimeltune.search.parameters import (
-    Categorical,
-    Integer,
-    Parameter,
-    ParametersVisitor,
-    Real,
-)
-from gimeltune.search.space import SearchSpace, from_yaml
+from examples.gcc.utils.extractor_v2 import extract
+from examples.gcc.utils.run_tools import continue_job, run_job
 from gimeltune.utils.logging import init
 
+now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")
+
 init(verbose=True)
-
-
-class Renderer(ParametersVisitor):
-    def __init__(self, experiment):
-        super().__init__()
-        self.experiment = experiment
-
-    def get_value(self, param: Parameter) -> Union[str, float]:
-        value = self.experiment.params[param.name]
-        return value
-
-    def visit_common(self, p: Parameter) -> str:
-        value = self.get_value(p)
-        return f"{p.name}{value}"
-
-    def visit_integer(self, p: Integer):
-        return self.visit_common(p)
-
-    def visit_real(self, p: Real) -> str:
-        return self.visit_common(p)
-
-    def visit_categorical(self, p: Categorical, **kwargs) -> str:
-        value = self.get_value(p)
-        if value:
-            return f"{value}"
-        return ""
-
-
-def render(experiment: Experiment, space: SearchSpace,
-           renderer_cls: Type[Renderer]) -> str:
-    renderer = renderer_cls(experiment)
-
-    rendered = list()
-
-    for p in space:
-        result_ = p.accept(renderer)
-        rendered.append(result_)
-
-    return " ".join(rendered)
-
-
-NAME = "gcc"
-METRICS = ("time", "compile_time", "size")
-SOURCE_FILE = os.path.join(dirname(abspath(__file__)), "raytracer",
-                           "raytracer.cpp")
-SPACE_FILE = os.path.join(dirname(abspath(__file__)), "space_minimal.yaml")
-SPACE = from_yaml(SPACE_FILE)
-ERROR_RESULT = 1e10
 
 log = logging.getLogger(__name__)
 
 
-class GccRenderer(Renderer):
-    def visit_integer(self, p):
-        value = self.get_value(p)
-        return f"--param {p.name}={value}"
+@click.group()
+def cli():
+    pass
 
 
-def run_command(command: str):
-    log.debug(f"RUN COMMAND:\n[cyan][bold]{command}")
-
-    output = execute(command, capture=True)
-
-    decoded = output.strip()
-    if decoded:
-        log.info(f"[yellow][bold]OUT: {decoded}")
-
-    return decoded
-
-
-def metric_collector(experiment: Experiment) -> Dict[str, float]:
-    rendered = render(experiment, SPACE, GccRenderer)
-
-    config_hash = hashlib.sha256(str(hash(
-        experiment.json())).encode()).hexdigest()
-
-    # TODO: check if file is exists and remove random.randint
-    binary_out = config_hash + str(random.randint(1, 99999)) + ".out"
-    binary_out = os.path.join(dirname(abspath(__file__)), binary_out)
-
-    system_name = platform.system()
-
-    if system_name == "Linux":
-        compile_cmd = (f"/usr/bin/time -f '%e' g++ -o"
-                       f" {binary_out} {SOURCE_FILE} {rendered} 2>&1")
-
-        run_cmd = f"/usr/bin/time -f '%e' {binary_out} 2>&1"
-
-    elif system_name == "Darwin":
-        # gnu-time is required
-        compile_cmd = (f"gtime -f '%e' g++-11 -o"
-                       f" {binary_out} {SOURCE_FILE} {rendered} 2>&1")
-        run_cmd = f"gtime -f '%e' {binary_out} 2>&1"
-
-    else:
-        # TODO (qnbhd): Refine exception type
-        raise Exception()
-
-    size_cmd = "wc -c {} | awk {}".format(binary_out, "'{print $1}'")
-
-    try:
-        compile_time = float(run_command(compile_cmd))
-    except Exception:
-        run_command(f"rm {binary_out}")
-        return {
-            "time": ERROR_RESULT,
-            "compile_time": ERROR_RESULT,
-            "size": ERROR_RESULT,
-        }
-
-    try:
-        size = int(run_command(size_cmd))
-    except Exception:
-        size = ERROR_RESULT
-
-    try:
-        run_time = numpy.array([float(run_command(run_cmd))
-                                for _ in range(5)]).mean()
-    except Exception:
-        run_time = ERROR_RESULT
-
-    run_command(f"rm {binary_out}")
-
-    return {
-        "time": run_time,
-        "compile_time": compile_time,
-        "size": size,
-    }
+@click.command(name="run")
+@click.option("--toolchain", type=str, required=True)
+@click.option("--search-space", type=str, required=True)
+@click.option("--source-file", type=str, required=True)
+@click.option("--iterations", type=int, default=5)
+@click.option("--n-trials", type=int, default=100)
+@click.option("--storage", type=str, default=f"sqlite:///{now}.db")
+@click.option("--job-name", type=str, default=now)
+def run_cmd(toolchain, search_space, source_file, n_trials, iterations,
+            storage, job_name):
+    init(verbose=True)
+    baselines, job = run_job(
+        toolchain,
+        search_space,
+        source_file,
+        n_trials,
+        iterations,
+        storage,
+        job_name,
+        "time",
+    )
+    log.info("Baselines:")
+    log.info(json.dumps(baselines, indent=2))
+    print(job.dataframe)
 
 
-def objective(experiment: Experiment) -> float:
-    log.info(f"Trying experiment: {experiment}")
-    metrics = metric_collector(experiment)
-    return metrics["time"]
+@click.command(name="continue")
+@click.option("--toolchain", type=str, required=True)
+@click.option("--search-space", type=str, required=True)
+@click.option("--source-file", type=str, required=True)
+@click.option("--iterations", type=int, default=5)
+@click.option("--storage", type=str, required=True)
+@click.option("--job-name", type=str, required=True)
+def continue_cmd(toolchain, search_space, source_file, n_trials, iterations,
+                 storage, job_name):
+    init(verbose=True)
+    baselines, job = continue_job(
+        toolchain,
+        search_space,
+        source_file,
+        n_trials,
+        iterations,
+        storage,
+        job_name,
+        "time",
+    )
+    log.info("Baselines:")
+    log.info(baselines)
+    print(job.dataframe)
 
 
-def run_gcc():
-    job = create_job(search_space=SPACE)
-    job.setup_default_algo()
+@click.command(name="extract")
+@click.option("--toolchain", type=str, required=True)
+@click.option("--captured-cache", type=str)
+@click.option("--out-file", type=str, default="extracted_search_space.yaml")
+def extract_cmd(toolchain, captured_cache, out_file):
+    extract(toolchain)
 
-    for i in range(10):
-        experiments = job.ask()
 
-        results = [objective(exp) for exp in experiments]
-
-        for experiment, result in zip(experiments, results):
-            experiment.apply(result)
-
-            if abs(result - ERROR_RESULT) < 1e-8:
-                log.info(f"Experiments {experiment} has inf result.")
-                experiment.error_finish()
-            else:
-                experiment.success_finish()
-
-            job.tell(experiment)
-
-    return job
-
+cli.add_command(run_cmd)
+cli.add_command(continue_cmd)
+cli.add_command(extract_cmd)
 
 if __name__ == "__main__":
-    run_gcc()
+    cli()
