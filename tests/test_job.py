@@ -104,7 +104,7 @@ def test_correct_algo_subclass_passed():
 
     class CorrectAlgo(SearchAlgorithm):
         def __init__(self, *args, **kwargs):
-            pass
+            super().__init__(*args, **kwargs)
 
         def ask(self) -> Optional[List[Experiment]]:
             pass

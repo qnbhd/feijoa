@@ -31,9 +31,9 @@ __all__ = ["SearchSpace"]
 
 class SearchSpace:
     """Search (observation) space class"""
-    def __init__(self):
-        self.params: List[Parameter] = list()
-        self.name2param = dict()
+    def __init__(self, *parameters):
+        self.params: List[Parameter] = parameters or list()
+        self.name2param = {p.name: p for p in parameters} or dict()
 
     def insert(self, p: Parameter) -> None:
         # TODO (qnbhd): make duplication check

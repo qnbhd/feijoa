@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import List, Optional, Generator
 
 import numpy as np
 from scipy.stats import norm
 from sklearn.gaussian_process import GaussianProcessRegressor
 
+from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms import SearchAlgorithm
 from gimeltune.search.parameters import Categorical, Integer, Real
@@ -12,10 +13,19 @@ from gimeltune.search.visitors import Randomizer
 
 # noinspection PyPep8Naming
 class BayesianAlgorithm(SearchAlgorithm):
-    def __init__(self, search_space, acq_function='ei', **kwargs):
+
+    def __init__(self,
+        search_space,
+        *args,
+        acq_function='ei',
+        regressor=GaussianProcessRegressor,
+        **kwargs
+    ):
+
+        super().__init__(*args, **kwargs)
         self.search_space = search_space
         self._ask_gen = self._ask()
-        self.model = GaussianProcessRegressor()
+        self.model = regressor()
 
         self.bounds = []
 
@@ -31,10 +41,11 @@ class BayesianAlgorithm(SearchAlgorithm):
         self.y = np.empty(shape=(0, ))
         self.random_generator = np.random.RandomState(0)
         self.n_warmup = 5
+        self._name = f'Bayesian<{regressor.__name__}>'
 
         self.acq_function = acq_function
 
-    def ask(self) -> Optional[List[Experiment]]:
+    def ask(self) -> Optional[List[Configuration]]:
         return next(self._ask_gen)
 
     def _to_gt_config(self, x):
@@ -67,29 +78,38 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         return vec
 
-    def _ask(self):
-
+    def _ask(self) -> Generator:
         randomizer = Randomizer()
         random_samples = [
-            {p.name: p.accept(randomizer)
-             for p in self.search_space}for _ in range(self.n_warmup)
+            Configuration(
+                {
+                    p.name: p.accept(randomizer) for p in self.search_space
+                },
+                requestor=self.name
+            )
+            for _ in range(self.n_warmup)
         ]
 
         yield random_samples
 
+        self.model.fit(self.X, self.y)
+
         while True:
             x = self.opt_acquisition()
             cfg = self._to_gt_config(x)
-            yield [cfg]
+            yield [Configuration(cfg, requestor=self.name)]
             self.model.fit(self.X, self.y)
 
-    def surrogate(self, X):
-        return self.model.predict(X, return_std=True)
-
     def acquisition(self, X_samples):
-        mean, std = self.surrogate(X_samples)
-        yhat, _ = self.surrogate(self.X)
+        yhat = self.model.predict(self.X)
         best = min(yhat)
+
+        if not isinstance(self.model, GaussianProcessRegressor):
+            return np.array([
+                max(0, best - y) for y in yhat
+            ])
+
+        mean, std = self.model.predict(X_samples, return_std=True)
         kappa = 2.5
 
         if self.acq_function == "poi":

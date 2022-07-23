@@ -31,6 +31,7 @@ from gimeltune.search.parameters import Categorical, Integer, Real
 from gimeltune.search.space import SearchSpace
 
 from . import SearchAlgorithm
+from ...models.configuration import Configuration
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 # noinspection PyPackageRequirements
@@ -99,11 +100,11 @@ class SkoptBayesianAlgorithm(SearchAlgorithm):
 
                     potentially_cfg[k] = v
 
-                asked.append(potentially_cfg)
+                asked.append(Configuration(potentially_cfg, requestor=self.name))
 
             yield asked
 
-    def ask(self) -> Optional[List[dict]]:
+    def ask(self) -> Optional[List[Configuration]]:
         return next(self.ask_generator)
 
     def tell(self, config, result):

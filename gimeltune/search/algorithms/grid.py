@@ -21,10 +21,11 @@
 # SOFTWARE.
 import warnings
 from itertools import product
-from typing import List, Optional
+from typing import List, Optional, Generator
 
 import numpy
 
+from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms import SearchAlgorithm
 from gimeltune.search.parameters import (Categorical, Integer,
@@ -52,7 +53,8 @@ class GridMaker(ParametersVisitor):
 
 
 class GridSearch(SearchAlgorithm):
-    def __init__(self, search_space, **kwargs):
+    def __init__(self, search_space, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.search_space = search_space
 
         grids = [p.accept(GridMaker()) for p in self.search_space.params]
@@ -65,10 +67,10 @@ class GridSearch(SearchAlgorithm):
         warnings.warn("Per emit count not implemented.")
         return 1
 
-    def ask(self) -> Optional[List[dict]]:
+    def ask(self) -> Optional[List[Configuration]]:
         return next(self._ask_gen)
 
-    def _ask(self):
+    def _ask(self) -> Generator:
 
         while True:
 
@@ -85,7 +87,7 @@ class GridSearch(SearchAlgorithm):
                     for h, v in zip(self.search_space, generation)
                 }
 
-                cfgs.append(cfg)
+                cfgs.append(Configuration(cfg, requestor=self.name))
 
             if not cfgs:
                 yield None

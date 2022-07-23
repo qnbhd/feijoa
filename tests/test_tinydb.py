@@ -7,6 +7,7 @@ from gimeltune import Experiment, TinyDBStorage
 # noinspection DuplicatedCode
 from gimeltune.exceptions import (DBVersionError,
                                   InsertExperimentWithTheExistedId)
+from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import ExperimentState
 
 
@@ -27,10 +28,10 @@ def test_insert_experiment_with_the_same_id():
         job_id=0,
         state=ExperimentState.WIP,
         create_timestamp=0.0,
-        params={
+        params=Configuration({
             "x": 0.0,
             "y": 1.0
-        },
+        }),
     )
 
     ex_duplicated = Experiment(
@@ -38,10 +39,10 @@ def test_insert_experiment_with_the_same_id():
         job_id=0,
         state=ExperimentState.WIP,
         create_timestamp=0.0,
-        params={
+        params=Configuration({
             "x": 0.0,
             "y": 1.0
-        },
+        }),
     )
 
     storage.insert_experiment(ex)
