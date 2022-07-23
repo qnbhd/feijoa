@@ -6,6 +6,8 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
+from gimeltune.models.configuration import Configuration
+
 
 class ExperimentState(str, Enum):
     OK = "OK"
@@ -34,7 +36,7 @@ class Experiment(BaseModel):
     state: ExperimentState
     hash: Optional[str]
     objective_result: Optional[Any]
-    params: Dict[str, Any]
+    params: Configuration
     create_timestamp: float
     finish_timestamp: Optional[float]
     metrics: Optional[dict]

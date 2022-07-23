@@ -24,12 +24,25 @@ from typing import List, Optional
 
 __all__ = ["SearchAlgorithm"]
 
+from gimeltune.models.configuration import Configuration
+
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
+    def __init__(self, *args, **kwargs):
+        self._name = self.__class__.__name__
+
     @abc.abstractmethod
-    def ask(self) -> Optional[List[dict]]:
+    def ask(self) -> Optional[List[Configuration]]:
         raise NotImplementedError()
 
     @abc.abstractmethod
     def tell(self, config, result):
         raise NotImplementedError()
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, v):
+        self._name = v

@@ -19,6 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import inspect
 import warnings
 from datetime import datetime
 from functools import partial
@@ -35,17 +36,20 @@ from gimeltune.exceptions import (
     InvalidStoragePassed,
     InvalidStorageRFC1738,
     JobNotFoundError,
-    SearchAlgorithmNotFoundedError,
+    SearchAlgorithmNotFoundedError, InvalidOptimizer,
 )
 from gimeltune.models import Experiment, Result
+from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import ExperimentState
-from gimeltune.search import Optimizer, SearchSpace
+from gimeltune.search import SearchSpace, RoundRobinMeta
 from gimeltune.search.algorithms import (
     SearchAlgorithm,
     SeedAlgorithm,
     SkoptBayesianAlgorithm,
     get_algo,
 )
+from gimeltune.search.bandit import ThompsonSampler
+from gimeltune.search.meta import MetaSearchAlgorithm
 from gimeltune.storages import Storage, TinyDBStorage
 
 __all__ = ["create_job", "load_job"]
@@ -65,6 +69,7 @@ class Job:
         search_space: SearchSpace,
         job_id: int,
         pruners: Any = None,
+        optimizer=RoundRobinMeta,
     ):
 
         self.name = name
@@ -72,7 +77,19 @@ class Job:
         self.pruners = pruners
         self.id = job_id
 
-        self.optimizer = Optimizer(search_space)
+        if issubclass(type(optimizer), MetaSearchAlgorithm):
+            self.optimizer = optimizer
+        elif (
+            not issubclass(type(optimizer), MetaSearchAlgorithm) and
+            (
+                not inspect.isclass(optimizer) or
+                not issubclass(optimizer, MetaSearchAlgorithm)
+            )
+        ):
+            raise InvalidOptimizer()
+        else:
+            self.optimizer = optimizer()
+
         self.search_space = search_space
         self.pending_experiments = 0
 
@@ -143,29 +160,24 @@ class Job:
 
         return self.storage.top_experiments(self.id, n)
 
+    @property
+    def rewards(self):
+        rewards = 0
+        experiments = self.experiments
+        m = float('+inf')
+
+        for exp in experiments:
+            if exp.objective_result < m:
+                rewards += 1
+                m = exp.objective_result
+
+        return rewards
+
     def setup_default_algo(self):
         self.add_algorithm(
             SkoptBayesianAlgorithm(self.search_space))
 
-    def do(
-        self,
-        objective: Callable,
-        n_trials: int = 100,
-        n_proc: int = 1,
-        algo_list: List[Union[str, Type[SearchAlgorithm]]] = None,
-    ):
-        """
-        :param objective: objective function
-        :param n_trials: count of max trials.
-        :param n_proc: max number of processes.
-        :param algo_list: chosen search algorithm's list.
-        :return: None
-        """
-
-        # noinspection PyPep8Naming
-
-        self.optimizer.algorithms.clear()
-
+    def _load_algo(self, algo_list=None):
         if self.seeds:
             self.add_algorithm(SeedAlgorithm(*self.seeds))
 
@@ -190,6 +202,34 @@ class Job:
                 # noinspection PyArgumentList
                 self.add_algorithm(
                     algo_cls(search_space=self.search_space))
+
+    def do(
+        self,
+        objective: Callable,
+        n_trials: int = 100,
+        n_proc: int = 1,
+        algo_list: List[Union[str, Type[SearchAlgorithm]]] = None,
+        clear=True,
+    ):
+        """
+        :param objective: objective function
+        :param n_trials: count of max trials.
+        :param n_proc: max number of processes.
+        :param algo_list: chosen search algorithm's list.
+        :param clear: clear algo list or not.
+        :return: None
+        """
+
+        # noinspection PyPep8Naming
+
+        if clear:
+            self.optimizer.algorithms.clear()
+
+        if (
+            algo_list or
+            algo_list is None and not self.optimizer.algorithms
+        ):
+            self._load_algo(algo_list)
 
         trials = 0
 
@@ -332,6 +372,7 @@ def create_job(
     search_space: SearchSpace,
     name: str = None,
     storage: Union[str, Optional[Storage]] = None,
+    **kwargs,
 ):
     """
 
@@ -351,11 +392,13 @@ def create_job(
     if storage.is_job_name_exists(name):
         raise DuplicatedJobError(f"Job {name} is already exists.")
 
-    return Job(name, storage, search_space, storage.jobs_count + 1)
+    return Job(name, storage, search_space, storage.jobs_count + 1, **kwargs)
 
 
-def load_job(*, search_space: SearchSpace, name: str, storage: Union[str,
-                                                                     Storage]):
+def load_job(*, search_space: SearchSpace,
+             name: str,
+             storage: Union[str, Storage] = None,
+             **kwargs):
     """
 
     :param search_space:
@@ -373,7 +416,7 @@ def load_job(*, search_space: SearchSpace, name: str, storage: Union[str,
 
     experiments = storage.get_experiments_by_job_id(job_id)
 
-    job = Job(name, storage, search_space, job_id)
+    job = Job(name, storage, search_space, job_id, **kwargs)
 
     for experiment in experiments:
         # noinspection PyProtectedMember

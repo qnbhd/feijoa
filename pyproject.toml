@@ -10,7 +10,6 @@ license = "GPL-3.0"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-scipy = "^1.8.0"
 click = "^8.1.2"
 scikit-optimize = "^0.9.0"
 rich = "^12.2.0"
@@ -22,16 +21,20 @@ numpy = "^1.22.3"
 pandas = "^1.4.2"
 pytest-cov = "^3.0.0"
 SQLAlchemy = "^1.4.35"
-tqdm = "^4.64.0"
 pydeps = "^1.10.18"
-seaborn = "^0.11.2"
 sklearn = "^0.0"
-imageio = "^2.19.3"
+mabalgs = "^0.6.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"
 isort = "^5.10.1"
 flake8 = "^4.0.1"
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

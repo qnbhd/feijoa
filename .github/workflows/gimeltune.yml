@@ -62,7 +62,7 @@ jobs:
       - name: Run python tests
         run: |
           source .venv/bin/activate
-          pytest --cov=gimeltune --cov-report=xml tests/
+          pytest --log-level=INFO --cov=gimeltune --cov-report=xml tests/
           
 
       - name: Run functional tests

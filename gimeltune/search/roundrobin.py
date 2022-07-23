@@ -20,18 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import logging
+from collections import deque
 from typing import Generator, List, Optional
 
 from gimeltune.models.experiment import Experiment
 from gimeltune.search.algorithms.algorithm import SearchAlgorithm
+from gimeltune.search.meta import MetaSearchAlgorithm
 from gimeltune.search.space import SearchSpace
 
 log = logging.getLogger(__name__)
 
-__all__ = ["Optimizer"]
+__all__ = ["RoundRobinMeta"]
 
 
-class Optimizer:
+class RoundRobinMeta(MetaSearchAlgorithm):
     """
     Experiment's optimizer class.
 
@@ -41,57 +43,16 @@ class Optimizer:
         - space
         - experiments_factory
     """
-    def __init__(self, space: SearchSpace):
-        self.space = space
-        self.algorithms: List[SearchAlgorithm] = list()
-        self._ask_generator = None
 
-    def add_algorithm(self, algo: SearchAlgorithm):
-        """
-        Append algorithm to algorithms list.
+    def __init__(self, *algorithms):
+        super().__init__(*algorithms)
+        self.algo_deq = None
 
-        :param algo: search algorithm instance.
-        :return: None
-        """
+    @property
+    def order(self):
+        # noinspection PyUnresolvedReferences
+        if not self.algo_deq:
+            self.algo_deq = deque(self.algorithms)
 
-        self.algorithms.append(algo)
-
-    def ask(self) -> Optional[List[Experiment]]:
-        """
-        Optimizer experiments ask method.
-
-        :return: list of experiments or None if
-                 no new experiments available.
-        """
-
-        self._ask_generator = self._ask_generator or self._ask()
-
-        try:
-            # noinspection PyTypeChecker
-            return next(self._ask_generator)
-        except StopIteration:
-            return None
-
-    def _ask(self) -> Generator:
-
-        assert self.algorithms, "Algorithms must be in list"
-
-        while self.algorithms:
-
-            algorithm = self.algorithms.pop(0)
-
-            configs = algorithm.ask()
-
-            if not configs:
-                continue
-
-            # Round Robin
-            self.algorithms.append(algorithm)
-
-            yield configs
-
-    def tell(self, config, result) -> None:
-        """Tell results to all search algorithms"""
-
-        for algo in self.algorithms:
-            algo.tell(config, result)
+        self.algo_deq.rotate(1)
+        return self.algo_deq

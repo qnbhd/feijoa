@@ -26,6 +26,7 @@ from tinydb.table import Document
 
 from gimeltune.exceptions import DBVersionError, InsertExperimentWithTheExistedId
 from gimeltune.models import Experiment
+from gimeltune.models.configuration import Configuration
 from gimeltune.storages.storage import Storage
 
 __all__ = ["TinyDBStorage"]
@@ -79,6 +80,7 @@ class TinyDBStorage(Storage):
 
     def insert_experiment(self, experiment):
         doc = experiment.dict()
+        doc['requestor'] = experiment.params.requestor
 
         if self.get_experiment(experiment.job_id, experiment.id):
             # TODO (qnbhd): make correct exception
@@ -94,6 +96,9 @@ class TinyDBStorage(Storage):
             return None
 
         exp = q[0]
+        exp['params'] = Configuration(exp['params'], requestor=exp['requestor'])
+        exp.pop('requestor')
+
         return Experiment(**exp)
 
     def _get_raw_experiments(self, job_id) -> List[Document]:
@@ -102,7 +107,13 @@ class TinyDBStorage(Storage):
 
     def get_experiments_by_job_id(self, job_id) -> List[Experiment]:
         docs = self._get_raw_experiments(job_id)
-        return [Experiment(**doc) for doc in docs]
+        experiments = []
+        for doc in docs:
+            doc['params'] = Configuration(doc['params'], requestor=doc['requestor'])
+            # doc.pop('requestor')
+            exp = Experiment(**doc)
+            experiments.append(exp)
+        return experiments
 
     def get_experiments_count(self, job) -> int:
         return len(self.get_experiments_by_job_id(job))

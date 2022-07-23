@@ -94,3 +94,8 @@ class InvalidStoragePassed(GimeltuneError):
 class InvalidStorageRFC1738(GimeltuneError):
     """Raises if you could not parse rfc1738 URL
     from specified string."""
+
+
+class InvalidOptimizer(GimeltuneError):
+    """Raises if specified optimizer class doesn't
+    inherit from MetaSearchAlgorithm"""

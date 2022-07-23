@@ -46,6 +46,7 @@ class ExperimentModel(_Base):
     state = Column(String)
     hash = Column(String)
     objective_result = Column(Float)
+    requestor = Column(String)
     params = Column(Json)
     create_timestamp = Column(Float)
     finish_timestamp = Column(Float)
