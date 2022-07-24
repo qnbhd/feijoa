@@ -77,7 +77,7 @@ def test_create_load_job():
     assert job2.experiments_count == 10
     assert len(job2.top_experiments(100)) == 10
 
-    print(job2.dataframe)
+    print(job2.get_dataframe(desc=True))
 
 
 def test_incorrect_algo_passed():

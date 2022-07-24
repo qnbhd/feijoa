@@ -41,9 +41,12 @@ class BayesianAlgorithm(SearchAlgorithm):
         self.y = np.empty(shape=(0, ))
         self.random_generator = np.random.RandomState(0)
         self.n_warmup = 5
-        self._name = f'Bayesian<{regressor.__name__}>'
-
-        self.acq_function = acq_function
+        self.acq_function = (
+            acq_function
+            if isinstance(self.model, GaussianProcessRegressor)
+            else 'mc'
+        )
+        self._name = f'Bayesian<{regressor.__name__}({self.acq_function})>'
 
     def ask(self) -> Optional[List[Configuration]]:
         return next(self._ask_gen)
@@ -104,10 +107,8 @@ class BayesianAlgorithm(SearchAlgorithm):
         yhat = self.model.predict(self.X)
         best = min(yhat)
 
-        if not isinstance(self.model, GaussianProcessRegressor):
-            return np.array([
-                max(0, best - y) for y in yhat
-            ])
+        if self.acq_function == 'mc':
+            return np.array([max(0, best - y) for y in yhat])
 
         mean, std = self.model.predict(X_samples, return_std=True)
         kappa = 2.5
