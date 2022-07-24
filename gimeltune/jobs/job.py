@@ -30,6 +30,8 @@ import pandas as pd
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
 
+from rich.progress import Progress
+
 from gimeltune.exceptions import (
     DuplicatedJobError,
     ExperimentNotFinishedError,
@@ -39,7 +41,6 @@ from gimeltune.exceptions import (
     SearchAlgorithmNotFoundedError, InvalidOptimizer,
 )
 from gimeltune.models import Experiment, Result
-from gimeltune.models.configuration import Configuration
 from gimeltune.models.experiment import ExperimentState
 from gimeltune.search import SearchSpace, RoundRobinMeta
 from gimeltune.search.algorithms import (
@@ -48,7 +49,6 @@ from gimeltune.search.algorithms import (
     SkoptBayesianAlgorithm,
     get_algo,
 )
-from gimeltune.search.bandit import ThompsonSampler
 from gimeltune.search.meta import MetaSearchAlgorithm
 from gimeltune.storages import Storage, TinyDBStorage
 
@@ -210,6 +210,7 @@ class Job:
         n_proc: int = 1,
         algo_list: List[Union[str, Type[SearchAlgorithm]]] = None,
         clear=True,
+        progress_bar=True,
     ):
         """
         :param objective: objective function
@@ -217,13 +218,15 @@ class Job:
         :param n_proc: max number of processes.
         :param algo_list: chosen search algorithm's list.
         :param clear: clear algo list or not.
+        :param progress_bar: show progress bar or not.
         :return: None
         """
 
         # noinspection PyPep8Naming
 
         if clear:
-            self.optimizer.algorithms.clear()
+            cls = type(self.optimizer)
+            self.optimizer = cls()
 
         if (
             algo_list or
@@ -232,26 +235,28 @@ class Job:
             self._load_algo(algo_list)
 
         trials = 0
+        with Progress(transient=True, disable=not progress_bar) as bar:
+            task = bar.add_task('Optimizing', total=n_trials)
+            while trials < n_trials:
+                bar.tasks[task].completed = trials
 
-        while trials < n_trials:
+                configurations = self.ask()
 
-            configurations = self.ask()
+                if not configurations:
+                    warnings.warn("No new configurations.")
+                    # TODO (qnbhd): make closing
+                    break
 
-            if not configurations:
-                warnings.warn("No new configurations.")
-                # TODO (qnbhd): make closing
-                break
+                trials += len(configurations)
 
-            trials += len(configurations)
+                # noinspection PyUnresolvedReferences
+                with mp.Pool(n_proc) as p:
+                    results = p.map(objective, configurations)
 
-            # noinspection PyUnresolvedReferences
-            with mp.Pool(n_proc) as p:
-                results = p.map(objective, configurations)
-
-            # Applying result
-            for experiment, result in zip(configurations, results):
-                experiment.success_finish()
-                self.tell(experiment, result)
+                # Applying result
+                for experiment, result in zip(configurations, results):
+                    experiment.success_finish()
+                    self.tell(experiment, result)
 
     def tell(self, experiment, result: Union[float, Result]):
         """
@@ -310,19 +315,25 @@ class Job:
 
         return experiments
 
-    @property
-    def dataframe(self):
-
+    def get_dataframe(self, brief=False, desc=False):
         container = []
+        m = float('+inf')
 
         for experiment in self.experiments:
             dataframe_dict = experiment.dict()
-            params = dataframe_dict.pop("params")
 
-            if dataframe_dict["metrics"]:
-                metrics = dataframe_dict.pop("metrics")
+            if dataframe_dict['objective_result'] < m:
+                m = dataframe_dict['objective_result']
             else:
-                metrics = dict()
+                if desc:
+                    continue
+
+            params = {
+                f'param_{key}': value
+                for key, value in dataframe_dict.pop("params").items()
+            }
+
+            metrics = dataframe_dict.pop("metrics") or dict()
 
             dataframe_dict["create_time"] = datetime.fromtimestamp(
                 dataframe_dict["create_timestamp"])
@@ -332,10 +343,42 @@ class Job:
 
             del dataframe_dict["create_timestamp"]
             del dataframe_dict["finish_timestamp"]
+            del dataframe_dict["hash"]
+            del dataframe_dict["job_id"]
 
-            container.append({**dataframe_dict, **params, **metrics})
+            dataframe_dict["state"] = str(dataframe_dict["state"])
 
-        return pd.DataFrame(container)
+            if brief:
+                idx = dataframe_dict['id']
+                objective_result = dataframe_dict['objective_result']
+                container.append(
+                    {
+                        'id': idx,
+                        'objective_result': objective_result,
+                        **params,
+                        **metrics,
+                    }
+                )
+                continue
+
+            container.append(
+                {
+                    **dataframe_dict,
+                    **params,
+                    **metrics,
+                }
+            )
+
+        df = pd.DataFrame(container)
+
+        if container:
+            df.set_index('id', inplace=True)
+
+        return df
+
+    @property
+    def dataframe(self):
+        return self.get_dataframe()
 
     def add_algorithm(self, algo: SearchAlgorithm):
         self.optimizer.add_algorithm(algo)

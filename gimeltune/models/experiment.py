@@ -10,10 +10,17 @@ from gimeltune.models.configuration import Configuration
 
 
 class ExperimentState(str, Enum):
+
     OK = "OK"
     WIP = "WIP"
     ERROR = "ERROR"
     SEMI = "SEMI"
+
+    def __repr__(self):
+        return self.name
+
+    def __str__(self):
+        return repr(self)
 
 
 class Experiment(BaseModel):
