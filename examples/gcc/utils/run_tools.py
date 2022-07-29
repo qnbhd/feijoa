@@ -12,13 +12,13 @@ import numpy
 from executor import ExternalCommandFailed, execute
 from rich.progress import track
 
-from gimeltune import Experiment, SearchSpace, create_job, load_job
-from gimeltune.search import ParametersVisitor
-from gimeltune.search.parameters import Categorical, Integer, Parameter, Real
+from feijoa import Experiment, SearchSpace, create_job, load_job
+from feijoa.search import ParametersVisitor
+from feijoa.search.parameters import Categorical, Integer, Parameter, Real
 
 log = logging.getLogger(__name__)
 
-ERROR_RESULT = 1e10
+ERROR_RESULT = float('+inf')
 
 
 class GccRenderer(ParametersVisitor):
@@ -276,19 +276,13 @@ def run_gcc(job, toolchain, iterations, n_trials, source_file,
         toolchain=toolchain,
     )
 
-    for _ in track(range(n_trials)):
-        experiments = job.ask()
-
-        results = [obj(exp) for exp in experiments]
-
-        for experiment, result in zip(experiments, results):
-            if abs(result - ERROR_RESULT) < 1e-8:
-                log.info(f"Experiments {experiment} has inf result.")
-                experiment.error_finish()
-            else:
-                experiment.success_finish()
-
-            job.tell(experiment, result)
+    job.do(
+        obj,
+        n_trials=n_trials,
+        n_proc=-1,
+        algo_list=['bayesian', 'template', 'random'],
+        use_numba_jit=False,
+    )
 
     return baselines, job
 

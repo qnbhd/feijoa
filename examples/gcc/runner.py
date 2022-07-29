@@ -6,7 +6,7 @@ import click
 
 from examples.gcc.utils.extractor_v2 import extract
 from examples.gcc.utils.run_tools import continue_job, run_job
-from gimeltune.utils.logging import init
+from feijoa.utils.logging import init
 
 now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")
 

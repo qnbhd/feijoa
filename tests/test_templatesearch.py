@@ -1,4 +1,4 @@
-from gimeltune import (
+from feijoa import (
     Categorical,
     Experiment,
     Real,

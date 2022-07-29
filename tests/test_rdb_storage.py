@@ -1,7 +1,7 @@
-from gimeltune import Experiment, Real, SearchSpace, create_job
-from gimeltune.models.configuration import Configuration
-from gimeltune.models.experiment import ExperimentState
-from gimeltune.storages.rdb.storage import RDBStorage
+from feijoa import Experiment, Real, SearchSpace, create_job
+from feijoa.models.configuration import Configuration
+from feijoa.models.experiment import ExperimentState
+from feijoa.storages.rdb.storage import RDBStorage
 
 
 def test_rdb_storage():
@@ -11,6 +11,9 @@ def test_rdb_storage():
         def __init__(self, job_id, job_name):
             self.id = job_id
             self.name = job_name
+            self.search_space = SearchSpace()
+            self.search_space.insert(Real('x', low=0.0, high=1.0))
+            self.search_space.insert(Real('y', low=0.0, high=1.0))
 
     ex = Experiment(
         id=0,

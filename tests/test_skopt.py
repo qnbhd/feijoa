@@ -1,4 +1,4 @@
-from gimeltune import (Categorical, Experiment, Integer,
+from feijoa import (Categorical, Experiment, Integer,
                        Real, SearchSpace, create_job)
 
 

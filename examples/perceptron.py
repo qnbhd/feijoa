@@ -4,8 +4,8 @@ from itertools import tee
 import numpy
 import numpy as np
 
-from gimeltune import SearchSpace, load_job
-from gimeltune.utils import logging
+from feijoa import SearchSpace, load_job
+from feijoa.utils import logging
 
 
 def pairwise(iterable):

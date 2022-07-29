@@ -1,6 +1,6 @@
-from gimeltune import Categorical, Integer, Real, SearchSpace, create_job
-from gimeltune.models import Result
-from gimeltune.search.algorithms import BayesianAlgorithm
+from feijoa import Categorical, Integer, Real, SearchSpace, create_job
+from feijoa.models import Result
+from feijoa.search.algorithms import BayesianAlgorithm
 
 
 def test_bayesian_search():

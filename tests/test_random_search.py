@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from gimeltune import (Categorical, Experiment, Integer,
+from feijoa import (Categorical, Experiment, Integer,
                        Real, SearchSpace, create_job)
 
 
@@ -20,14 +20,7 @@ def fake_random(nums):
         i = (i + 1) % len(nums)
 
 
-@patch(
-    "random.random",
-    side_effect=faked_random(
-        [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]),
-)
-@patch("random.randint", side_effect=lambda lo, hi: lo)
-@patch("random.choice", side_effect=lambda x: x[0])
-def test_random_search(rr, ri, rc):
+def test_random_search():
     space = SearchSpace()
     space.insert(Real("x", low=0.0, high=1.0))
     space.insert(Real("y", low=0.0, high=1.0))
@@ -45,5 +38,10 @@ def test_random_search(rr, ri, rc):
     job = create_job(search_space=space)
     job.do(objective, n_trials=10, algo_list=["random"])
 
-    assert job.best_parameters == {"w": "foo", "x": 0.8, "y": 0.9, "z": 0}
+    assert job.best_parameters == {
+        'w': 'foo',
+        'x': 0.8444218515250481,
+        'y': 0.7579544029403025,
+        'z': 1,
+    }
 

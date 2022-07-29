@@ -3,11 +3,11 @@ import logging
 import numpy as np
 import pytest
 
-from gimeltune import Real, SearchSpace, create_job, GridSearch
-from gimeltune.exceptions import InvalidOptimizer
-from gimeltune.search import RoundRobinMeta
-from gimeltune.search.algorithms import TemplateSearchAlgorithm
-from gimeltune.search.bandit import UCB1, UCBTuned, ThompsonSampler
+from feijoa import Real, SearchSpace, create_job, GridSearch
+from feijoa.exceptions import InvalidOptimizer
+from feijoa.search import RoundRobinMeta
+from feijoa.search.algorithms import TemplateSearchAlgorithm
+from feijoa.search.bandit import UCB1, UCBTuned, ThompsonSampler
 
 log = logging.getLogger(__name__)
 

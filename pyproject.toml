@@ -1,32 +1,33 @@
 [tool.poetry]
-name = "gimeltune"
+name = "feijoa"
 version = "0.2.4"
 description = "Hyperparameter's optimization framework"
 authors = ["Konstantin Templin <1qnbhd@gmail.com>"]
 readme = "README.md"
-repository = "https://github.com/qnbhd/gimeltune"
+repository = "https://github.com/qnbhd/feijoa"
 keywords = ["hyperparameters", "BBO", "optimization", "autotuning"]
 license = "GPL-3.0"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-click = "^8.1.2"
-scikit-optimize = "^0.9.0"
-rich = "^12.2.0"
-executor = "^23.2"
-pydantic = "^1.9.0"
+click = ">=8.1.2"
+scikit-optimize = ">=0.9.0"
+rich = ">=12.2.0"
+executor = ">=23.2"
+pydantic = ">=1.9.0"
 tinydb = "^4.7.0"
-multiprocess = "^0.70.12"
-numpy = "^1.22.3"
-pandas = "^1.4.2"
+numpy = ">=1.22.3"
+pandas = ">=1.4.2"
 pytest-cov = "^3.0.0"
 SQLAlchemy = "^1.4.35"
-pydeps = "^1.10.18"
+pydeps = ">=1.10.18"
 sklearn = "^0.0"
 mabalgs = "^0.6.8"
+numba = ">=0.55.2"
+plotly = "^5.9.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.1.1"
+pytest = "^>=.1.1"
 isort = "^5.10.1"
 flake8 = "^4.0.1"
 

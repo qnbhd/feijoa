@@ -2,13 +2,13 @@ import unittest.mock
 
 import pytest
 
-from gimeltune import Experiment, TinyDBStorage
+from feijoa import Experiment, TinyDBStorage, SearchSpace, Real
 
 # noinspection DuplicatedCode
-from gimeltune.exceptions import (DBVersionError,
+from feijoa.exceptions import (DBVersionError,
                                   InsertExperimentWithTheExistedId)
-from gimeltune.models.configuration import Configuration
-from gimeltune.models.experiment import ExperimentState
+from feijoa.models.configuration import Configuration
+from feijoa.models.experiment import ExperimentState
 
 
 def test_tiny_db_version_check():
@@ -60,6 +60,9 @@ def test_load_job_by_id():
         def __init__(self, job_id, job_name):
             self.id = job_id
             self.name = job_name
+            self.search_space = SearchSpace()
+            self.search_space.insert(Real('x', low=0.0, high=1.0))
+            self.search_space.insert(Real('y', low=0.0, high=1.0))
 
     job = _Job(0, "foo")
 

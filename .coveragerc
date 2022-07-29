@@ -24,4 +24,5 @@ exclude_lines =
     if __name__ == .__main__.:
 
 omit =
-    gimeltune/utils/logging
+    feijoa/utils/logging
+    feijoa/visualization

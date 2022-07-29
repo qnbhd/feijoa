@@ -1,4 +1,4 @@
-from gimeltune.models.experiment import Experiment
+from feijoa.models.experiment import Experiment
 
 NAME = "rosenbrock"
 METRICS = ("x", )

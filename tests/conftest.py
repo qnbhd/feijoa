@@ -4,7 +4,7 @@ from itertools import chain
 
 import pytest
 
-from gimeltune.utils.logging import init
+from feijoa.utils.logging import init
 
 
 @pytest.fixture(autouse=True)

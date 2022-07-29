@@ -1,7 +1,7 @@
 import pytest
 
-from gimeltune.search import SearchSpace
-from gimeltune.search.space import from_yaml
+from feijoa.search import SearchSpace
+from feijoa.search.space import from_yaml
 
 
 def test_space_from_yaml():

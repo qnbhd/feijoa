@@ -1,6 +1,7 @@
 ignore:
-  - "gimeltune/utils/logging.py"
-  - "gimeltune/storages/rdb/models.py"
+  - "feijoa/utils/logging.py"
+  - "feijoa/storages/rdb/models.py"
+  - "feijoa/visualization"
 
 coverage:
   status:
