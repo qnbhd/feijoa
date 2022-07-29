@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "feijoa"
-version = "0.1.0"
+version = "0.1.1"
 description = "Hyperparameter's optimization framework"
 authors = ["Konstantin Templin <1qnbhd@gmail.com>"]
 readme = "README.md"
