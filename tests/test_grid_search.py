@@ -1,4 +1,4 @@
-from gimeltune import Categorical, Integer, Real, SearchSpace, create_job
+from feijoa import Categorical, Integer, Real, SearchSpace, create_job
 
 
 def test_grid_search():

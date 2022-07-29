@@ -1,25 +1,25 @@
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gimeltune?style=for-the-badge) ![PyPI](https://img.shields.io/pypi/v/gimeltune?style=for-the-badge) ![Codecov](https://img.shields.io/codecov/c/github/qnbhd/gimeltune?style=for-the-badge)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/feijoa?style=for-the-badge) ![PyPI](https://img.shields.io/pypi/v/feijoa?style=for-the-badge) ![Codecov](https://img.shields.io/codecov/c/github/qnbhd/feijoa?style=for-the-badge)
 
-Gimeltune is a Python framework for hyperparameter's optimization.
+Feijoa is a Python framework for hyperparameter's optimization.
 
-The Gimeltune API is very easy to use, effective for optimizing machine learning algorithms and various software. Gimeltune contains many different use cases.
+The Feijoa API is very easy to use, effective for optimizing machine learning algorithms and various software. Feijoa contains many different use cases.
 
 ## Compatibility
 
-Gimeltune works with Linux and OS X. Requires Python 3.8 or later.
+Feijoa works with Linux and OS X. Requires Python 3.8 or later.
 
-Gimeltune works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
+Feijoa works with [Jupyter notebooks](https://jupyter.org/) with no additional configuration required.
 
 # Installing
 
 Install with `pip` or your favourite PyPI package manager.
 
-`python -m pip install gimeltune`
+`python -m pip install feijoa`
 
 ## Code example:
 
 ```python
-from gimeltune import create_job, Experiment, SearchSpace, Real
+from feijoa import create_job, Experiment, SearchSpace, Real
 from math import sin
 
 

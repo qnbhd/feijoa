@@ -2,7 +2,7 @@ from typing import List, Optional
 
 import pytest
 
-from gimeltune import (
+from feijoa import (
     Experiment,
     Real,
     SearchAlgorithm,
@@ -11,7 +11,7 @@ from gimeltune import (
     create_job,
     load_job,
 )
-from gimeltune.exceptions import (
+from feijoa.exceptions import (
     DuplicatedJobError,
     ExperimentNotFinishedError,
     InvalidStoragePassed,
@@ -19,9 +19,9 @@ from gimeltune.exceptions import (
     JobNotFoundError,
     SearchAlgorithmNotFoundedError,
 )
-from gimeltune.jobs.job import _load_storage
-from gimeltune.models import Result
-from gimeltune.models.experiment import ExperimentState
+from feijoa.jobs.job import _load_storage
+from feijoa.models import Result
+from feijoa.models.experiment import ExperimentState
 
 
 def test_job():
@@ -69,8 +69,7 @@ def test_create_load_job():
 
     print(job.dataframe)
 
-    job2 = load_job(search_space=SearchSpace(),
-                    name="foo",
+    job2 = load_job(name="foo",
                     storage="sqlite:///foo.db")
 
     assert isinstance(job2.experiments, list) and len(job2.experiments) == 10
@@ -106,7 +105,7 @@ def test_correct_algo_subclass_passed():
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
-        def ask(self) -> Optional[List[Experiment]]:
+        def ask(self, n: int = 1) -> Optional[List[Experiment]]:
             pass
 
         def tell(self, config, result):
@@ -120,7 +119,7 @@ def test_no_configurations_warning():
     job = create_job(search_space=space)
 
     class SomeAlgo(SearchAlgorithm):
-        def ask(self) -> Optional[List[Experiment]]:
+        def ask(self, n: int = 1) -> Optional[List[Experiment]]:
             return None
 
         def tell(self, config, result):
@@ -128,25 +127,6 @@ def test_no_configurations_warning():
 
     with pytest.warns(UserWarning, match="No new configurations."):
         job.do(space, algo_list=[SomeAlgo()])
-
-
-def test_not_finished_experiment_tell():
-    space = SearchSpace()
-    job = create_job(search_space=space)
-
-    ex = Experiment(
-        id=0,
-        job_id=0,
-        state=ExperimentState.WIP,
-        create_timestamp=0.0,
-        params={
-            "x": 0.0,
-            "y": 1.0
-        },
-    )
-
-    with pytest.raises(ExperimentNotFinishedError):
-        job.tell(ex, 1.0)
 
 
 def test_job_duplicated_error():

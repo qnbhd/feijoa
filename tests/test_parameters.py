@@ -1,8 +1,8 @@
 import pytest
 
-from gimeltune import Categorical, Integer, Real
-from gimeltune.exceptions import ParametersIncorrectInputValues
-from gimeltune.search.parameters import ParametersVisitor
+from feijoa import Categorical, Integer, Real
+from feijoa.exceptions import ParametersIncorrectInputValues
+from feijoa.search.parameters import ParametersVisitor
 
 
 def test_parameters_constructing():

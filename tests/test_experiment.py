@@ -1,8 +1,8 @@
 import hashlib
 import json
 
-from gimeltune import Experiment
-from gimeltune.models.experiment import ExperimentState
+from feijoa import Experiment
+from feijoa.models.experiment import ExperimentState
 
 
 def test_experiment():

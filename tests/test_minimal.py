@@ -1,12 +1,12 @@
 from sklearn.ensemble import AdaBoostRegressor, RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
 
-from gimeltune import Experiment, Real, SearchSpace, create_job
+from feijoa import Experiment, Real, SearchSpace, create_job
 
 
 # noinspection DuplicatedCode
-from gimeltune.search.algorithms import BayesianAlgorithm
-from gimeltune.search.bandit import ThompsonSampler
+from feijoa.search.algorithms import BayesianAlgorithm
+from feijoa.search.bandit import ThompsonSampler
 
 
 def objective(experiment: Experiment):

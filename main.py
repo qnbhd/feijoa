@@ -1,6 +1,6 @@
 import click
 
-from gimeltune import Experiment, Real, SearchSpace, create_job
+from feijoa import Experiment, Real, SearchSpace, create_job
 
 
 @click.group()

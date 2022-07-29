@@ -160,15 +160,15 @@ cython_debug/
 .idea/
 /tuning_dataframes/
 
-gimeltune/__pycache__/
+feijoa/__pycache__/
 examples/__pycache__/
-gimeltune/search/__pycache__/
-gimeltune/measurement/__pycache__/
+feijoa/search/__pycache__/
+feijoa/measurement/__pycache__/
 examples/rosenbrock/__pycache__/
-gimeltune/utils/__pycache__/
+feijoa/utils/__pycache__/
 *.pyc
 /tuning_dbs/
-/gimeltune/tuning_dataframes/
+/feijoa/tuning_dataframes/
 /examples/notebooks/*.json
 /foo.json
 /test_job_*.json
@@ -199,3 +199,6 @@ examples/gcc/utils/.DS_Store
 
 **/catboost_info
 **/*.out
+
+*.ipynb
+*.whl

@@ -1,4 +1,4 @@
-from gimeltune import Experiment, Real, SearchSpace, create_job
+from feijoa import Experiment, Real, SearchSpace, create_job
 
 
 # noinspection DuplicatedCode

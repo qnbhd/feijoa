@@ -1,0 +1,89 @@
+name: test
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  test:
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10" ]
+    runs-on: ubuntu-latest
+    steps:
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Set up python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      #----------------------------------------------
+      #  -----  install & configure poetry  -----
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      #----------------------------------------------
+      #       load cached venv if cache exists
+      #----------------------------------------------
+#      - name: Load cached venv
+#        id: cached-poetry-dependencies
+#        uses: actions/cache@v2
+#        with:
+#          path: .venv
+#          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry_backup.lock') }}
+      #----------------------------------------------
+      # install dependencies if cache does not exist
+      #----------------------------------------------
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+      #----------------------------------------------
+      # install your root project, if required
+      #----------------------------------------------
+      - name: Install library
+        run: poetry install --no-interaction
+      #----------------------------------------------
+      #              run test suite
+      #----------------------------------------------
+      - name: Run python tests
+        run: |
+          source .venv/bin/activate
+          pytest --log-level=INFO --cov=feijoa --cov-report=xml tests/
+          
+
+      - name: Run functional tests
+        run: |
+          source .venv/bin/activate
+          cd examples/gcc
+          ls -ahl
+          python runner.py run --toolchain=g++ --search-space=space_minimal.yaml \
+            --source-file=matrixmultiply/matrixmultiply.cpp \
+            --iterations=2 --n-trials=10
+
+      - name: Archive gcc runner db
+        uses: actions/upload-artifact@v3
+        with:
+          name: GCC example tiny db
+          path: examples/gcc/*.db
+
+          
+      - name: Publish codecov report
+        uses: codecov/codecov-action@v1
+        if: matrix.python-version == '3.9'
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
