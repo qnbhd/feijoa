@@ -1,3 +1,7 @@
+<p align="left">
+          <img width="600" height="250" src="https://raw.githubusercontent.com/qnbhd/feijoa/fa3a125e1a46d7206bee55ec0ba6cf4f580c2e68/docs/feijoa_logo.svg">
+</p>
+
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/feijoa?style=for-the-badge) ![PyPI](https://img.shields.io/pypi/v/feijoa?style=for-the-badge) ![Codecov](https://img.shields.io/codecov/c/github/qnbhd/feijoa?style=for-the-badge)
 
 Feijoa is a Python framework for hyperparameter's optimization.
