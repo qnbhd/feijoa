@@ -3,10 +3,11 @@ import logging
 import numpy as np
 import pytest
 
-from feijoa import Real, SearchSpace, create_job, GridSearch
+from feijoa import Real, SearchSpace, create_job
+from feijoa.search.algorithms.grid import GridSearch
+from feijoa.search.algorithms.templatesearch import TemplateSearchAlgorithm
 from feijoa.exceptions import InvalidOptimizer
 from feijoa.search import RoundRobinMeta
-from feijoa.search.algorithms import TemplateSearchAlgorithm
 from feijoa.search.bandit import UCB1, UCBTuned, ThompsonSampler
 
 log = logging.getLogger(__name__)

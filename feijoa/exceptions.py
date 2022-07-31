@@ -30,6 +30,8 @@ __all__ = [
     "InsertExperimentWithTheExistedId",
     "InvalidStoragePassed",
     "InvalidStorageRFC1738",
+    "PackageNotInstalledError",
+    "InvalidOptimizer",
 ]
 
 
@@ -99,3 +101,8 @@ class InvalidStorageRFC1738(FeijoaError):
 class InvalidOptimizer(FeijoaError):
     """Raises if specified optimizer class doesn't
     inherit from MetaSearchAlgorithm"""
+
+
+class PackageNotInstalledError(FeijoaError):
+    """Raises if an attempt to import a package
+     was not successful"""

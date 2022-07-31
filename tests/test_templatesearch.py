@@ -30,5 +30,5 @@ def test_template_search():
     space.insert(Integer("y", low=0, high=2))
     space.insert(Categorical("z", choices=["foo", "bar"]))
 
-    job = create_job(search_space=space, storage="tinydb:///foo.json")
+    job = create_job(search_space=space)
     job.do(objective, n_trials=200, algo_list=["template"])

@@ -21,8 +21,11 @@
 # SOFTWARE.
 from typing import List, Optional, NamedTuple
 
-from tinydb import Query, TinyDB
-from tinydb.table import Document
+from feijoa.utils.imports import ImportWrapper
+
+with ImportWrapper():
+    from tinydb import Query, TinyDB
+    from tinydb.table import Document
 
 from feijoa.search.space import SearchSpace
 from feijoa.exceptions import DBVersionError, InsertExperimentWithTheExistedId
@@ -155,5 +158,5 @@ class TinyDBStorage(Storage):
     def version(self):
         return self.__version__
 
-    def close(self):
+    def __del__(self):
         self.tiny_db.close()

@@ -116,7 +116,7 @@ class Real(Parameter):
         self.high = high
 
     def __repr__(self):
-        return f"Real('{self.name}', {self.low=}, {self.high=})"
+        return f"Real('{self.name}', low={self.low}, high={self.high})"
 
     def accept(self, v):
         return v.visit_real(self)

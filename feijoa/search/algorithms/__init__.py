@@ -19,39 +19,85 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import contextlib
+import inspect
+import pathlib
+import sys
+from functools import lru_cache
+from itertools import chain
+import importlib.util
 
-from ...exceptions import SearchAlgorithmNotFoundedError
-from .algorithm import SearchAlgorithm
-from .bayesian import BayesianAlgorithm
-from .grid import GridSearch
-from .randomized import RandomSearch
-from .seed import SeedAlgorithm
-from .skopt import SkoptBayesianAlgorithm
-from .templatesearch import TemplateSearchAlgorithm
+from feijoa import __feijoa_folder__
+from feijoa.exceptions import SearchAlgorithmNotFoundedError, PackageNotInstalledError
+from feijoa.search.algorithms.algorithm import SearchAlgorithm
 
-registry = {}
-
-
-def register(algo_name, algo_cls, *algo_aliases):
-    registry[algo_name] = algo_cls
-
-    for alias in algo_aliases:
-        registry[alias] = algo_cls
+ALGORITHMS_FOLDER = pathlib.Path(__feijoa_folder__) / 'search' / 'algorithms'
+INTEGRATION_FOLDER = pathlib.Path(__feijoa_folder__).parent / 'integration' / 'algorithms'
 
 
-register("skopt", SkoptBayesianAlgorithm, "Skopt")
-register("bayesian", BayesianAlgorithm, "bayes, Bayesian")
-register("seed", SeedAlgorithm, "Seed")
-register("random", RandomSearch, "Random", "RandomSearch")
-register("grid", GridSearch, "Grid", "GridSearch")
-register("template", TemplateSearchAlgorithm, "template-search",
-         "basic-template")
+@lru_cache(maxsize=None)
+def fetch_algorithms(**folders):
+    """
+    Fetch algorithm from specified algorithms folders.
+
+    By default, uses:
+        - integration.algorithms folder
+        - default algorithms folder
+
+    :returns: all finded algorithm's classes.
+    """
+
+    folders = folders or (
+        ALGORITHMS_FOLDER,
+        INTEGRATION_FOLDER,
+    )
+
+    pool = dict()
+
+    target = (
+        script for script in chain(
+            *[folder.rglob('*.py') for folder in folders]
+        )
+        if '__' not in script.name
+    )
+
+    for script in target:
+        spec = importlib.util.spec_from_file_location(script.stem, str(script))
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module.__name__] = module
+
+        with contextlib.suppress(PackageNotInstalledError):
+            spec.loader.exec_module(module)
+
+        iterable = (
+            obj
+            for obj in inspect.getmembers(
+                module,
+                inspect.isclass
+            )
+            if (
+                obj[1].__module__ == module.__name__ and
+                issubclass(obj[1], SearchAlgorithm)
+            )
+        )
+
+        for name, cls in iterable:
+            pool[name] = cls
+            pool[cls.anchor] = cls
+
+            for al in cls.aliases:
+                pool[al] = cls
+
+    return pool
 
 
-def get_algo(algo_name):
-    algo = registry.get(algo_name, None)
+def get_algo(name):
+    """Get algorithm class by name"""
 
-    if not algo:
+    classes = fetch_algorithms()
+    cls = classes.get(name)
+
+    if not cls:
         raise SearchAlgorithmNotFoundedError()
 
-    return algo
+    return cls

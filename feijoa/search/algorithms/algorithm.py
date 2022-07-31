@@ -28,6 +28,17 @@ from feijoa.models.configuration import Configuration
 
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
+
+    @property
+    @abc.abstractmethod
+    def anchor(self):
+        raise NotImplementedError()
+
+    @property
+    @abc.abstractmethod
+    def aliases(self):
+        raise NotImplementedError()
+
     def __init__(self, *args, **kwargs):
         self._name = self.__class__.__name__
 

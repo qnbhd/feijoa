@@ -19,28 +19,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import warnings
 from typing import Generator, List, Optional
 
 import sklearn.utils.fixes
 from numpy import float64, int64
 from numpy.ma import MaskedArray
 
-from feijoa.models import Experiment
 from feijoa.search.parameters import Categorical, Integer, Real
 from feijoa.search.space import SearchSpace
-
-from . import SearchAlgorithm
-from ...models.configuration import Configuration
+from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.models.configuration import Configuration
+from feijoa.utils.imports import ImportWrapper
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 # noinspection PyPackageRequirements
-import skopt
+with ImportWrapper():
+    import skopt
 
 __all__ = ["SkoptBayesianAlgorithm"]
 
 
 class SkoptBayesianAlgorithm(SearchAlgorithm):
+
+    anchor = 'skopt'
+    aliases = ('Skopt', 'SkoptBayesian', 'skopt')
+
     def __init__(self, search_space: SearchSpace, **kwargs):
 
         super().__init__(**kwargs)
