@@ -58,8 +58,9 @@ all = ["click>=8.0.4", "numba>=0.53.1", "tinydb>=4.7.0", "executor>=23.2", "scik
 [tool.setuptools_scm]
 write_to = "feijoa/_version.py"
 fallback_version = "0.0.1"
-local_scheme = "no-local-version"
-version_scheme = "post-release"
+local_scheme = "dirty-tag"
+version_scheme = "release-branch-semver"
+
 
 [tool.pytest.ini_options]
 log_cli = true
