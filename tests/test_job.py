@@ -5,15 +5,13 @@ import pytest
 from feijoa import (
     Experiment,
     Real,
-    SearchAlgorithm,
     SearchSpace,
-    TinyDBStorage,
     create_job,
     load_job,
 )
+from feijoa.search.algorithms import SearchAlgorithm
 from feijoa.exceptions import (
     DuplicatedJobError,
-    ExperimentNotFinishedError,
     InvalidStoragePassed,
     InvalidStorageRFC1738,
     JobNotFoundError,
@@ -21,7 +19,6 @@ from feijoa.exceptions import (
 )
 from feijoa.jobs.job import _load_storage
 from feijoa.models import Result
-from feijoa.models.experiment import ExperimentState
 
 
 def test_job():
@@ -102,6 +99,10 @@ def test_correct_algo_subclass_passed():
     job = create_job(search_space=space)
 
     class CorrectAlgo(SearchAlgorithm):
+
+        anchor = 'CorrectAlgo'
+        aliases = ('CorrectAlgo', )
+
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
@@ -119,6 +120,10 @@ def test_no_configurations_warning():
     job = create_job(search_space=space)
 
     class SomeAlgo(SearchAlgorithm):
+
+        anchor = 'SomeAlgo'
+        aliases = ('SomeAlgo', )
+
         def ask(self, n: int = 1) -> Optional[List[Experiment]]:
             return None
 
@@ -143,19 +148,11 @@ def test_job_duplicated_error():
 def test_load_non_existed():
 
     with pytest.raises(JobNotFoundError):
-        load_job(search_space=SearchSpace(),
-                 name="dimple",
+        load_job(name="dimple",
                  storage="sqlite:///:memory:")
-
-    with pytest.raises(JobNotFoundError):
-        load_job(search_space=SearchSpace(),
-                 name="dimple",
-                 storage="tinydb:///zoo.json")
 
 
 def test_load_storage():
-    assert isinstance(_load_storage("tinydb:///foo.json"), TinyDBStorage)
-
     with pytest.raises(InvalidStorageRFC1738):
         _load_storage("dfddsfdsfsd")
 

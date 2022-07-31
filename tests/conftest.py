@@ -1,15 +1,22 @@
 import glob
+import logging
 import os
 from itertools import chain
 
 import pytest
 
-from feijoa.utils.logging import init
+excluded_loggers = (
+    'numba',
+    'matplotlib',
+)
+
+for log_name in excluded_loggers:
+    other_log = logging.getLogger(log_name)
+    other_log.setLevel(logging.WARNING)
 
 
 @pytest.fixture(autouse=True)
 def cleanup():
-    init(verbose=True)
     yield
     for f in chain(glob.glob("*.json"), glob.glob("*.yaml"),
                    glob.glob("*.db")):

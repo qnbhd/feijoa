@@ -9,8 +9,11 @@ from os.path import abspath, dirname
 from typing import Optional, Tuple, Union
 
 import numpy
-from executor import ExternalCommandFailed, execute
-from rich.progress import track
+
+from feijoa.utils.imports import ImportWrapper
+
+with ImportWrapper():
+    from executor import ExternalCommandFailed, execute
 
 from feijoa import Experiment, SearchSpace, create_job, load_job
 from feijoa.search import ParametersVisitor

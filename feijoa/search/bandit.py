@@ -1,5 +1,5 @@
 import logging
-from collections import defaultdict, Counter
+from collections import Counter
 
 import numpy as np
 from mab import algs
@@ -10,7 +10,15 @@ from feijoa.search.meta import MetaSearchAlgorithm
 log = logging.getLogger(__name__)
 
 
+def relative_change_d1(x_cur: float, x_prev: float):
+    sign = np.sign(x_prev - x_cur)
+    return sign * np.abs(x_prev - x_cur) / (1e-10 + np.abs(x_cur) + np.abs(x_prev))
+
+
 class UCB1(MetaSearchAlgorithm):
+
+    anchor = 'UCB1'
+    aliases = ('UCB1', )
 
     STRATEGY = algs.UCB1
 
@@ -75,7 +83,8 @@ class UCB1(MetaSearchAlgorithm):
 
             if self.results:
                 m = min(self.results)
-                relative_change = -(result - m)/m
+
+                relative_change = relative_change_d1(result, m)
                 has_reward = relative_change > 0.005
                 performance = relative_change * self.mult
 
@@ -83,8 +92,6 @@ class UCB1(MetaSearchAlgorithm):
                     reward_multiplier = max(1, int(relative_change * self.mult))
                 else:
                     reward_multiplier = 100
-            else:
-                has_reward = False
 
         if has_reward:
             for i in range(reward_multiplier):
@@ -100,8 +107,16 @@ class UCB1(MetaSearchAlgorithm):
 
 
 class UCBTuned(UCB1):
+
+    anchor = 'UCBTuned'
+    aliases = ('UCBTuned', )
+
     STRATEGY = algs.UCBTuned
 
 
 class ThompsonSampler(UCB1):
+
+    anchor = 'ThompsonSampler'
+    aliases = ('ThompsonSampler', )
+
     STRATEGY = algs.ThompsomSampling

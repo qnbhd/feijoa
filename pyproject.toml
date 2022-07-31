@@ -1,42 +1,68 @@
-[tool.poetry]
+[project]
 name = "feijoa"
-version = "0.1.1"
+dynamic = ["version"]
 description = "Hyperparameter's optimization framework"
-authors = ["Konstantin Templin <1qnbhd@gmail.com>"]
+authors = [
+    {name = "Konstantin Templin", email = "1qnbhd@gmail.com"}
+]
+maintainers = [
+    {name = "Konstantin Templin", email = "1qnbhd@gmail.com"}
+]
+urls = {Repository = "https://github.com/qnbhd/feijoa"}
 readme = "README.md"
-repository = "https://github.com/qnbhd/feijoa"
 keywords = ["hyperparameters", "BBO", "optimization", "autotuning"]
-license = "GPL-3.0"
+license = {text = "GPL-3.0"}
+requires-python = ">=3.6"
+dependencies = [
+    "numpy>=1.19.5", "pandas>=0.25.3",
+    "rich>=10.11.0", "pydantic>=1.7.4",
+    "mabalgs>=0.6.8", "plotly>=5.9.0",
+    "PyYAML>=6.0", "scikit-learn>=0.24.2",
+    "importlib-metadata>=4.8.3",
+    "joblib>=1.1.0",
+    "SQLAlchemy>=1.4.39"
+]
+classifiers = [
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3 :: Only",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Mathematics",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Topic :: Software Development",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.8,<3.11"
-click = ">=8.1.2"
-scikit-optimize = ">=0.9.0"
-rich = ">=12.2.0"
-executor = ">=23.2"
-pydantic = ">=1.9.0"
-tinydb = "^4.7.0"
-numpy = ">=1.22.3"
-pandas = ">=1.4.2"
-pytest-cov = "^3.0.0"
-SQLAlchemy = "^1.4.35"
-pydeps = ">=1.10.18"
-sklearn = "^0.0"
-mabalgs = "^0.6.8"
-numba = ">=0.55.2"
-plotly = "^5.9.0"
+[build-system]
+requires = [
+    "setuptools>=45",
+    "setuptools_scm>=6.2",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
 
-[tool.poetry.dev-dependencies]
-pytest = "^>=.1.1"
-isort = "^5.10.1"
-flake8 = "^4.0.1"
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.1.1", "isort>=5.10.1", "flake8>=4.0.1", "pytest-cov>=3.0.0"]
+all = ["click>=8.0.4", "numba>=0.53.1", "tinydb>=4.7.0", "executor>=23.2", "scikit-optimize>=0.9.0"]
+
+[tool.setuptools_scm]
+write_to = "feijoa/_version.py"
+fallback_version = "0.0.1"
+local_scheme = "no-local-version"
+version_scheme = "release-branch-semver"
 
 [tool.pytest.ini_options]
 log_cli = true
 log_cli_level = "DEBUG"
 log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"

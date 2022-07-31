@@ -31,6 +31,10 @@ __all__ = ["RandomSearch"]
 
 
 class RandomSearch(SearchAlgorithm):
+
+    anchor = 'random'
+    aliases = ('RandomSearch', 'random', 'randomized')
+
     def __init__(self, search_space, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.search_space = search_space

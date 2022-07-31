@@ -30,6 +30,10 @@ log = logging.getLogger(__name__)
 
 
 class SeedAlgorithm(SearchAlgorithm):
+
+    anchor = 'seed'
+    aliases = ('SeedAlgorithm', 'seed', )
+
     def __init__(self, *seeds, **kwargs):
         super().__init__(*seeds, **kwargs)
         self.seeds: list = list(seeds)

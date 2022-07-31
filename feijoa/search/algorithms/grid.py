@@ -51,6 +51,10 @@ class GridMaker(ParametersVisitor):
 
 
 class GridSearch(SearchAlgorithm):
+
+    anchor = 'grid'
+    aliases = ('GridSearch', 'grid', )
+
     def __init__(self, search_space, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.search_space = search_space

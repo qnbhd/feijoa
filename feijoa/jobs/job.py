@@ -29,9 +29,9 @@ from typing import Any, Callable, List, Optional, Type, Union
 import joblib
 import numpy as np
 import pandas as pd
-from numba import jit
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
+from feijoa.utils.imports import ImportWrapper
 
 from rich.progress import Progress
 
@@ -47,18 +47,20 @@ from feijoa.exceptions import (
 )
 from feijoa.models import Experiment, Result
 from feijoa.models.experiment import ExperimentState
-from feijoa.search import SearchSpace, RoundRobinMeta
+from feijoa.search import SearchSpace
 from feijoa.search.algorithms import (
     SearchAlgorithm,
-    SeedAlgorithm,
-    SkoptBayesianAlgorithm,
     get_algo,
 )
+from feijoa.search.algorithms.seed import SeedAlgorithm
+from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 from feijoa.search.meta import MetaSearchAlgorithm
-from feijoa.storages import Storage, TinyDBStorage
+from feijoa.storages import Storage
 from feijoa.storages.rdb.storage import RDBStorage
 
 __all__ = ["create_job", "load_job"]
+
+from feijoa.utils.imports import ImportWrapper
 
 log = logging.getLogger(__name__)
 
@@ -180,7 +182,7 @@ class Job:
 
     def setup_default_algo(self):
         self.add_algorithm(
-            SkoptBayesianAlgorithm(self.search_space))
+            BayesianAlgorithm(self.search_space))
 
     def _load_algo(self, algo_list=None):
         if self.seeds:
@@ -188,7 +190,7 @@ class Job:
 
         if not algo_list:
             self.add_algorithm(
-                SkoptBayesianAlgorithm(self.search_space))
+                BayesianAlgorithm(self.search_space))
         else:
             for algo in algo_list:
                 if isinstance(algo, str):
@@ -244,7 +246,9 @@ class Job:
             self._load_algo(algo_list)
 
         if use_numba_jit:
-            objective = jit(objective)
+            with ImportWrapper():
+                from numba import jit
+                objective = jit(objective)
 
         dela = joblib.delayed(objective)
 
@@ -443,7 +447,9 @@ def _load_storage(storage_or_name: Union[str, Optional[Storage]]) -> Storage:
     assert url.database
 
     if url.drivername == "tinydb":
-        return TinyDBStorage(str(url.database))
+        with ImportWrapper():
+            from feijoa.storages.tiny import TinyDBStorage
+            return TinyDBStorage(str(url.database))
 
     return RDBStorage(storage_or_name)
 

@@ -1,6 +1,6 @@
 from feijoa import Categorical, Integer, Real, SearchSpace, create_job
 from feijoa.models import Result
-from feijoa.search.algorithms import BayesianAlgorithm
+from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 
 
 def test_bayesian_search():
@@ -17,7 +17,7 @@ def test_bayesian_search():
 
         return -(x + y + (2 if z == "foo" else 3))
 
-    job = create_job(search_space=space, storage="tinydb:///foo.json")
+    job = create_job(search_space=space)
     job.do(objective, n_trials=50, algo_list=["bayesian"])
 
 
@@ -36,7 +36,7 @@ def test_specify_acq_bayesian_search():
 
         return -(x + y + (2 if z == "foo" else 3))
 
-    job = create_job(search_space=space, storage="tinydb:///foo.json")
+    job = create_job(search_space=space)
 
     a_ei = BayesianAlgorithm(search_space=job.search_space,
                              acq_function='ei')

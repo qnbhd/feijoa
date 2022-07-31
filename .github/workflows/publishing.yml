@@ -1,0 +1,46 @@
+name: publishing
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.repository == 'qnbhd/feijoa'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install build & publish tools
+        run: |
+          python -m pip install -U pip
+          python -m pip install -U twine
+      
+      - name: Build
+        run: |
+          python -m build
+
+      - name: Publish distribution to pypi
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+            password: ${{ secrets.PYPI_API_TOKEN }}
+            verbose: true
+
