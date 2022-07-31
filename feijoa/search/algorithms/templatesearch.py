@@ -12,6 +12,10 @@ log = logging.getLogger(__name__)
 
 
 class TemplateSearchAlgorithm(SearchAlgorithm):
+
+    anchor = 'template'
+    aliases = ('TemplateSearch', 'template')
+
     def __init__(self, search_space: SearchSpace, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.search_space = search_space

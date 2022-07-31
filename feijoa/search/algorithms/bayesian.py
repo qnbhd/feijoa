@@ -16,6 +16,9 @@ from feijoa.search.visitors import Randomizer
 # noinspection PyPep8Naming
 class BayesianAlgorithm(SearchAlgorithm):
 
+    anchor = 'bayesian'
+    aliases = ('BayesianAlgorithm', 'bayesian', 'bayes', )
+
     def __init__(self,
         search_space,
         *args,

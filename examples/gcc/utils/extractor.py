@@ -4,7 +4,10 @@ import os
 import re
 from os.path import abspath, dirname
 
-import executor
+from feijoa.utils.imports import ImportWrapper
+
+with ImportWrapper():
+    import executor
 
 log = logging.getLogger(__name__)
 

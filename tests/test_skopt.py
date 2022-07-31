@@ -1,5 +1,8 @@
 from feijoa import (Categorical, Experiment, Integer,
-                       Real, SearchSpace, create_job)
+                    Real, SearchSpace, create_job)
+from feijoa.utils.imports import import_or_skip
+
+import_or_skip('skopt')
 
 
 # noinspection DuplicatedCode

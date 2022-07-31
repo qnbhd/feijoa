@@ -5,7 +5,7 @@ from feijoa import Experiment, Real, SearchSpace, create_job
 
 
 # noinspection DuplicatedCode
-from feijoa.search.algorithms import BayesianAlgorithm
+from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 from feijoa.search.bandit import ThompsonSampler
 
 
@@ -22,7 +22,7 @@ def test_minimal():
     space.insert(Real("x", low=0.0, high=5.0))
     space.insert(Real("y", low=0.0, high=2.0))
 
-    job = create_job(search_space=space, storage="tinydb:///foo.json")
+    job = create_job(search_space=space)
     job.do(objective, n_trials=50)
 
     assert abs(job.best_value - 0) < 5
@@ -37,7 +37,6 @@ def test_job_with_algo_ensemble():
 
     job = create_job(
         search_space=space,
-        storage="tinydb:///foo.json",
         optimizer=ThompsonSampler
     )
 

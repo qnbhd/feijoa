@@ -1,12 +1,15 @@
 import json
 import logging
+import sys
 from datetime import datetime
 
 import click
 
-from examples.gcc.utils.extractor_v2 import extract
-from examples.gcc.utils.run_tools import continue_job, run_job
+from utils.extractor import extract
+from utils.run_tools import continue_job, run_job
 from feijoa.utils.logging import init
+
+print(sys.path)
 
 now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")
 

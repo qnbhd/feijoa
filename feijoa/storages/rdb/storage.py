@@ -102,3 +102,6 @@ class RDBStorage(Storage):
     @property
     def version(self):
         raise NotImplementedError()
+
+    def __del__(self):
+        self.session.close()

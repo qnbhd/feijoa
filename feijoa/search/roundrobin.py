@@ -41,6 +41,9 @@ class RoundRobinMeta(MetaSearchAlgorithm):
         - experiments_factory
     """
 
+    anchor = 'roundrobin'
+    aliases = ('roundrobin', )
+
     def __init__(self, *algorithms):
         super().__init__(*algorithms)
         self.algo_deq = None

@@ -30,11 +30,4 @@ __project_folder__ = dirname(__feijoa_folder__)
 from .jobs import create_job, load_job
 from .models import Experiment
 from .search import Categorical, Integer, Real, SearchSpace
-from .search.algorithms import (
-    GridSearch,
-    RandomSearch,
-    SearchAlgorithm,
-    SeedAlgorithm,
-    SkoptBayesianAlgorithm,
-)
-from .storages import Storage, TinyDBStorage
+from .storages import Storage

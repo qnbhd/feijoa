@@ -2,18 +2,20 @@ import unittest.mock
 
 import pytest
 
-from feijoa import Experiment, TinyDBStorage, SearchSpace, Real
+from feijoa import Experiment, SearchSpace, Real
 
 # noinspection DuplicatedCode
 from feijoa.exceptions import (DBVersionError,
-                                  InsertExperimentWithTheExistedId)
+                               InsertExperimentWithTheExistedId)
 from feijoa.models.configuration import Configuration
 from feijoa.models.experiment import ExperimentState
+from feijoa.utils.imports import import_or_skip
+
+TinyDBStorage = import_or_skip('feijoa.storages.tiny').TinyDBStorage
 
 
 def test_tiny_db_version_check():
-    storage1 = TinyDBStorage("boo.json")
-    storage1.close()
+    TinyDBStorage("boo.json")
 
     with unittest.mock.patch.object(TinyDBStorage, "__version__", "0.1.1"):
         with pytest.raises(DBVersionError):

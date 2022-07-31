@@ -202,3 +202,4 @@ examples/gcc/utils/.DS_Store
 
 *.ipynb
 *.whl
+/feijoa/_version.py
