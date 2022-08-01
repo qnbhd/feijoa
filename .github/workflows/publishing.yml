@@ -15,7 +15,7 @@ jobs:
     if: github.repository == 'qnbhd/feijoa'
     steps:
       - uses: actions/checkout@v2
-      - with:
+        with:
           fetch-depth: 0
 
       - name: Set up Python
