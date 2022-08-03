@@ -1,16 +1,24 @@
-from feijoa import (Categorical, Experiment, Integer,
-                    Real, SearchSpace, create_job)
+from feijoa import Categorical
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import Integer
+from feijoa import Real
+from feijoa import SearchSpace
 from feijoa.utils.imports import import_or_skip
 
-import_or_skip('skopt')
+
+import_or_skip("skopt")
 
 
 # noinspection DuplicatedCode
 def objective(experiment: Experiment):
     x = experiment.params.get("x")
     y = experiment.params.get("y")
-    return ((1.5 - x + x * y)**2 + (2.25 - x + x * y**2)**2 +
-            (2.625 - x + x * y**3)**2)
+    return (
+        (1.5 - x + x * y) ** 2
+        + (2.25 - x + x * y**2) ** 2
+        + (2.625 - x + x * y**3) ** 2
+    )
 
 
 def test_skopt():

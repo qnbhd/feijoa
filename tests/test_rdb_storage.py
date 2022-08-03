@@ -1,4 +1,7 @@
-from feijoa import Experiment, Real, SearchSpace, create_job
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import Real
+from feijoa import SearchSpace
 from feijoa.models.configuration import Configuration
 from feijoa.models.experiment import ExperimentState
 from feijoa.storages.rdb.storage import RDBStorage
@@ -12,18 +15,15 @@ def test_rdb_storage():
             self.id = job_id
             self.name = job_name
             self.search_space = SearchSpace()
-            self.search_space.insert(Real('x', low=0.0, high=1.0))
-            self.search_space.insert(Real('y', low=0.0, high=1.0))
+            self.search_space.insert(Real("x", low=0.0, high=1.0))
+            self.search_space.insert(Real("y", low=0.0, high=1.0))
 
     ex = Experiment(
         id=0,
         job_id=0,
         state=ExperimentState.WIP,
         create_timestamp=0.0,
-        params=Configuration({
-            "x": 0.0,
-            "y": 1.0
-        }),
+        params=Configuration({"x": 0.0, "y": 1.0}),
     )
 
     ex_2 = Experiment(
@@ -31,10 +31,7 @@ def test_rdb_storage():
         job_id=1,
         state=ExperimentState.WIP,
         create_timestamp=0.0,
-        params=Configuration({
-            "x": 0.0,
-            "y": 1.0
-        }),
+        params=Configuration({"x": 0.0, "y": 1.0}),
     )
 
     mock_job = _Job(0, "foo")
@@ -51,7 +48,10 @@ def test_rdb_storage():
 
     assert storage.get_experiment(job_id=0, experiment_id=0) == ex
 
-    assert storage.jobs == [{"id": 0, "name": "foo"}, {"id": 1, "name": "boo"}]
+    assert storage.jobs == [
+        {"id": 0, "name": "foo"},
+        {"id": 1, "name": "boo"},
+    ]
 
 
 def test_integrated_rdb_storage():
@@ -62,8 +62,11 @@ def test_integrated_rdb_storage():
     def objective(experiment: Experiment):
         x = experiment.params.get("x")
         y = experiment.params.get("y")
-        return ((1.5 - x + x * y)**2 + (2.25 - x + x * y**2)**2 +
-                (2.625 - x + x * y**3)**2)
+        return (
+            (1.5 - x + x * y) ** 2
+            + (2.25 - x + x * y**2) ** 2
+            + (2.625 - x + x * y**3) ** 2
+        )
 
     space.insert(Real("x", low=0.0, high=5.0))
     space.insert(Real("y", low=0.0, high=2.0))

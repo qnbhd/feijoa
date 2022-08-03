@@ -105,4 +105,4 @@ class InvalidOptimizer(FeijoaError):
 
 class PackageNotInstalledError(FeijoaError):
     """Raises if an attempt to import a package
-     was not successful"""
+    was not successful"""

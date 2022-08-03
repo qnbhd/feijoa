@@ -26,7 +26,7 @@ Install with `pip` or your favourite PyPI package manager.
 python -m pip install feijoa
 ```
 
-## Code example:
+## Code example
 
 ```python
 from feijoa import create_job, SearchSpace, Real
@@ -46,4 +46,3 @@ space.insert(Real('y', low=0.0, high=2.0))
 job = create_job(search_space=space)
 job.do(objective)
 ```
-

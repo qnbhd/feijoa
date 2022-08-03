@@ -1,11 +1,9 @@
-from feijoa import (
-    Categorical,
-    Experiment,
-    Real,
-    SearchSpace,
-    create_job,
-    Integer,
-)
+from feijoa import Categorical
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import Integer
+from feijoa import Real
+from feijoa import SearchSpace
 
 
 def objective(experiment: Experiment):
@@ -19,8 +17,12 @@ def objective(experiment: Experiment):
     if z == "bar":
         a = -1
 
-    return ((1.5 - x + x * y)**2 + (2.25 - x + x * y**2)**2 +
-            (2.625 - x + x * y**3)**2 + a)
+    return (
+        (1.5 - x + x * y) ** 2
+        + (2.25 - x + x * y**2) ** 2
+        + (2.625 - x + x * y**3) ** 2
+        + a
+    )
 
 
 def test_template_search():

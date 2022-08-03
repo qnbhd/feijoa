@@ -1,24 +1,20 @@
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-import pytest
-
-from feijoa import (
-    Experiment,
-    Real,
-    SearchSpace,
-    create_job,
-    load_job,
-)
-from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.exceptions import (
-    DuplicatedJobError,
-    InvalidStoragePassed,
-    InvalidStorageRFC1738,
-    JobNotFoundError,
-    SearchAlgorithmNotFoundedError,
-)
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import load_job
+from feijoa import Real
+from feijoa import SearchSpace
+from feijoa.exceptions import DuplicatedJobError
+from feijoa.exceptions import InvalidStoragePassed
+from feijoa.exceptions import InvalidStorageRFC1738
+from feijoa.exceptions import JobNotFoundError
+from feijoa.exceptions import SearchAlgorithmNotFoundedError
 from feijoa.jobs.job import _load_storage
 from feijoa.models import Result
+from feijoa.search.algorithms import SearchAlgorithm
+import pytest
 
 
 def test_job():
@@ -51,25 +47,30 @@ def test_create_load_job():
             "bar": 2.0,
         }
 
-        obj = (1 - x)**2 + (1 - y)**2
+        obj = (1 - x) ** 2 + (1 - y) ** 2
 
         return Result(objective_result=obj, metrics=metrics)
 
-    job = create_job(search_space=space,
-                     name="foo",
-                     storage="sqlite:///foo.db")
+    job = create_job(
+        search_space=space, name="foo", storage="sqlite:///foo.db"
+    )
     job.do(objective, n_trials=10, algo_list=["random"])
 
-    assert isinstance(job.experiments, list) and len(job.experiments) == 10
+    assert (
+        isinstance(job.experiments, list)
+        and len(job.experiments) == 10
+    )
     assert job.experiments_count == 10
     assert len(job.top_experiments(100)) == 10
 
     print(job.dataframe)
 
-    job2 = load_job(name="foo",
-                    storage="sqlite:///foo.db")
+    job2 = load_job(name="foo", storage="sqlite:///foo.db")
 
-    assert isinstance(job2.experiments, list) and len(job2.experiments) == 10
+    assert (
+        isinstance(job2.experiments, list)
+        and len(job2.experiments) == 10
+    )
     assert job2.experiments_count == 10
     assert len(job2.top_experiments(100)) == 10
 
@@ -100,8 +101,8 @@ def test_correct_algo_subclass_passed():
 
     class CorrectAlgo(SearchAlgorithm):
 
-        anchor = 'CorrectAlgo'
-        aliases = ('CorrectAlgo', )
+        anchor = "CorrectAlgo"
+        aliases = ("CorrectAlgo",)
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
@@ -121,8 +122,8 @@ def test_no_configurations_warning():
 
     class SomeAlgo(SearchAlgorithm):
 
-        anchor = 'SomeAlgo'
-        aliases = ('SomeAlgo', )
+        anchor = "SomeAlgo"
+        aliases = ("SomeAlgo",)
 
         def ask(self, n: int = 1) -> Optional[List[Experiment]]:
             return None
@@ -135,21 +136,24 @@ def test_no_configurations_warning():
 
 
 def test_job_duplicated_error():
-    create_job(search_space=SearchSpace(),
-               name="foo",
-               storage="sqlite:///foo.db")
+    create_job(
+        search_space=SearchSpace(),
+        name="foo",
+        storage="sqlite:///foo.db",
+    )
 
     with pytest.raises(DuplicatedJobError):
-        create_job(search_space=SearchSpace(),
-                   name="foo",
-                   storage="sqlite:///foo.db")
+        create_job(
+            search_space=SearchSpace(),
+            name="foo",
+            storage="sqlite:///foo.db",
+        )
 
 
 def test_load_non_existed():
 
     with pytest.raises(JobNotFoundError):
-        load_job(name="dimple",
-                 storage="sqlite:///:memory:")
+        load_job(name="dimple", storage="sqlite:///:memory:")
 
 
 def test_load_storage():

@@ -1,12 +1,12 @@
 import datetime
+from enum import Enum
 import hashlib
 import json
-from enum import Enum
-from typing import Any, Dict, Optional
-
-from pydantic import BaseModel
+from typing import Any
+from typing import Optional
 
 from feijoa.models.configuration import Configuration
+from pydantic import BaseModel
 
 
 class ExperimentState(str, Enum):
@@ -59,8 +59,10 @@ class Experiment(BaseModel):
         self.state = ExperimentState.ERROR
 
     def is_finished(self):
-        return (self.state == ExperimentState.OK
-                or self.state == ExperimentState.ERROR)
+        return (
+            self.state == ExperimentState.OK
+            or self.state == ExperimentState.ERROR
+        )
 
     def _calculate_hash(self):
         params_dumped = json.dumps(self.params, sort_keys=True)

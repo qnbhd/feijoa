@@ -19,20 +19,25 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
 from functools import partial
-from typing import List, Optional
+import logging
+from typing import List
+from typing import Optional
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.algorithms import SearchAlgorithm
+
 
 log = logging.getLogger(__name__)
 
 
 class SeedAlgorithm(SearchAlgorithm):
 
-    anchor = 'seed'
-    aliases = ('SeedAlgorithm', 'seed', )
+    anchor = "seed"
+    aliases = (
+        "SeedAlgorithm",
+        "seed",
+    )
 
     def __init__(self, *seeds, **kwargs):
         super().__init__(*seeds, **kwargs)
@@ -40,8 +45,10 @@ class SeedAlgorithm(SearchAlgorithm):
         self.is_emitted = False
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
-        log.debug('Parameter `n` does not affect on configuration\'s count,'
-                  f' because {self.__class__.__name__} is sequential.')
+        log.debug(
+            "Parameter `n` does not affect on configuration's count,"
+            f" because {self.__class__.__name__} is sequential."
+        )
 
         cf = partial(Configuration, requestor=self.name)
 

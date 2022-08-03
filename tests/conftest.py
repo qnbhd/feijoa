@@ -1,13 +1,14 @@
 import glob
+from itertools import chain
 import logging
 import os
-from itertools import chain
 
 import pytest
 
+
 excluded_loggers = (
-    'numba',
-    'matplotlib',
+    "numba",
+    "matplotlib",
 )
 
 for log_name in excluded_loggers:
@@ -18,7 +19,7 @@ for log_name in excluded_loggers:
 @pytest.fixture(autouse=True)
 def cleanup():
     yield
-    for f in chain(glob.glob("*.json"), glob.glob("*.yaml"),
-                   glob.glob("*.db")):
+    for f in chain(
+        glob.glob("*.json"), glob.glob("*.yaml"), glob.glob("*.db")
+    ):
         os.remove(f)
-

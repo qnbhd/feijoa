@@ -20,7 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import abc
-from typing import List, Optional
+from typing import List
+from typing import Optional
+
 
 __all__ = ["SearchAlgorithm"]
 
@@ -28,7 +30,6 @@ from feijoa.models.configuration import Configuration
 
 
 class SearchAlgorithm(metaclass=abc.ABCMeta):
-
     @property
     @abc.abstractmethod
     def anchor(self):

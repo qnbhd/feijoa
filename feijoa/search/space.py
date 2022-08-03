@@ -19,18 +19,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import warnings
 from typing import List
+import warnings
 
+from feijoa.search.parameters import Categorical
+from feijoa.search.parameters import Integer
+from feijoa.search.parameters import Parameter
+from feijoa.search.parameters import Real
 import yaml
 
-from feijoa.search.parameters import Categorical, Integer, Parameter, Real
 
 __all__ = ["SearchSpace"]
 
 
 class SearchSpace:
     """Search (observation) space class"""
+
     def __init__(self, *parameters):
         self.params: List[Parameter] = parameters or list()
         self.name2param = {p.name: p for p in parameters} or dict()
@@ -47,7 +51,7 @@ class SearchSpace:
         buff = ["SearchSpace:"]
 
         for p in self.params:
-            buff.append(f"\t{p}")
+            buff.append(f"{' ' * 4}{p}")
 
         return "\n".join(buff)
 
@@ -88,8 +92,8 @@ class SearchSpace:
             kind = param.kind
             meta = param.meta
             kwargs = {
-                'signature': name,
-                'type': kind,
+                "signature": name,
+                "type": kind,
                 **meta,
             }
             p = parameter_factory(**kwargs)

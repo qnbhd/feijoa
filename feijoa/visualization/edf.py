@@ -1,7 +1,8 @@
+from feijoa import create_job
+from feijoa import Real
+from feijoa import SearchSpace
 import numpy as np
 import plotly.graph_objs as go
-
-from feijoa import SearchSpace, Real, create_job
 
 
 def plot_edf(
@@ -12,28 +13,27 @@ def plot_edf(
     name = name or job.name
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
-    objectives = df['objective_result']
+    objectives = df["objective_result"]
     min_value, max_value = objectives.min(), objectives.max()
     lspace = np.linspace(min_value, max_value, 100)
 
-    dist = np.array([
-        np.sum(objectives <= x)
-        for x in lspace
-    ]) / len(objectives)
+    dist = np.array([np.sum(objectives <= x) for x in lspace]) / len(
+        objectives
+    )
 
     fig.add_trace(
         go.Scatter(
             x=lspace,
             y=dist,
-            mode='lines',
-            name=f'{name}',
+            mode="lines",
+            name=f"{name}",
         )
     )
 
     fig.update_layout(
-        title='Empirical distribution plot',
-        xaxis_title='Objective value',
-        yaxis_title='Cumulative probability'
+        title="Empirical distribution plot",
+        xaxis_title="Objective value",
+        yaxis_title="Cumulative probability",
     )
 
     return fig
@@ -42,8 +42,11 @@ def plot_edf(
 def objective(experiment):
     x = experiment.params.get("x")
     y = experiment.params.get("y")
-    return ((1.5 - x + x * y)**2 + (2.25 - x + x * y**2)**2 +
-            (2.625 - x + x * y**3)**2)
+    return (
+        (1.5 - x + x * y) ** 2
+        + (2.25 - x + x * y**2) ** 2
+        + (2.625 - x + x * y**3) ** 2
+    )
 
 
 def main():
@@ -57,7 +60,7 @@ def main():
         objective,
         n_proc=-1,
         n_trials=2000,
-        algo_list=['grid'],
+        algo_list=["grid"],
         progress_bar=True,
         use_numba_jit=True,
     )
@@ -66,5 +69,5 @@ def main():
     fig.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

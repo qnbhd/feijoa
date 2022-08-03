@@ -1,37 +1,44 @@
 import inspect
+from typing import Generator
+from typing import List
+from typing import Optional
 import warnings
-from typing import List, Optional, Generator
 
+from feijoa.models.configuration import Configuration
+from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.parameters import Categorical
+from feijoa.search.parameters import Integer
+from feijoa.search.parameters import Real
+from feijoa.search.visitors import Randomizer
 import numpy as np
 from scipy.stats import norm
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.gaussian_process import GaussianProcessRegressor
 
-from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.search.parameters import Categorical, Integer, Real
-from feijoa.search.visitors import Randomizer
-
 
 # noinspection PyPep8Naming
 class BayesianAlgorithm(SearchAlgorithm):
 
-    anchor = 'bayesian'
-    aliases = ('BayesianAlgorithm', 'bayesian', 'bayes', )
+    anchor = "bayesian"
+    aliases = (
+        "BayesianAlgorithm",
+        "bayesian",
+        "bayes",
+    )
 
-    def __init__(self,
+    def __init__(
+        self,
         search_space,
         *args,
-        acq_function='ei',
+        acq_function="ei",
         regressor=GaussianProcessRegressor,
-        **kwargs
+        **kwargs,
     ):
 
         super().__init__(*args, **kwargs)
         self.search_space = search_space
         self.model = (
-            regressor() if inspect.isclass(regressor)
-            else regressor
+            regressor() if inspect.isclass(regressor) else regressor
         )
 
         self.bounds = []
@@ -45,15 +52,15 @@ class BayesianAlgorithm(SearchAlgorithm):
         self.bounds = np.array(self.bounds)
 
         self.X = np.empty(shape=(0, len(self.search_space)))
-        self.y = np.empty(shape=(0, ))
+        self.y = np.empty(shape=(0,))
         self.random_generator = np.random.RandomState(0)
         self.n_warmup = 5
         self.acq_function = (
             acq_function
             if isinstance(self.model, GaussianProcessRegressor)
-            else 'mc'
+            else "mc"
         )
-        self._name = f'Bayesian<{type(self.model).__name__}({self.acq_function})>'
+        self._name = f"Bayesian<{type(self.model).__name__}({self.acq_function})>"
         self._ask_gen = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
@@ -96,9 +103,10 @@ class BayesianAlgorithm(SearchAlgorithm):
         random_samples = [
             Configuration(
                 {
-                    p.name: p.accept(randomizer) for p in self.search_space
+                    p.name: p.accept(randomizer)
+                    for p in self.search_space
                 },
-                requestor=self.name
+                requestor=self.name,
             )
             for _ in range(n)
         ]
@@ -113,8 +121,7 @@ class BayesianAlgorithm(SearchAlgorithm):
             for c in x:
                 configurations.append(
                     Configuration(
-                        self._to_gt_config(c),
-                        requestor=self.name
+                        self._to_gt_config(c), requestor=self.name
                     )
                 )
             yield configurations
@@ -124,14 +131,16 @@ class BayesianAlgorithm(SearchAlgorithm):
         yhat = self.model.predict(self.X)
         best = min(yhat)
 
-        if self.acq_function == 'mc':
+        if self.acq_function == "mc":
             mean = self.model.predict(X_samples)
-            warnings.warn('Not correct acquisition function, research only')
+            warnings.warn(
+                "Not correct acquisition function, research only"
+            )
             negative = np.where(mean - best < 0)
             mean[negative] = 0
             return mean - best
 
-        if self.acq_function == 'lfboei':
+        if self.acq_function == "lfboei":
             # https://arxiv.org/abs/2206.13035
             tau = np.quantile(self.y, q=0.33)
             classified = np.greater_equal(self.y, tau)
@@ -144,7 +153,9 @@ class BayesianAlgorithm(SearchAlgorithm):
             z = np.concatenate([z1, z0], axis=0)
             s1 = x1.shape[0]
             s0 = x0.shape[0]
-            w = np.concatenate([w1 * (s1 + s0) / s1, w0 * (s1 + s0) / s0], axis=0)
+            w = np.concatenate(
+                [w1 * (s1 + s0) / s1, w0 * (s1 + s0) / s0], axis=0
+            )
             w = w / np.mean(w)
 
             clf = RandomForestClassifier(n_jobs=-1)
@@ -152,7 +163,7 @@ class BayesianAlgorithm(SearchAlgorithm):
             y_pred = clf.predict_proba(X_samples)[:, 1]
             return y_pred
 
-        if self.acq_function == 'lfbopi':
+        if self.acq_function == "lfbopi":
             # https://arxiv.org/abs/2206.13035
             tau = np.quantile(self.y, q=0.33)
             classified = np.greater_equal(self.y, tau)
@@ -177,10 +188,11 @@ class BayesianAlgorithm(SearchAlgorithm):
     def opt_acquisition(self, n: int):
         n_warmup = 10000
 
-        x_tries = self.random_generator.uniform(self.bounds[:, 0],
-                                                self.bounds[:, 1],
-                                                size=(n_warmup,
-                                                      self.bounds.shape[0]))
+        x_tries = self.random_generator.uniform(
+            self.bounds[:, 0],
+            self.bounds[:, 1],
+            size=(n_warmup, self.bounds.shape[0]),
+        )
 
         scores = self.acquisition(x_tries)
         minima_x = x_tries[scores.argsort()[:n]]

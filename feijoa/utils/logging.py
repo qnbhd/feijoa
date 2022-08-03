@@ -34,10 +34,20 @@ def init(verbose=False):
         format="%(message)s",
         datefmt="[%X]",
         handlers=[
-            RichHandler(rich_tracebacks=True,
-                        markup=True,
-                        enable_link_path=False)
+            RichHandler(
+                rich_tracebacks=True,
+                markup=True,
+                enable_link_path=False,
+            )
         ],
     )
 
-    logging.getLogger("executor").setLevel(logging.CRITICAL)
+    excluded_loggers = (
+        "numba",
+        "matplotlib",
+        "executor",
+    )
+
+    for log_name in excluded_loggers:
+        other_log = logging.getLogger(log_name)
+        other_log.setLevel(logging.WARNING)
