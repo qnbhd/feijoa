@@ -20,10 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import abc
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-from feijoa.search.space import SearchSpace
 from feijoa.models import Experiment
+from feijoa.search.space import SearchSpace
+
 
 __all__ = ["Storage"]
 
@@ -90,10 +92,10 @@ class Storage(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def get_experiments_count(self, job) -> int:
+    def get_experiments_count(self, job_id) -> int:
         """
 
-        :param job:
+        :param job_id:
         :return:
         """
 
@@ -111,7 +113,7 @@ class Storage(metaclass=abc.ABCMeta):
         if not experiments:
             return None
 
-        return min(experiments, key=lambda x: x.objective_result)
+        return min(experiments, key=lambda x: x.objective_result)  # type: ignore
 
     def top_experiments(self, job_id, n) -> List[Experiment]:
         """
@@ -123,8 +125,8 @@ class Storage(metaclass=abc.ABCMeta):
 
         experiments = self.get_experiments_by_job_id(job_id)
 
-        experiments.sort(key=lambda x: x.objective_result)
-        return experiments[:min(len(experiments), n)]
+        experiments.sort(key=lambda x: x.objective_result)  # type: ignore
+        return experiments[: min(len(experiments), n)]
 
     def get_search_space_by_job_id(self, job_id) -> SearchSpace:
         """

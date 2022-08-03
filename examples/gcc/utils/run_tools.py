@@ -1,27 +1,37 @@
+from contextlib import suppress
+from functools import partial
 import hashlib
 import logging
 import os
+from os.path import abspath
+from os.path import dirname
 import platform
 import random
-from contextlib import suppress
-from functools import partial
-from os.path import abspath, dirname
-from typing import Optional, Tuple, Union
-
-import numpy
+from typing import Optional
+from typing import Tuple
+from typing import Union
 
 from feijoa.utils.imports import ImportWrapper
+import numpy
+
 
 with ImportWrapper():
     from executor import ExternalCommandFailed, execute
 
-from feijoa import Experiment, SearchSpace, create_job, load_job
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import load_job
+from feijoa import SearchSpace
 from feijoa.search import ParametersVisitor
-from feijoa.search.parameters import Categorical, Integer, Parameter, Real
+from feijoa.search.parameters import Categorical
+from feijoa.search.parameters import Integer
+from feijoa.search.parameters import Parameter
+from feijoa.search.parameters import Real
+
 
 log = logging.getLogger(__name__)
 
-ERROR_RESULT = float('+inf')
+ERROR_RESULT = float("+inf")
 
 
 class GccRenderer(ParametersVisitor):
@@ -43,14 +53,18 @@ class GccRenderer(ParametersVisitor):
     def visit_real(self, p: Real) -> Optional[str]:
         return self.visit_common(p)
 
-    def visit_categorical(self, p: Categorical, **kwargs) -> Optional[str]:
+    def visit_categorical(
+        self, p: Categorical, **kwargs
+    ) -> Optional[str]:
         value = self.get_value(p)
         if value:
             return f"{value}"
         return None
 
 
-def render(experiment: Experiment, space: SearchSpace, renderer_cls) -> str:
+def render(
+    experiment: Experiment, space: SearchSpace, renderer_cls
+) -> str:
     renderer = renderer_cls(experiment)
 
     rendered = list()
@@ -80,36 +94,44 @@ def run_command_and_capture_stdout(command: str) -> Optional[str]:
         return None
 
 
-def compile_source(toolchain: str, source_file: str, rendered_opts,
-                   out_file: str) -> Optional[float]:
+def compile_source(
+    toolchain: str, source_file: str, rendered_opts, out_file: str
+) -> Optional[float]:
 
     system_name = platform.system()
 
     if system_name == "Linux":
-        compile_cmd = (f"/usr/bin/time -f '%e' {toolchain} -o"
-                       f" {out_file} {source_file} {rendered_opts} 2>&1")
+        compile_cmd = (
+            f"/usr/bin/time -f '%e' {toolchain} -o"
+            f" {out_file} {source_file} {rendered_opts} 2>&1"
+        )
 
     elif system_name == "Darwin":
         # gnu-time is required
-        compile_cmd = (f"/usr/local/bin/gtime -f '%e' {toolchain} -o"
-                       f" {out_file} {source_file} {rendered_opts} 2>&1")
+        compile_cmd = (
+            f"/usr/local/bin/gtime -f '%e' {toolchain} -o"
+            f" {out_file} {source_file} {rendered_opts} 2>&1"
+        )
 
     else:
         raise RuntimeError()
 
     stdout = run_command_and_capture_stdout(compile_cmd)
 
-    try:
+    if (
+        stdout is not None
+        and stdout.lstrip("-").replace(".", "").isdigit()
+    ):
         compile_time = float(stdout)
-    except (ValueError, TypeError):
+    else:
         return None
 
     return compile_time
 
 
 def run_binary(
-        binary_name,
-        iterations) -> Optional[Tuple[float, float, float, float, float]]:
+    binary_name, iterations
+) -> Optional[Tuple[float, float, float, float, float]]:
     system_name = platform.system()
 
     if system_name == "Linux":
@@ -120,7 +142,7 @@ def run_binary(
     else:
         raise RuntimeError()
 
-    buff = numpy.array([])
+    buff: numpy.ndarray = numpy.array([])
     for _ in range(iterations):
         stdout = run_command_and_capture_stdout(run_cmd)
 
@@ -143,10 +165,12 @@ def run_binary(
     return run_time, std, cv, low, high
 
 
-def get_binary_size(binary_name) -> float:
+def get_binary_size(binary_name) -> Optional[float]:
     size_cmd = "wc -c {} | awk {}".format(binary_name, "'{print $1}'")
     size_out = run_command_and_capture_stdout(size_cmd)
-    return int(size_out)
+    if size_out is not None and size_out.isdigit():
+        return int(size_out)
+    return None
 
 
 def objective(
@@ -169,8 +193,9 @@ def objective(
 
     experiment.metrics = metrics
 
-    config_hash = hashlib.sha256(str(hash(
-        experiment.json())).encode()).hexdigest()
+    config_hash = hashlib.sha256(
+        str(hash(experiment.json())).encode()
+    ).hexdigest()
 
     # TODO: check if file is exists and remove random.randint
     binary_out = config_hash + str(random.randint(1, 99999)) + ".out"
@@ -178,8 +203,9 @@ def objective(
 
     rendered_opts = render(experiment, search_space, GccRenderer)
 
-    compile_result = compile_source(toolchain, source_file, rendered_opts,
-                                    binary_out)
+    compile_result = compile_source(
+        toolchain, source_file, rendered_opts, binary_out
+    )
 
     if not compile_result:
         with suppress(FileNotFoundError):
@@ -204,7 +230,9 @@ def objective(
 
     size = get_binary_size(binary_out)
 
-    experiment.metrics["size"] = size
+    if not size:
+        os.remove(binary_out)
+        return experiment.metrics[objective_metric]
 
     os.remove(binary_out)
     return experiment.metrics[objective_metric]
@@ -231,11 +259,17 @@ def run_baselines(toolchain, source_file, iterations):
     )
 
     run_time_o3, std_o3, cv_o3, low_o3, high_o3 = run_binary(
-        os.path.join(dirname(abspath(__file__)), "baselineO3.out"), iterations)
+        os.path.join(dirname(abspath(__file__)), "baselineO3.out"),
+        iterations,
+    )
     run_time_o2, std_o2, cv_o2, low_o2, high_o2 = run_binary(
-        os.path.join(dirname(abspath(__file__)), "baselineO2.out"), iterations)
+        os.path.join(dirname(abspath(__file__)), "baselineO2.out"),
+        iterations,
+    )
     run_time_o1, std_o1, cv_o1, low_o1, high_o1 = run_binary(
-        os.path.join(dirname(abspath(__file__)), "baselineO1.out"), iterations)
+        os.path.join(dirname(abspath(__file__)), "baselineO1.out"),
+        iterations,
+    )
 
     baselines = {
         "O3": {
@@ -264,9 +298,18 @@ def run_baselines(toolchain, source_file, iterations):
     return baselines
 
 
-def run_gcc(job, toolchain, iterations, n_trials, source_file,
-            objective_metric):
-    job.setup_default_algo()
+def run_gcc(
+    job,
+    toolchain,
+    iterations,
+    n_trials,
+    source_file,
+    objective_metric,
+    algorithms=None,
+):
+
+    # noinspection PyProtectedMember
+    job._load_algo(algo_list=algorithms)
 
     baselines = run_baselines(toolchain, source_file, iterations)
 
@@ -283,7 +326,7 @@ def run_gcc(job, toolchain, iterations, n_trials, source_file,
         obj,
         n_trials=n_trials,
         n_proc=-1,
-        algo_list=['bayesian', 'template', 'random'],
+        algo_list=["bayesian", "template", "random"],
         use_numba_jit=False,
     )
 
@@ -299,11 +342,21 @@ def run_job(
     storage,
     job_name,
     objective_metric,
+    *algorithms,
 ):
+    algorithms = algorithms or ["bayesian"]
     space = SearchSpace.from_yaml_file(search_space_file)
-    job = create_job(search_space=space, storage=storage, name=job_name)
-    baselines, job = run_gcc(job, toolchain, iterations, n_trials, source_file,
-                             objective_metric)
+    job = create_job(
+        search_space=space, storage=storage, name=job_name
+    )
+    baselines, job = run_gcc(
+        job,
+        toolchain,
+        iterations,
+        n_trials,
+        source_file,
+        objective_metric,
+    )
     return baselines, job
 
 
@@ -319,6 +372,12 @@ def continue_job(
 ):
     space = SearchSpace.from_yaml_file(search_space_file)
     job = load_job(search_space=space, storage=storage, name=job_name)
-    baselines, job = run_gcc(job, toolchain, iterations, n_trials, source_file,
-                             objective_metric)
+    baselines, job = run_gcc(
+        job,
+        toolchain,
+        iterations,
+        n_trials,
+        source_file,
+        objective_metric,
+    )
     return baselines, job

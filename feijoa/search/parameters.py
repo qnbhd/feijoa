@@ -21,7 +21,14 @@
 # SOFTWARE.
 import abc
 
-__all__ = ["Parameter", "Integer", "Real", "Categorical", "ParametersVisitor"]
+
+__all__ = [
+    "Parameter",
+    "Integer",
+    "Real",
+    "Categorical",
+    "ParametersVisitor",
+]
 
 from feijoa.exceptions import ParametersIncorrectInputValues
 
@@ -63,18 +70,23 @@ class Integer(Parameter):
         super().__init__(name)
 
         if not isinstance(low, int) or not isinstance(high, int):
-            raise ParametersIncorrectInputValues("Low and High bounds for"
-                                                 " Integer parameter"
-                                                 " must be ints.")
+            raise ParametersIncorrectInputValues(
+                "Low and High bounds for"
+                " Integer parameter"
+                " must be ints."
+            )
         if low > high:
-            raise ParametersIncorrectInputValues("High bound must"
-                                                 " be greater than low bound.")
+            raise ParametersIncorrectInputValues(
+                "High bound must" " be greater than low bound."
+            )
 
         self.low = low
         self.high = high
 
     def __repr__(self):
-        return f"Integer('{self.name}, low={self.low}, high={self.high})"
+        return (
+            f"Integer('{self.name}, low={self.low}, high={self.high})"
+        )
 
     def accept(self, v):
         return v.visit_integer(self)
@@ -86,15 +98,15 @@ class Integer(Parameter):
         return True
 
     def get_unit_value(self, value):
-        return float(value -
-                     (self.low - 0.4999)) / float((self.high + 0.4999) -
-                                                  (self.low - 0.4999))
+        return float(value - (self.low - 0.4999)) / float(
+            (self.high + 0.4999) - (self.low - 0.4999)
+        )
 
     @property
     def meta(self):
         m = {
-            'low': self.low,
-            'high': self.high,
+            "low": self.low,
+            "high": self.high,
         }
         return m
 
@@ -104,19 +116,24 @@ class Real(Parameter):
         super().__init__(name)
 
         if not isinstance(low, float) or not isinstance(high, float):
-            raise ParametersIncorrectInputValues("Low and High bounds for"
-                                                 " Float parameter"
-                                                 " must be floats.")
+            raise ParametersIncorrectInputValues(
+                "Low and High bounds for"
+                " Float parameter"
+                " must be floats."
+            )
 
         if low > high:
-            raise ParametersIncorrectInputValues("High bound must"
-                                                 " be greater than low bound.")
+            raise ParametersIncorrectInputValues(
+                "High bound must" " be greater than low bound."
+            )
 
         self.low = low
         self.high = high
 
     def __repr__(self):
-        return f"Real('{self.name}', low={self.low}, high={self.high})"
+        return (
+            f"Real('{self.name}', low={self.low}, high={self.high})"
+        )
 
     def accept(self, v):
         return v.visit_real(self)
@@ -133,8 +150,8 @@ class Real(Parameter):
     @property
     def meta(self):
         m = {
-            'low': self.low,
-            'high': self.high,
+            "low": self.low,
+            "high": self.high,
         }
         return m
 
@@ -146,10 +163,12 @@ class Categorical(Parameter):
         if not choices:
             raise ParametersIncorrectInputValues(
                 "Choices for Categorical"
-                " parameter must be not empty.")
+                " parameter must be not empty."
+            )
         if len(choices) != len(set(choices)):
-            raise ParametersIncorrectInputValues("Choices for Categorical"
-                                                 " parameter must unique.")
+            raise ParametersIncorrectInputValues(
+                "Choices for Categorical" " parameter must unique."
+            )
         self.choices = choices
 
     def __repr__(self):
@@ -169,9 +188,7 @@ class Categorical(Parameter):
 
     @property
     def meta(self):
-        m = {
-            'choices': self.choices
-        }
+        m = {"choices": self.choices}
         return m
 
 

@@ -1,13 +1,14 @@
+from datetime import datetime
 import json
 import logging
 import sys
-from datetime import datetime
 
 import click
-
-from utils.extractor import extract
-from utils.run_tools import continue_job, run_job
 from feijoa.utils.logging import init
+from utils.extractor import extract
+from utils.run_tools import continue_job
+from utils.run_tools import run_job
+
 
 print(sys.path)
 
@@ -31,8 +32,15 @@ def cli():
 @click.option("--n-trials", type=int, default=100)
 @click.option("--storage", type=str, default=f"sqlite:///{now}.db")
 @click.option("--job-name", type=str, default=now)
-def run_cmd(toolchain, search_space, source_file, n_trials, iterations,
-            storage, job_name):
+def run_cmd(
+    toolchain,
+    search_space,
+    source_file,
+    n_trials,
+    iterations,
+    storage,
+    job_name,
+):
     init(verbose=True)
     baselines, job = run_job(
         toolchain,
@@ -56,8 +64,15 @@ def run_cmd(toolchain, search_space, source_file, n_trials, iterations,
 @click.option("--iterations", type=int, default=5)
 @click.option("--storage", type=str, required=True)
 @click.option("--job-name", type=str, required=True)
-def continue_cmd(toolchain, search_space, source_file, n_trials, iterations,
-                 storage, job_name):
+def continue_cmd(
+    toolchain,
+    search_space,
+    source_file,
+    n_trials,
+    iterations,
+    storage,
+    job_name,
+):
     init(verbose=True)
     baselines, job = continue_job(
         toolchain,
@@ -77,7 +92,9 @@ def continue_cmd(toolchain, search_space, source_file, n_trials, iterations,
 @click.command(name="extract")
 @click.option("--toolchain", type=str, required=True)
 @click.option("--captured-cache", type=str)
-@click.option("--out-file", type=str, default="extracted_search_space.yaml")
+@click.option(
+    "--out-file", type=str, default="extracted_search_space.yaml"
+)
 def extract_cmd(toolchain, captured_cache, out_file):
     extract(toolchain)
 

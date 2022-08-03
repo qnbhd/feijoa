@@ -19,11 +19,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
 from collections import deque
+import logging
 
 from feijoa.search.algorithms.algorithm import SearchAlgorithm
 from feijoa.search.meta import MetaSearchAlgorithm
+
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +42,8 @@ class RoundRobinMeta(MetaSearchAlgorithm):
         - experiments_factory
     """
 
-    anchor = 'roundrobin'
-    aliases = ('roundrobin', )
+    anchor = "roundrobin"
+    aliases = ("roundrobin",)
 
     def __init__(self, *algorithms):
         super().__init__(*algorithms)

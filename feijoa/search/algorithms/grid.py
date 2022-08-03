@@ -19,16 +19,20 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
 from itertools import product
-from typing import List, Optional, Generator
-
-import numpy
+import logging
+from typing import Generator
+from typing import List
+from typing import Optional
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.search.parameters import (Categorical, Integer,
-                                         ParametersVisitor, Real)
+from feijoa.search.parameters import Categorical
+from feijoa.search.parameters import Integer
+from feijoa.search.parameters import ParametersVisitor
+from feijoa.search.parameters import Real
+import numpy
+
 
 __all__ = ["GridSearch"]
 
@@ -44,7 +48,11 @@ class GridMaker(ParametersVisitor):
 
     def visit_real(self, p: Real):
         return numpy.round(
-            numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS), 2)
+            numpy.arange(
+                p.low, p.high + GridMaker.EPS, GridMaker.EPS
+            ),
+            2,
+        )
 
     def visit_categorical(self, p: Categorical):
         return p.choices
@@ -52,13 +60,18 @@ class GridMaker(ParametersVisitor):
 
 class GridSearch(SearchAlgorithm):
 
-    anchor = 'grid'
-    aliases = ('GridSearch', 'grid', )
+    anchor = "grid"
+    aliases = (
+        "GridSearch",
+        "grid",
+    )
 
     def __init__(self, search_space, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.search_space = search_space
-        grids = [p.accept(GridMaker()) for p in self.search_space.params]
+        grids = [
+            p.accept(GridMaker()) for p in self.search_space.params
+        ]
         self.prod_iter = product(*grids)
         self._ask_gen = None
 
@@ -72,7 +85,7 @@ class GridSearch(SearchAlgorithm):
         while True:
             cfgs = []
 
-            for i in range(n):
+            for _ in range(n):
                 try:
                     generation = next(self.prod_iter)
                 except StopIteration:

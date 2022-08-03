@@ -1,6 +1,8 @@
 import copy
 import logging
-from typing import List, Optional
+from typing import Generator
+from typing import List
+from typing import Optional
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.algorithms import SearchAlgorithm
@@ -8,31 +10,36 @@ from feijoa.search.parameters import Integer
 from feijoa.search.space import SearchSpace
 from feijoa.search.visitors import Randomizer
 
+
 log = logging.getLogger(__name__)
 
 
 class TemplateSearchAlgorithm(SearchAlgorithm):
 
-    anchor = 'template'
-    aliases = ('TemplateSearch', 'template')
+    anchor = "template"
+    aliases = ("TemplateSearch", "template")
 
     def __init__(self, search_space: SearchSpace, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.search_space = search_space
         self.step_size = 0.1
-        self.results = []
-        self._ask_gen = None
+        self.results: List[tuple] = []
+        self._ask_gen: Optional[Generator] = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
         if not self._ask_gen:
-            log.debug('Parameter `n` does not affect on configuration\'s count,'
-                      f' because {self.__class__.__name__} is sequential.')
-            self._ask_gen = self._ask()
+            log.debug(
+                "Parameter `n` does not affect on configuration's count,"
+                f" because {self.__class__.__name__} is sequential."
+            )
+            self._ask_gen = self._ask(n)
         return next(self._ask_gen)
 
-    def _ask(self):
+    def _ask(self, n: int) -> Generator:
         randomizer = Randomizer()
-        center = {p.name: p.accept(randomizer) for p in self.search_space}
+        center = {
+            p.name: p.accept(randomizer) for p in self.search_space
+        }
         yield [Configuration(center, requestor=self.name)]
 
         def set_unit_value(p, config, uv):
@@ -57,20 +64,34 @@ class TemplateSearchAlgorithm(SearchAlgorithm):
             for param in self.search_space:
                 if param.is_primitive():
 
-                    unit_value = param.get_unit_value(center[param.name])
+                    unit_value = param.get_unit_value(
+                        center[param.name]
+                    )
 
                     if unit_value > 0.0:
                         down_cfg = copy.copy(center)
-                        set_unit_value(param, down_cfg,
-                                       min(1.0, unit_value - self.step_size))
-                        yield [Configuration(down_cfg, requestor=self.name)]
+                        set_unit_value(
+                            param,
+                            down_cfg,
+                            min(1.0, unit_value - self.step_size),
+                        )
+                        yield [
+                            Configuration(
+                                down_cfg, requestor=self.name
+                            )
+                        ]
                         points.append(down_cfg)
 
                     if unit_value < 1.0:
                         up_cfg = copy.copy(center)
-                        set_unit_value(param, up_cfg,
-                                       min(1.0, unit_value + self.step_size))
-                        yield [Configuration(up_cfg, requestor=self.name)]
+                        set_unit_value(
+                            param,
+                            up_cfg,
+                            min(1.0, unit_value + self.step_size),
+                        )
+                        yield [
+                            Configuration(up_cfg, requestor=self.name)
+                        ]
                         points.append(up_cfg)
 
                 else:

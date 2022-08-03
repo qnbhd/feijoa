@@ -1,25 +1,19 @@
-import plotly
+from feijoa import Real
+from feijoa import SearchSpace
+from feijoa.jobs.job import create_job
 import plotly.graph_objs as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-
-import numpy as np
-import pandas as pd
-
-from feijoa import SearchSpace, Real
-from feijoa.jobs.job import Job, create_job
 
 
 def plot_optimization_history(
-    job: Job,
-    mode='lines+markers',
+    job,
+    mode="lines+markers",
     name=None,
     fig=None,
     only_best=True,
 ):
     df = job.get_dataframe(desc=True)
-    obj = df['objective_result']
-    iterations = df['id']
+    obj = df["objective_result"]
+    iterations = df["id"]
     name = name or job.name
 
     fig = fig or go.Figure()
@@ -29,7 +23,7 @@ def plot_optimization_history(
             x=iterations,
             y=obj,
             mode=mode,
-            name=f'{name} bests',
+            name=f"{name} bests",
         )
     )
 
@@ -37,17 +31,17 @@ def plot_optimization_history(
         full_df = job.get_dataframe()
         fig.add_trace(
             go.Scatter(
-                x=full_df['id'],
-                y=full_df['objective_result'],
-                mode='markers',
+                x=full_df["id"],
+                y=full_df["objective_result"],
+                mode="markers",
                 name=name,
             )
         )
 
     fig.update_layout(
-        title='Optimization history plot',
-        xaxis_title='Iteration',
-        yaxis_title='Objective value'
+        title="Optimization history plot",
+        xaxis_title="Iteration",
+        yaxis_title="Objective value",
     )
 
     return fig
@@ -55,12 +49,12 @@ def plot_optimization_history(
 
 def plot_compare_jobs(
     *jobs,
-    mode='lines+markers',
+    mode="lines+markers",
     fig=None,
     names=None,
 ):
     if isinstance(names, list) and len(names) != len(jobs):
-        raise ValueError(f'Names must contains {len(jobs)} values.')
+        raise ValueError(f"Names must contains {len(jobs)} values.")
 
     names = names or [job.name for job in jobs]
 
@@ -75,8 +69,11 @@ def plot_compare_jobs(
 def objective(experiment):
     x = experiment.params.get("x")
     y = experiment.params.get("y")
-    return ((1.5 - x + x * y)**2 + (2.25 - x + x * y**2)**2 +
-            (2.625 - x + x * y**3)**2)
+    return (
+        (1.5 - x + x * y) ** 2
+        + (2.25 - x + x * y**2) ** 2
+        + (2.625 - x + x * y**3) ** 2
+    )
 
 
 def main():
@@ -92,5 +89,5 @@ def main():
     fig.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

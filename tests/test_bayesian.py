@@ -1,5 +1,8 @@
-from feijoa import Categorical, Integer, Real, SearchSpace, create_job
-from feijoa.models import Result
+from feijoa import Categorical
+from feijoa import create_job
+from feijoa import Integer
+from feijoa import Real
+from feijoa import SearchSpace
 from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 
 
@@ -38,17 +41,20 @@ def test_specify_acq_bayesian_search():
 
     job = create_job(search_space=space)
 
-    a_ei = BayesianAlgorithm(search_space=job.search_space,
-                             acq_function='ei')
+    a_ei = BayesianAlgorithm(
+        search_space=job.search_space, acq_function="ei"
+    )
 
     job.do(objective, n_trials=10, algo_list=[a_ei])
 
-    a_poi = BayesianAlgorithm(search_space=job.search_space,
-                              acq_function='poi')
+    a_poi = BayesianAlgorithm(
+        search_space=job.search_space, acq_function="poi"
+    )
 
     job.do(objective, n_trials=10, algo_list=[a_poi])
 
-    a_ucb = BayesianAlgorithm(search_space=job.search_space,
-                              acq_function='ucb')
+    a_ucb = BayesianAlgorithm(
+        search_space=job.search_space, acq_function="ucb"
+    )
 
     job.do(objective, n_trials=10, algo_list=[a_ucb])

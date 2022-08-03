@@ -20,23 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import contextlib
+from functools import lru_cache
+import importlib.util
 import inspect
+from itertools import chain
 import pathlib
 import sys
-from functools import lru_cache
-from itertools import chain
-import importlib.util
 
 from feijoa import __feijoa_folder__
-from feijoa.exceptions import SearchAlgorithmNotFoundedError, PackageNotInstalledError
+from feijoa.exceptions import PackageNotInstalledError
+from feijoa.exceptions import SearchAlgorithmNotFoundedError
 from feijoa.search.algorithms.algorithm import SearchAlgorithm
 
-ALGORITHMS_FOLDER = pathlib.Path(__feijoa_folder__) / 'search' / 'algorithms'
-INTEGRATION_FOLDER = pathlib.Path(__feijoa_folder__).parent / 'integration' / 'algorithms'
+
+ALGORITHMS_FOLDER = (
+    pathlib.Path(__feijoa_folder__) / "search" / "algorithms"
+)
+INTEGRATION_FOLDER = (
+    pathlib.Path(__feijoa_folder__).parent
+    / "integration"
+    / "algorithms"
+)
 
 
 @lru_cache(maxsize=None)
-def fetch_algorithms(**folders):
+def fetch_algorithms(only_anchors=False, **folders):
     """
     Fetch algorithm from specified algorithms folders.
 
@@ -55,14 +63,17 @@ def fetch_algorithms(**folders):
     pool = dict()
 
     target = (
-        script for script in chain(
-            *[folder.rglob('*.py') for folder in folders]
+        script
+        for script in chain(
+            *[folder.rglob("*.py") for folder in folders]
         )
-        if '__' not in script.name
+        if "__" not in script.name
     )
 
     for script in target:
-        spec = importlib.util.spec_from_file_location(script.stem, str(script))
+        spec = importlib.util.spec_from_file_location(
+            script.stem, str(script)
+        )
         module = importlib.util.module_from_spec(spec)
         sys.modules[module.__name__] = module
 
@@ -71,22 +82,21 @@ def fetch_algorithms(**folders):
 
         iterable = (
             obj
-            for obj in inspect.getmembers(
-                module,
-                inspect.isclass
-            )
+            for obj in inspect.getmembers(module, inspect.isclass)
             if (
-                obj[1].__module__ == module.__name__ and
-                issubclass(obj[1], SearchAlgorithm)
+                obj[1].__module__ == module.__name__
+                and issubclass(obj[1], SearchAlgorithm)
             )
         )
 
         for name, cls in iterable:
-            pool[name] = cls
             pool[cls.anchor] = cls
 
-            for al in cls.aliases:
-                pool[al] = cls
+            if not only_anchors:
+                pool[name] = cls
+
+                for al in cls.aliases:
+                    pool[al] = cls
 
     return pool
 

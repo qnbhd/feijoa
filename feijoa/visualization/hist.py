@@ -1,6 +1,7 @@
+from feijoa import create_job
+from feijoa import Real
+from feijoa import SearchSpace
 import plotly.graph_objs as go
-
-from feijoa import SearchSpace, Real, create_job
 
 
 def plot_objective_hist(
@@ -10,21 +11,25 @@ def plot_objective_hist(
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
 
-    fig.add_histogram(x=df['objective_result'], nbinsx=100)
+    fig.add_histogram(x=df["objective_result"], nbinsx=100)
 
     fig.update_layout(
-        title='Objective result histogram',
-        xaxis_title='Objective value',
-        yaxis_title='Count'
+        title="Objective result histogram",
+        xaxis_title="Objective value",
+        yaxis_title="Count",
     )
 
     return fig
 
+
 def objective(experiment):
     x = experiment.params.get("x")
     y = experiment.params.get("y")
-    return ((1.5 - x + x * y)**2 + (2.25 - x + x * y**2)**2 +
-            (2.625 - x + x * y**3)**2)
+    return (
+        (1.5 - x + x * y) ** 2
+        + (2.25 - x + x * y**2) ** 2
+        + (2.625 - x + x * y**3) ** 2
+    )
 
 
 def main():
@@ -38,7 +43,7 @@ def main():
         objective,
         n_proc=-1,
         n_trials=2000,
-        algo_list=['grid'],
+        algo_list=["grid"],
         progress_bar=True,
         use_numba_jit=True,
     )
@@ -47,5 +52,5 @@ def main():
     fig.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

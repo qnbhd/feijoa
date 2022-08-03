@@ -1,7 +1,9 @@
-from unittest.mock import patch
-
-from feijoa import (Categorical, Experiment, Integer,
-                       Real, SearchSpace, create_job)
+from feijoa import Categorical
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import Integer
+from feijoa import Real
+from feijoa import SearchSpace
 
 
 def faked_random(nums):
@@ -33,15 +35,14 @@ def test_random_search():
         x = params.get("x")
         y = params.get("y")
 
-        return (1 - x)**2 + (1 - y)**2
+        return (1 - x) ** 2 + (1 - y) ** 2
 
     job = create_job(search_space=space)
     job.do(objective, n_trials=10, algo_list=["random"])
 
     assert job.best_parameters == {
-        'w': 'foo',
-        'x': 0.8444218515250481,
-        'y': 0.7579544029403025,
-        'z': 1,
+        "w": "foo",
+        "x": 0.8444218515250481,
+        "y": 0.7579544029403025,
+        "z": 1,
     }
-

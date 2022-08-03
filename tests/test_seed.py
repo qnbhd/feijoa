@@ -1,4 +1,7 @@
-from feijoa import Experiment, Real, SearchSpace, create_job
+from feijoa import create_job
+from feijoa import Experiment
+from feijoa import Real
+from feijoa import SearchSpace
 
 
 # noinspection DuplicatedCode
@@ -13,7 +16,7 @@ def test_seed():
         x = params.get("x", 5.0)
         y = params.get("y", 5.0)
 
-        return (1 - x)**2 + (1 - y)**2
+        return (1 - x) ** 2 + (1 - y) ** 2
 
     job = create_job(search_space=space)
     job.add_seed({"x": 1.0, "y": 1.0})

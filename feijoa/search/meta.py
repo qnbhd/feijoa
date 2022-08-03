@@ -1,16 +1,18 @@
 import abc
 import logging
-from typing import Optional, List, Generator
+from typing import Generator
+from typing import List
+from typing import Optional
 
-from feijoa.search.algorithms.seed import SeedAlgorithm
 from feijoa.models.configuration import Configuration
 from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.seed import SeedAlgorithm
+
 
 log = logging.getLogger(__name__)
 
 
 class MetaSearchAlgorithm(SearchAlgorithm):
-
     def __init__(self, *algorithms, **kwargs):
         super().__init__(*algorithms, **kwargs)
         self.algorithms = list(algorithms)
@@ -22,15 +24,16 @@ class MetaSearchAlgorithm(SearchAlgorithm):
         return next(self.ask_gen)
 
     def _ask(self, n: int) -> Generator:
-        prev_picked = ''
-        seed_algorithms = [a for a in self.algorithms
-                           if isinstance(a, SeedAlgorithm)]
+        prev_picked = ""
+        seed_algorithms = [
+            a for a in self.algorithms if isinstance(a, SeedAlgorithm)
+        ]
 
         for algo in seed_algorithms:
             self.remove_algorithm(algo)
 
         if seed_algorithms:
-            log.debug('Let\'s measure seed configurations!')
+            log.debug("Let's measure seed configurations!")
             for algo in seed_algorithms:
                 configs = algo.ask(n)
                 yield configs
@@ -38,7 +41,7 @@ class MetaSearchAlgorithm(SearchAlgorithm):
         while True:
             for algo in self.order:
                 if not prev_picked or prev_picked != algo.name:
-                    log.debug(f'Pick {algo.name}')
+                    log.debug(f"Pick {algo.name}")
                 configs = algo.ask(n)
                 yield configs
                 prev_picked = algo.name

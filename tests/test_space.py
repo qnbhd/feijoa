@@ -1,7 +1,8 @@
-import pytest
-
 from feijoa.search import SearchSpace
+
+# noinspection PyProtectedMember,PyDeprecation
 from feijoa.search.space import from_yaml
+import pytest
 
 
 def test_space_from_yaml():
@@ -16,17 +17,17 @@ def test_space_from_yaml():
 - signature: iv-max-considered-uses
   type: integer
   range: [0, 1000]
-  
+
 - signature: foo
   type: integer
   low: 0
   high: 1000
-  
+
 - signature: boo
   type: real
   low: 0.0
   high: 1.0
-  
+
 - signature: zoo
   type: real
   range: [0.0, 10.0]
@@ -45,21 +46,27 @@ def test_space_from_yaml():
 
     space_from_file = SearchSpace.from_yaml_file("foo.yaml")
 
-    assert (str(space) == """SearchSpace:
-	Categorical('-O', choices=['-O1', '-O2', '-O3', None])
-	Categorical('align-functions', choices=['-falign-functions', '-fno-align-functions', None])
-	Integer('iv-max-considered-uses, low=0, high=1000)
-	Integer('foo, low=0, high=1000)
-	Real('boo', low=0.0, high=1.0)
-	Real('zoo', low=0.0, high=10.0)""")
+    assert (
+        str(space)
+        == """SearchSpace:
+    Categorical('-O', choices=['-O1', '-O2', '-O3', None])
+    Categorical('align-functions', choices=['-falign-functions', '-fno-align-functions', None])
+    Integer('iv-max-considered-uses, low=0, high=1000)
+    Integer('foo, low=0, high=1000)
+    Real('boo', low=0.0, high=1.0)
+    Real('zoo', low=0.0, high=10.0)"""
+    )
 
-    assert (str(space_from_file) == """SearchSpace:
-	Categorical('-O', choices=['-O1', '-O2', '-O3', None])
-	Categorical('align-functions', choices=['-falign-functions', '-fno-align-functions', None])
-	Integer('iv-max-considered-uses, low=0, high=1000)
-	Integer('foo, low=0, high=1000)
-	Real('boo', low=0.0, high=1.0)
-	Real('zoo', low=0.0, high=10.0)""")
+    assert (
+        str(space_from_file)
+        == """SearchSpace:
+    Categorical('-O', choices=['-O1', '-O2', '-O3', None])
+    Categorical('align-functions', choices=['-falign-functions', '-fno-align-functions', None])
+    Integer('iv-max-considered-uses, low=0, high=1000)
+    Integer('foo, low=0, high=1000)
+    Real('boo', low=0.0, high=1.0)
+    Real('zoo', low=0.0, high=10.0)"""
+    )
 
 
 def test_incorrect_yaml_parameter_type():

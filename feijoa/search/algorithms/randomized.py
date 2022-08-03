@@ -19,21 +19,22 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import warnings
-from typing import List, Optional, Generator
+from typing import Generator
+from typing import List
+from typing import Optional
 
 from feijoa.models.configuration import Configuration
-from feijoa.models.experiment import Experiment
 from feijoa.search.algorithms import SearchAlgorithm
 from feijoa.search.visitors import Randomizer
+
 
 __all__ = ["RandomSearch"]
 
 
 class RandomSearch(SearchAlgorithm):
 
-    anchor = 'random'
-    aliases = ('RandomSearch', 'random', 'randomized')
+    anchor = "random"
+    aliases = ("RandomSearch", "random", "randomized")
 
     def __init__(self, search_space, *args, **kwargs):
         super().__init__(*args, **kwargs)

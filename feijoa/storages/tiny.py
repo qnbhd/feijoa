@@ -19,19 +19,24 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import List, Optional, NamedTuple
+from typing import List
+from typing import NamedTuple
+from typing import Optional
 
 from feijoa.utils.imports import ImportWrapper
+
 
 with ImportWrapper():
     from tinydb import Query, TinyDB
     from tinydb.table import Document
 
-from feijoa.search.space import SearchSpace
-from feijoa.exceptions import DBVersionError, InsertExperimentWithTheExistedId
+from feijoa.exceptions import DBVersionError
+from feijoa.exceptions import InsertExperimentWithTheExistedId
 from feijoa.models import Experiment
 from feijoa.models.configuration import Configuration
+from feijoa.search.space import SearchSpace
 from feijoa.storages.storage import Storage
+
 
 __all__ = ["TinyDBStorage"]
 
@@ -79,18 +84,22 @@ class TinyDBStorage(Storage):
             kind = p.__class__.__name__
             meta = p.meta
             param_model = {
-                'job_id': job.id,
-                'name': name,
-                'kind': kind,
-                'meta': meta,
+                "job_id": job.id,
+                "name": name,
+                "kind": kind,
+                "meta": meta,
             }
             self.parameters_table.insert(param_model)
 
     def get_search_space_by_job_id(self, job_id) -> SearchSpace:
-        parameters = self.parameters_table.search(Query().job_id == job_id)
+        parameters = self.parameters_table.search(
+            Query().job_id == job_id
+        )
         pool = list()
         for p in parameters:
-            mod = _Parameter(name=p['name'], kind=p['kind'], meta=p['meta'])
+            mod = _Parameter(
+                name=p["name"], kind=p["kind"], meta=p["meta"]
+            )
             pool.append(mod)
         return SearchSpace.from_db_parameters(pool)
 
@@ -112,7 +121,7 @@ class TinyDBStorage(Storage):
 
     def insert_experiment(self, experiment):
         doc = experiment.dict()
-        doc['requestor'] = experiment.params.requestor
+        doc["requestor"] = experiment.params.requestor
 
         if self.get_experiment(experiment.job_id, experiment.id):
             # TODO (qnbhd): make correct exception
@@ -121,15 +130,18 @@ class TinyDBStorage(Storage):
         self.experiments_table.insert(doc)
 
     def get_experiment(self, job_id, experiment_id):
-        q = self.experiments_table.search((Query().id == experiment_id)
-                                          & (Query().job_id == job_id))
+        q = self.experiments_table.search(
+            (Query().id == experiment_id) & (Query().job_id == job_id)
+        )
 
         if not q:
             return None
 
         exp = q[0]
-        exp['params'] = Configuration(exp['params'], requestor=exp['requestor'])
-        exp.pop('requestor')
+        exp["params"] = Configuration(
+            exp["params"], requestor=exp["requestor"]
+        )
+        exp.pop("requestor")
 
         return Experiment(**exp)
 
@@ -141,7 +153,9 @@ class TinyDBStorage(Storage):
         docs = self._get_raw_experiments(job_id)
         experiments = []
         for doc in docs:
-            doc['params'] = Configuration(doc['params'], requestor=doc['requestor'])
+            doc["params"] = Configuration(
+                doc["params"], requestor=doc["requestor"]
+            )
             # doc.pop('requestor')
             exp = Experiment(**doc)
             experiments.append(exp)
