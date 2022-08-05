@@ -62,7 +62,7 @@ from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
 
 
-__all__ = ["create_job", "load_job"]
+__all__ = ["Job", "create_job", "load_job"]
 
 from feijoa.utils.imports import ImportWrapper
 
@@ -429,13 +429,7 @@ class Job:
                 )
                 continue
 
-            container.append(
-                {
-                    **dataframe_dict,
-                    **params,
-                    **metrics,
-                }
-            )
+            container.append({**dataframe_dict, **params, **metrics})
 
         df = pd.DataFrame(container)
 

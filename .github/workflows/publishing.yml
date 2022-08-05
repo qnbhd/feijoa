@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  publishing:
     runs-on: ubuntu-latest
     if: github.repository == 'qnbhd/feijoa'
     steps:

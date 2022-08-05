@@ -1,6 +1,12 @@
 import numpy as np
 from numpy import float64
-import rsfanova
+
+from ..utils.imports import ImportWrapper
+
+
+with ImportWrapper():
+    import rsfanova
+
 from sklearn.preprocessing import LabelEncoder
 
 from ..jobs.job import Job
