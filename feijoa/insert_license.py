@@ -1,4 +1,5 @@
-# MIT License
+
+doc = '''# MIT License
 #
 # Copyright (c) 2021-2022 Templin Konstantin
 #
@@ -18,29 +19,26 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-from pprint import pformat
+# SOFTWARE.'''
 
+from pathlib import Path
 
-class Configuration(dict):
-    def __init__(
-        self,
-        *args,
-        requestor="UNKNOWN",
-        request_id="UNKNOWN",
-        **kwargs,
-    ):
-        super().__init__(*args, **kwargs)
-        self.requestor = requestor
-        self.request_id = request_id
+pathlist = (Path('').absolute().parent / 'tests').glob('**/*.py')
 
-    def __str__(self):
-        fmt = pformat(dict(self.items()))
-        return (
-            f"Configuration({fmt}, "
-            f"requestor={self.requestor}, "
-            f"request_id={self.request_id})"
-        )
+for path in [p for p in pathlist if not str(p).startswith('.')]:
+    path_in_str = str(path)
 
-    def __repr__(self):
-        return self.__str__()
+    fix_needed = False
+    w = ''
+
+    with open(path_in_str, 'r') as f:
+        content = f.read()
+
+        if 'MIT' not in content:
+            print(path_in_str)
+            fix_needed = True
+            w = '\n'.join([doc, content])
+
+    if fix_needed:
+        with open(path_in_str, 'w') as f:
+            f.write(w)
