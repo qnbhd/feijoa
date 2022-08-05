@@ -18,7 +18,6 @@ dependencies = [
     "rich>=10.11.0", "pydantic>=1.7.4",
     "mabalgs>=0.6.8", "plotly>=5.9.0",
     "PyYAML>=6.0", "scikit-learn>=0.24.2",
-    "importlib-metadata>=4.8.3",
     "joblib>=1.1.0",
     "SQLAlchemy>=1.4.39"
 ]
@@ -52,7 +51,7 @@ build-backend = "setuptools.build_meta"
 exclude = ["tests"]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.1.1", "isort>=5.10.1", "flake8>=4.0.1", "pytest-cov>=3.0.0"]
+dev = ["pytest>=7.0.1", "isort>=5.8.0", "flake8>=4.0.1", "pytest-cov>=3.0.0", "importlib-metadata"]
 all = ["click>=8.0.4", "numba>=0.53.1", "tinydb>=4.7.0", "executor>=23.2", "scikit-optimize>=0.9.0"]
 
 [tool.setuptools_scm]
