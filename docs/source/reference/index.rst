@@ -10,7 +10,8 @@ API Reference
     feijoa.models
     feijoa.search
     feijoa.search.algorithms
+    feijoa.search.parameters
     feijoa.storages
     feijoa.storages.rdb
-    feijoa.visuzalization
+    feijoa.visualization
     feijoa.utils

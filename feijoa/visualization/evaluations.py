@@ -1,27 +1,77 @@
+# MIT License
+#
+# Copyright (c) 2021-2022 Templin Konstantin
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
 from feijoa import create_job
 from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 from feijoa.search.algorithms.genetic import CMAES
 from feijoa.search.algorithms.genetic import PSO
+from feijoa.search.algorithms.pattern import PatternSearch
 from feijoa.search.algorithms.randomized import RandomSearch
-from feijoa.search.algorithms.templatesearch import (
-    TemplateSearchAlgorithm,
-)
 from feijoa.search.bandit import ThompsonSampler
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Real
 from feijoa.search.space import SearchSpace
 from feijoa.utils.logging import init
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
 
 
 def pad(string: str, width: int, filler=" ", fill_chars=3):
+    """Pads a string to a given width.
+
+    Args:
+        string (str):
+            String instance.
+        width (int):
+            Target width of string.
+        filler:
+            Fill places with specified char.
+        fill_chars:
+            Count of chars to fill.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     if len(string) <= width:
         return string
     return f"{string[:width - 3]}{filler * fill_chars}"
 
 
 def plot_evaluations(job, params=None):
+    """Plot evaluations of job.
+
+    Args:
+        job (Job):
+            Job instance.
+        params (list):
+            List of parameters to plot.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     df = job.get_dataframe(brief=True, only_good=True)
     objectives = df["objective_result"]
     df.drop(columns=["id", "objective_result"], inplace=True)
@@ -182,7 +232,7 @@ def main():
     space.insert(Categorical("fast", choices=["foo", "bar", "zoo"]))
 
     bayesian = BayesianAlgorithm(search_space=space)
-    template = TemplateSearchAlgorithm(search_space=space)
+    template = PatternSearch(search_space=space)
     cmaes = CMAES(search_space=space)
     pso_ = PSO(search_space=space)
     rnd = RandomSearch(search_space=space)
@@ -192,7 +242,7 @@ def main():
     job = create_job(search_space=space)
     job.do(
         objective,
-        n_proc=-1,
+        n_jobs=-1,
         n_trials=100,
         algo_list=[thompson],
         progress_bar=True,

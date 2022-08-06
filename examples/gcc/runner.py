@@ -1,9 +1,31 @@
+# MIT License
+#
+# Copyright (c) 2021-2022 Templin Konstantin
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 from datetime import datetime
 import json
 import logging
 import sys
 
 import click
+
 from feijoa.utils.logging import init
 from utils.extractor import extract
 from utils.run_tools import continue_job
@@ -59,14 +81,12 @@ def run_cmd(
 
 @click.command(name="continue")
 @click.option("--toolchain", type=str, required=True)
-@click.option("--search-space", type=str, required=True)
 @click.option("--source-file", type=str, required=True)
 @click.option("--iterations", type=int, default=5)
 @click.option("--storage", type=str, required=True)
 @click.option("--job-name", type=str, required=True)
 def continue_cmd(
     toolchain,
-    search_space,
     source_file,
     n_trials,
     iterations,
@@ -76,7 +96,6 @@ def continue_cmd(
     init(verbose=True)
     baselines, job = continue_job(
         toolchain,
-        search_space,
         source_file,
         n_trials,
         iterations,
@@ -91,11 +110,7 @@ def continue_cmd(
 
 @click.command(name="extract")
 @click.option("--toolchain", type=str, required=True)
-@click.option("--captured-cache", type=str)
-@click.option(
-    "--out-file", type=str, default="extracted_search_space.yaml"
-)
-def extract_cmd(toolchain, captured_cache, out_file):
+def extract_cmd(toolchain):
     extract(toolchain)
 
 

@@ -1,3 +1,26 @@
+# MIT License
+#
+# Copyright (c) 2021-2022 Templin Konstantin
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+"""Meta algorithm base class module."""
+
 import abc
 import logging
 from typing import Generator
@@ -13,6 +36,15 @@ log = logging.getLogger(__name__)
 
 
 class MetaSearchAlgorithm(SearchAlgorithm):
+    """Meta-search algorithm.
+
+    Used for pick up algorithms.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     def __init__(self, *algorithms, **kwargs):
         super().__init__(*algorithms, **kwargs)
         self.algorithms = list(algorithms)
@@ -25,9 +57,14 @@ class MetaSearchAlgorithm(SearchAlgorithm):
 
     def _ask(self, n: int) -> Generator:
         prev_picked = ""
+
+        # pick up all seed's algorithms
+
         seed_algorithms = [
             a for a in self.algorithms if isinstance(a, SeedAlgorithm)
         ]
+
+        # remove all seed's algorithms
 
         for algo in seed_algorithms:
             self.remove_algorithm(algo)
@@ -53,26 +90,42 @@ class MetaSearchAlgorithm(SearchAlgorithm):
             algo.tell(config, result)
 
     def add_algorithm(self, algo: SearchAlgorithm):
-        """
-        Append algorithm to algorithms list.
+        """Append algorithm to algorithms list.
 
-        :param algo: search algorithm instance.
-        :return: None
+        Args:
+            algo (SearchAlgorithm):
+                search algorithm instance.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         self.algorithms.append(algo)
 
     @abc.abstractmethod
     def remove_algorithm(self, algo: SearchAlgorithm):
-        """
-        Remove algorithm from inner techniques
+        """Remove algorithm from inner techniques
         pool in meta-technique.
 
-        :param algo: search algorithm instance.
-        :return: None.
+        Args:
+            algo (SearchAlgorithm):
+                search algorithm instance.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
     @property
     @abc.abstractmethod
     def order(self):
+        """Get order for algorithms."""
+
         raise NotImplementedError()

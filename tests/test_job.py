@@ -1,12 +1,15 @@
 from typing import List
 from typing import Optional
 
+import pytest
+
 from feijoa import create_job
 from feijoa import Experiment
 from feijoa import load_job
 from feijoa import Real
 from feijoa import SearchSpace
 from feijoa.exceptions import DuplicatedJobError
+from feijoa.exceptions import InvalidSearchAlgorithmPassed
 from feijoa.exceptions import InvalidStoragePassed
 from feijoa.exceptions import InvalidStorageRFC1738
 from feijoa.exceptions import JobNotFoundError
@@ -14,7 +17,6 @@ from feijoa.exceptions import SearchAlgorithmNotFoundedError
 from feijoa.jobs.job import _load_storage
 from feijoa.models import Result
 from feijoa.search.algorithms import SearchAlgorithm
-import pytest
 
 
 def test_job():
@@ -91,7 +93,7 @@ def test_incorrect_algo_passed():
         def tell(self, experiment: Experiment):
             pass
 
-    with pytest.raises(SearchAlgorithmNotFoundedError):
+    with pytest.raises(InvalidSearchAlgorithmPassed):
         job.do(lambda: 1, algo_list=[IncorrectAlgo])
 
 

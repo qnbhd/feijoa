@@ -1,3 +1,7 @@
+from sklearn.ensemble import AdaBoostRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neural_network import MLPRegressor
+
 from feijoa import create_job
 from feijoa import Experiment
 from feijoa import Real
@@ -6,9 +10,6 @@ from feijoa import SearchSpace
 # noinspection DuplicatedCode
 from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 from feijoa.search.bandit import ThompsonSampler
-from sklearn.ensemble import AdaBoostRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.neural_network import MLPRegressor
 
 
 def objective(experiment: Experiment):

@@ -1,8 +1,9 @@
+import pytest
+
 from feijoa.search import SearchSpace
 
 # noinspection PyProtectedMember,PyDeprecation
 from feijoa.search.space import from_yaml
-import pytest
 
 
 def test_space_from_yaml():

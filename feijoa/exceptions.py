@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Templin Konstantin
+# Copyright (c) 2021-2022 Templin Konstantin
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,12 @@ class SearchAlgorithmNotFoundedError(FeijoaError):
     """
     Raises if the chosen search algorithm
     not founded.
+    """
+
+
+class InvalidSearchAlgorithmPassed(FeijoaError):
+    """Raises if the specified object is
+    not valid SearchAlgorithm.
     """
 
 
