@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Templin Konstantin
+# Copyright (c) 2021-2022 Templin Konstantin
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,22 @@ __all__ = ["RandomSearch"]
 
 
 class RandomSearch(SearchAlgorithm):
+    """Simple random search.
+
+    Random search replaces the exhaustive
+    search of all combinations with a
+    selection of them randomly. This can
+    easily be applied to the discrete settings
+    above, but the method can also be
+    generalized to continuous and mixed spaces.
+    Random search can outperform lattice search,
+    especially if only a small number of hyperparameters
+    affects the performance of the algorithm.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     anchor = "random"
     aliases = ("RandomSearch", "random", "randomized")
@@ -55,6 +71,8 @@ class RandomSearch(SearchAlgorithm):
             for _ in range(n):
                 cfg = dict()
 
+                # random sample
+
                 for p in self.search_space:
                     cfg[p.name] = p.accept(self.randomizer)
 
@@ -63,5 +81,6 @@ class RandomSearch(SearchAlgorithm):
             yield cfgs
 
     def tell(self, config, result):
-        # no needed
+        """No needed."""
+
         pass

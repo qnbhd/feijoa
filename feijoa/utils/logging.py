@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2021 Templin Konstantin
+# Copyright (c) 2021-2022 Templin Konstantin
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,17 @@ from rich.traceback import install
 
 
 def init(verbose=False):
+    """Init logging.
+
+    Args:
+        verbose (bool):
+            Verbose level (DEBUG) or not (INFO).
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     install(suppress=[click])
 
     logging.basicConfig(

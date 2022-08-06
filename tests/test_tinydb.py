@@ -1,5 +1,7 @@
 import unittest.mock
 
+import pytest
+
 from feijoa import Experiment
 from feijoa import Real
 from feijoa import SearchSpace
@@ -10,7 +12,6 @@ from feijoa.exceptions import InsertExperimentWithTheExistedId
 from feijoa.models.configuration import Configuration
 from feijoa.models.experiment import ExperimentState
 from feijoa.utils.imports import import_or_skip
-import pytest
 
 
 TinyDBStorage = import_or_skip("feijoa.storages.tiny").TinyDBStorage
