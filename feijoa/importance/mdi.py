@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""MDI importance evaluator module."""
+
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder
@@ -27,7 +29,30 @@ from ..jobs.job import Job
 from .evaluator import ImportanceEvaluator
 
 
+__all__ = ["MDIEvaluator"]
+
+
+# noinspection DuplicatedCode
 class MDIEvaluator(ImportanceEvaluator):
+    """Mean decrease impurity (MDI) importance evaluator.
+
+    .. code-block:: python
+
+        from feijoa.importance.mdi import MDIEvaluator
+
+        job = ...
+        evaluator = MDIEvaluator()
+        imp = evaluator.do(job)
+
+        params = imp["params"]
+        importances = imp["importances"]
+
+    Args:
+        n_trees (int): number of trees in RandomForestRegressor.
+        max_depth (int): maximum of trees depth.
+
+    """
+
     def __init__(self, *, n_trees: int = 64, max_depth: int = 64):
         self.forest = RandomForestRegressor(
             n_estimators=n_trees,

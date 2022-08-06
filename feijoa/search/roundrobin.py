@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Round robin meta algorithm module."""
+
 from collections import deque
 import logging
 
@@ -32,14 +34,11 @@ __all__ = ["RoundRobinMeta"]
 
 
 class RoundRobinMeta(MetaSearchAlgorithm):
-    """
-    Experiment's optimizer class.
+    """RoundRobin meta algorithm.
 
-    Optimizer has two main methods:
+    Raises:
+        AnyError: If anything bad happens.
 
-    Parameters:
-        - space
-        - experiments_factory
     """
 
     anchor = "roundrobin"

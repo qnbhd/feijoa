@@ -21,19 +21,37 @@
 # SOFTWARE.
 import logging
 
+import numpy as np
+import plotly.graph_objs as go
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import LabelEncoder
+
 from feijoa import Categorical
 from feijoa import create_job
 from feijoa import Integer
 from feijoa import Real
 from feijoa import SearchSpace
 from feijoa.search.algorithms.bayesian import BayesianAlgorithm
-import numpy as np
-import plotly.graph_objs as go
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import LabelEncoder
 
 
 def pad(string: str, width: int, filler=" ", fill_chars=3):
+    """Pads a string to a given width.
+
+    Args:
+        string (str):
+            String instance.
+        width (int):
+            Target width of string.
+        filler:
+            Fill places with specified char.
+        fill_chars:
+            Count of chars to fill.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     if len(string) <= width:
         return string
     return f"{string[:width - 3]}{filler * fill_chars}"
@@ -43,6 +61,20 @@ def plot_parallel_coordinates(
     job,
     params=None,
 ):
+    """Plot the parallel coordinates for
+    a specified job.
+
+    Args:
+        job (Job):
+            Job instance.
+        params (list):
+            Parameters names to plot.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     df = job.get_dataframe(brief=True, only_good=True)
     objectives = df["objective_result"]
     df.drop(columns=["id", "objective_result"], inplace=True)
@@ -135,7 +167,7 @@ def main():
     logging.basicConfig(level="DEBUG")
     job.do(
         objective,
-        n_proc=-1,
+        n_jobs=-1,
         n_trials=50,
         algo_list=[ba],
         progress_bar=True,

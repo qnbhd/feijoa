@@ -40,6 +40,19 @@ APPLICATION = os.path.join(
 
 
 def check_is_working_flag(gcc_toolchain_path, flag):
+    """Check to see if a given flag is currently running.
+
+    Args:
+        gcc_toolchain_path (str):
+            GCC compiler path.
+        flag (str):
+            Flag to test.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     cmd = f"{gcc_toolchain_path} {APPLICATION} {flag} 2>&1"
     try:
         result = executor.execute(cmd, capture=True)
@@ -49,6 +62,17 @@ def check_is_working_flag(gcc_toolchain_path, flag):
 
 
 def invert_gcc_flag(flag_):
+    """Invert a gcc flag
+
+    Args:
+        flag_ (str):
+            Flag to invert.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     assert flag_[:2] == "-f"
     if flag_[2:5] != "no-":
         return "-fno-" + flag_[2:]
@@ -56,6 +80,17 @@ def invert_gcc_flag(flag_):
 
 
 def parse_optimizers(gcc_toolchain_path):
+    """Parse GCC optimizers.
+
+    Args:
+        gcc_toolchain_path (str):
+            GCC compiler path.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     try:
         result = executor.execute(
             f"{gcc_toolchain_path} --help=optimizers -Q", capture=True
@@ -184,6 +219,17 @@ def parse_optimizers(gcc_toolchain_path):
 
 
 def parse_parameters(gcc_toolchain_path):
+    """Parse the command line GCC parameters.
+
+    Args:
+        gcc_toolchain_path (str):
+            GCC compiler path.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     try:
         result = executor.execute(
             f"{gcc_toolchain_path} --help=params -Q", capture=True
@@ -208,6 +254,8 @@ def parse_parameters(gcc_toolchain_path):
     params = {}
 
     def parse_line(line: str):
+        """Parse a single line"""
+
         bits = line.split()
         if not bits:
             return
@@ -306,7 +354,22 @@ cc_black_list_chunks = [
 
 
 def fix_parameters(gcc_toolchain, all_params):
+    """This function fixes the parameters in the GCC
+
+    Args:
+        gcc_toolchain (str):
+            GCC compiler path.
+        all_params (dict):
+            All parameters space.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     def keep(param, value):
+        """Helper function."""
+
         for bcc in cc_black_list_chunks:
             if bcc in param:
                 return False
@@ -330,6 +393,16 @@ def fix_parameters(gcc_toolchain, all_params):
 
 
 def get_version(gcc_toolchain_path):
+    """Get the GCC version.
+
+    Args:
+        gcc_toolchain_path (str):
+            GCC compiler path.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
     try:
         result = executor.execute(
             f"{gcc_toolchain_path} --version", capture=True
@@ -348,6 +421,8 @@ def get_version(gcc_toolchain_path):
 
 
 def extract(gcc_toolchain_path):
+    """Extract optimization's flags."""
+
     version = get_version(gcc_toolchain_path)
     if not version:
         raise RuntimeError("Toolchain isn't runnable")

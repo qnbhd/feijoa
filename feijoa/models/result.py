@@ -19,12 +19,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Result model class module."""
+
 from typing import Dict
 from typing import Optional
 
 from pydantic import BaseModel
 
 
+# noinspection PyUnresolvedReferences
 class Result(BaseModel):
+    """Result model.
+
+    Args:
+        objective_result (float):
+            Objective value.
+        metrics (Optional[Dict[str, float]]):
+            Metrics for result.
+
+    Returns:
+        None
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     objective_result: float
     metrics: Optional[Dict[str, float]]

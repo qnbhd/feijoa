@@ -19,11 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""EDF plot module."""
+
+import numpy as np
+import plotly.graph_objs as go
+
 from feijoa import create_job
 from feijoa import Real
 from feijoa import SearchSpace
-import numpy as np
-import plotly.graph_objs as go
+
+
+__all__ = ["plot_edf"]
 
 
 def plot_edf(
@@ -31,6 +37,21 @@ def plot_edf(
     fig=None,
     name=None,
 ):
+    """Plot the EDF of a job.
+
+    Args:
+        job (Job):
+            Job instance.
+        fig (go.Figure):
+            Plotly figure object.
+        name:
+            Name of trace.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     name = name or job.name
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
@@ -79,7 +100,7 @@ def main():
     job = create_job(search_space=space)
     job.do(
         objective,
-        n_proc=-1,
+        n_jobs=-1,
         n_trials=2000,
         algo_list=["grid"],
         progress_bar=True,

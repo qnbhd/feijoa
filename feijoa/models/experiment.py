@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Experiment model class module."""
+
 import datetime
 from enum import Enum
 import hashlib
@@ -26,8 +28,12 @@ import json
 from typing import Any
 from typing import Optional
 
-from feijoa.models.configuration import Configuration
 from pydantic import BaseModel
+
+from feijoa.models.configuration import Configuration
+
+
+__all__ = ["ExperimentState", "Experiment"]
 
 
 class ExperimentState(str, Enum):
@@ -35,7 +41,6 @@ class ExperimentState(str, Enum):
     OK = "OK"
     WIP = "WIP"
     ERROR = "ERROR"
-    SEMI = "SEMI"
 
     def __repr__(self):
         return self.name
@@ -44,19 +49,45 @@ class ExperimentState(str, Enum):
         return repr(self)
 
 
+# noinspection PyUnresolvedReferences
 class Experiment(BaseModel):
-    """
-    Pipeline:
+    """Experiment model.
+
+    Lifecycle of experiment:
 
     1) Create experiment from params (state=WIP)
     2) Suggest experiment to job
     3) Measure it
     4) If all metrics are collected set OK state,
-    therefore SEMI state, if error caused - ERROR.
+       if error caused - ERROR.
     5) Finish experiment - calculate hash, set finish
-    timestamp
+       timestamp
     6) Tell to optimizers
     6) Save to storage
+
+    Args:
+        id (int):
+            Index of experiment.
+        job_id (int):
+            Job index.
+        state (ExperimentState):
+            Experiment state. Must be `WIP`, `OK` or `ERROR`
+        hash (str, optional):
+            Hash of experiment.
+        objective_result (Optional[Any]):
+            Objective result of experiment. Now
+            is float only, but in next version
+            can be tuple/array.
+        create_timestamp (float):
+            Experiment creation timestamp.
+        finish_timestamp (float):
+            Experiment finish timestamp.
+        metrics (dict, optional):
+            Metrics of experiment.
+
+    Raises:
+        AnyError: If anything bad happens.
+
     """
 
     id: int
@@ -73,19 +104,39 @@ class Experiment(BaseModel):
         orm_mode = True
 
     def apply(self, result):
+        """Apply result to experiment.
+
+        Args:
+            result (float):
+                Objective result.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         # TODO (qnbhd): make safe operations
         self.objective_result = result
 
     def set_error(self):
+        """Set error state to experiment."""
+
         self.state = ExperimentState.ERROR
 
     def is_finished(self):
+        """Check if experiment is finished."""
+
         return (
             self.state == ExperimentState.OK
             or self.state == ExperimentState.ERROR
         )
 
     def _calculate_hash(self):
+        """Calculate hash."""
+
         params_dumped = json.dumps(self.params, sort_keys=True)
 
         curve1 = hashlib.sha1(params_dumped.encode())
@@ -97,6 +148,8 @@ class Experiment(BaseModel):
         return hd1 + hd2
 
     def _finish(self, state):
+        """Finish experiment."""
+
         self.state = state
         self.hash = self._calculate_hash()
 
@@ -104,9 +157,13 @@ class Experiment(BaseModel):
         self.finish_timestamp = datetime.datetime.timestamp(time)
 
     def success_finish(self):
+        """Finish experiment with success state."""
+
         self._finish(ExperimentState.OK)
 
     def error_finish(self):
+        """Finish experiment with error state."""
+
         self._finish(ExperimentState.ERROR)
 
     def __repr__(self):

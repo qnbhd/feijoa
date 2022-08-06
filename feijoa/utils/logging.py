@@ -27,6 +27,17 @@ from rich.traceback import install
 
 
 def init(verbose=False):
+    """Init logging.
+
+    Args:
+        verbose (bool):
+            Verbose level (DEBUG) or not (INFO).
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     install(suppress=[click])
 
     logging.basicConfig(

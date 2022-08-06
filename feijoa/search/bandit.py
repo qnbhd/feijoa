@@ -22,16 +22,31 @@
 from collections import Counter
 import logging
 
-from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.search.meta import MetaSearchAlgorithm
 from mab import algs
 import numpy as np
+
+from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.meta import MetaSearchAlgorithm
 
 
 log = logging.getLogger(__name__)
 
 
 def relative_change_d1(x_cur: float, x_prev: float):
+    """
+    Return the relative difference between two points.
+
+    Args:
+        x_cur (float) :
+            Current value.
+        x_prev (float) :
+            Previous value.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     sign = np.sign(x_prev - x_cur)
     return (
         sign
@@ -41,6 +56,21 @@ def relative_change_d1(x_cur: float, x_prev: float):
 
 
 class UCB1(MetaSearchAlgorithm):
+
+    """UCB1 bandit algorithm.
+
+    Used for the optimal choice of optimization strategy
+
+    Args:
+        algorithms:
+            List of algorithms.
+        algo_select_count (int):
+            Count of algorithms to yield (with ranking).
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     anchor = "UCB1"
     aliases = ("UCB1",)
@@ -72,6 +102,8 @@ class UCB1(MetaSearchAlgorithm):
                 self.mab.reward(algo_index)
 
     def _fix_names(self):
+        """Needed for make unique algorithms names."""
+
         names = set()
         for a in self.algorithms:
             while a.name in names:
@@ -80,6 +112,13 @@ class UCB1(MetaSearchAlgorithm):
 
     @property
     def order(self):
+        """Get order for algorithms.
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         if not self.mab:
             self._fix_names()
             self.mab = self.STRATEGY(len(self.algorithms))
@@ -94,7 +133,15 @@ class UCB1(MetaSearchAlgorithm):
         return [self.algorithms[i] for i in ranking_chunk]
 
     def tell(self, config, result):
-        """Tell results to all search algorithms"""
+        """Tell results to all search algorithms.
+
+        An adaptive strategy is used with increasing
+        reward upon convergence.
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
 
         reward_multiplier = 1
 

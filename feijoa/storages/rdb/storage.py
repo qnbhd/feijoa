@@ -19,8 +19,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""RDB storage uses SQLAlchemy module."""
+
 from typing import List
 from typing import Optional
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from feijoa.models import Experiment
 from feijoa.models.configuration import Configuration
@@ -31,11 +36,18 @@ from feijoa.storages.rdb.models import JobModel
 from feijoa.storages.rdb.models import ParameterModel
 from feijoa.storages.rdb.models import SearchSpaceModel
 from feijoa.storages.storage import Storage
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 
 class RDBStorage(Storage):
+    """Relational Database Storage.
+
+    Uses SQLAlchemy framework.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     def __init__(self, url):
         self.engine = create_engine(url)
         _Base.metadata.create_all(self.engine)

@@ -53,6 +53,12 @@ class SearchAlgorithmNotFoundedError(FeijoaError):
     """
 
 
+class InvalidSearchAlgorithmPassed(FeijoaError):
+    """Raises if the specified object is
+    not valid SearchAlgorithm.
+    """
+
+
 class DuplicatedJobError(FeijoaError):
     """
     Raises if the specified job name already

@@ -25,6 +25,7 @@ import logging
 import sys
 
 import click
+
 from feijoa.utils.logging import init
 from utils.extractor import extract
 from utils.run_tools import continue_job
@@ -80,14 +81,12 @@ def run_cmd(
 
 @click.command(name="continue")
 @click.option("--toolchain", type=str, required=True)
-@click.option("--search-space", type=str, required=True)
 @click.option("--source-file", type=str, required=True)
 @click.option("--iterations", type=int, default=5)
 @click.option("--storage", type=str, required=True)
 @click.option("--job-name", type=str, required=True)
 def continue_cmd(
     toolchain,
-    search_space,
     source_file,
     n_trials,
     iterations,
@@ -97,7 +96,6 @@ def continue_cmd(
     init(verbose=True)
     baselines, job = continue_job(
         toolchain,
-        search_space,
         source_file,
         n_trials,
         iterations,
@@ -112,11 +110,7 @@ def continue_cmd(
 
 @click.command(name="extract")
 @click.option("--toolchain", type=str, required=True)
-@click.option("--captured-cache", type=str)
-@click.option(
-    "--out-file", type=str, default="extracted_search_space.yaml"
-)
-def extract_cmd(toolchain, captured_cache, out_file):
+def extract_cmd(toolchain):
     extract(toolchain)
 
 

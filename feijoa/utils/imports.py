@@ -23,8 +23,9 @@ import importlib
 import types
 from typing import Any
 
-from feijoa.exceptions import PackageNotInstalledError
 import pytest
+
+from feijoa.exceptions import PackageNotInstalledError
 
 
 class ImportWrapper:
@@ -46,6 +47,20 @@ class ImportWrapper:
 
 
 def import_or_skip(module, reason=""):
+    """Import module or skip test in
+    pytest framework.
+
+    Args:
+        module:
+            Python module.
+        reason:
+            Reason of skipping.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     try:
         return pytest.importorskip(module, reason=reason)
     except PackageNotInstalledError:
@@ -53,6 +68,8 @@ def import_or_skip(module, reason=""):
 
 
 class LazyModuleImportProxy(types.ModuleType):
+    """Class for lazy modules importing."""
+
     def __init__(self, module: str) -> None:
         super().__init__(module)
         self.module = module

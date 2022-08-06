@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Genetic algorithms with `pymoo` backend module."""
+
 import logging
 import time
 from typing import Generator
@@ -26,9 +28,10 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+import numpy as np
+
 from feijoa.utils.imports import ImportWrapper
 from feijoa.utils.imports import LazyModuleImportProxy
-import numpy as np
 
 
 with ImportWrapper():
@@ -70,7 +73,20 @@ log = logging.getLogger(__name__)
 
 class Genetic(SearchAlgorithm):
 
-    """Genetic algorithms with `pymoo` backend."""
+    """Genetic algorithms with `pymoo` backend.
+    Pymoo link: https://pymoo.org/.
+
+    Args:
+        algorithm_cls:
+            Pymoo algorithm class.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    .. note::
+        This set of algorithms is experimental.
+
+    """
 
     anchor: str = "GA"
     aliases: Tuple = ("Genetic", "genetic", "GA", "ga")
@@ -90,6 +106,7 @@ class Genetic(SearchAlgorithm):
             if isinstance(p, Categorical):
                 self.bounds[i, :] = np.array([0, len(p.choices) - 1])
 
+        # parse lower and upper bounds
         self.xl = self.bounds[:, 0]
         self.xu = self.bounds[:, 1]
 
@@ -135,6 +152,8 @@ class Genetic(SearchAlgorithm):
         return next(self._ask_gen)
 
     def _ask(self, n: int) -> Generator:
+        """Main ask generator for genetic algorithms."""
+
         n_gen = 0
 
         while True:

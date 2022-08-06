@@ -32,8 +32,9 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
-from feijoa.utils.imports import ImportWrapper
 import numpy
+
+from feijoa.utils.imports import ImportWrapper
 
 
 with ImportWrapper():
@@ -56,6 +57,17 @@ ERROR_RESULT = float("+inf")
 
 
 class GccRenderer(ParametersVisitor):
+    """GCC renderer visitor.
+
+    Args:
+        experiment (Experiment):
+            Specified experiment.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     def __init__(self, experiment):
         super().__init__()
         self.experiment = experiment
@@ -86,6 +98,21 @@ class GccRenderer(ParametersVisitor):
 def render(
     experiment: Experiment, space: SearchSpace, renderer_cls
 ) -> str:
+    """Render an experiment to cli flags.
+
+    Args:
+        experiment (Experiment):
+            Specified experiment.
+        space (SearchSpace):
+            Search space instance.
+        renderer_cls (type):
+            Renderer class.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     renderer = renderer_cls(experiment)
 
     rendered = list()
@@ -100,6 +127,17 @@ def render(
 
 
 def run_command_and_capture_stdout(command: str) -> Optional[str]:
+    """Run a command and capture stdout.
+
+    Args:
+        command (str):
+            CLI command.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     log.debug(f"RUN COMMAND:\n{command}")
 
     try:
@@ -118,6 +156,22 @@ def run_command_and_capture_stdout(command: str) -> Optional[str]:
 def compile_source(
     toolchain: str, source_file: str, rendered_opts, out_file: str
 ) -> Optional[float]:
+    """Compile the source file.
+
+    Args:
+        toolchain (str):
+            Toolchain path.
+        source_file (str):
+            Source file path.
+        rendered_opts (str):
+            Rendered opt (cli-format)
+        out_file (str):
+            Temporary out file.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     system_name = platform.system()
 
@@ -153,6 +207,19 @@ def compile_source(
 def run_binary(
     binary_name, iterations
 ) -> Optional[Tuple[float, float, float, float, float]]:
+    """Measure binary file.
+
+    Args:
+        binary_name (str):
+            Path to binary file.
+        iterations (int):
+            Number of iterations to get specified
+            accuracy.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
     system_name = platform.system()
 
     if system_name == "Linux":
@@ -187,6 +254,8 @@ def run_binary(
 
 
 def get_binary_size(binary_name) -> Optional[float]:
+    """Get the size of a binary file"""
+
     size_cmd = "wc -c {} | awk {}".format(binary_name, "'{print $1}'")
     size_out = run_command_and_capture_stdout(size_cmd)
     if size_out is not None and size_out.isdigit():
@@ -202,6 +271,28 @@ def objective(
     objective_metric: str,
     iterations: int,
 ):
+    """Objective function for GCC example.
+
+    Args:
+        experiment (Experiment):
+            Specified experiment.
+        toolchain (str):
+            Toolchain path.
+        search_space (SearchSpace):
+            Search space instance.
+        source_file (str):
+            Source file path.
+        objective_metric (str):
+            Name of objective metric.
+        iterations (int):
+            Count of iteration to get
+            specified accuracy.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     metrics = {
         "compile_time": ERROR_RESULT,
         "time": ERROR_RESULT,
@@ -260,6 +351,22 @@ def objective(
 
 
 def run_baselines(toolchain, source_file, iterations):
+    """Runs the baselines flags set.
+
+    Args:
+        toolchain (str):
+            Toolchain path.
+        source_file (str):
+            Source file path.
+        iterations (int):
+            Count of iteration to get
+            specified accuracy.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     compile_source(
         toolchain,
         source_file,
@@ -328,6 +435,28 @@ def run_gcc(
     objective_metric,
     algorithms=None,
 ):
+    """Runs the GCC example.
+
+    Args:
+        job (Job):
+            Job instance.
+        toolchain (str):
+            Toolchain path.
+        source_file (str):
+            Source file path.
+        objective_metric (str):
+            Name of objective metric.
+        iterations (int):
+            Count of iteration to get
+            specified accuracy.
+        algorithms:
+            List of names, classes or specified instances
+            of algorithms.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     # noinspection PyProtectedMember
     job._load_algo(algo_list=algorithms)
@@ -346,7 +475,7 @@ def run_gcc(
     job.do(
         obj,
         n_trials=n_trials,
-        n_proc=-1,
+        n_jobs=-1,
         algo_list=["bayesian", "template", "random"],
         use_numba_jit=False,
     )
@@ -365,7 +494,37 @@ def run_job(
     objective_metric,
     *algorithms,
 ):
+    """Only run wrapper for GCC example.
+
+    Args:
+        search_space_file (str):
+            Path to search space file.
+        n_trials (int):
+            Count of total trials.
+        storage (Storage):
+            Specified storage instance.
+        job_name (str):
+            Job name.
+        toolchain (str):
+            Toolchain path.
+        source_file (str):
+            Source file path.
+        objective_metric (str):
+            Name of objective metric.
+        iterations (int):
+            Count of iteration to get
+            specified accuracy.
+        algorithms:
+            List of names, classes or specified instances
+            of algorithms.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     algorithms = algorithms or ["bayesian"]
+
     space = SearchSpace.from_yaml_file(search_space_file)
     job = create_job(
         search_space=space, storage=storage, name=job_name
@@ -377,13 +536,13 @@ def run_job(
         n_trials,
         source_file,
         objective_metric,
+        algorithms=algorithms,
     )
     return baselines, job
 
 
 def continue_job(
     toolchain,
-    search_space_file,
     source_file,
     n_trials,
     iterations,
@@ -391,8 +550,31 @@ def continue_job(
     job_name,
     objective_metric,
 ):
-    space = SearchSpace.from_yaml_file(search_space_file)
-    job = load_job(search_space=space, storage=storage, name=job_name)
+    """Continue command for GCC example.
+
+    Args:
+        n_trials (int):
+            Count of total trials.
+        storage (Storage):
+            Specified storage instance.
+        job_name (str):
+            Job name.
+        toolchain (str):
+            Toolchain path.
+        source_file (str):
+            Source file path.
+        objective_metric (str):
+            Name of objective metric.
+        iterations (int):
+            Count of iteration to get
+            specified accuracy.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
+    job = load_job(storage=storage, name=job_name)
     baselines, job = run_gcc(
         job,
         toolchain,

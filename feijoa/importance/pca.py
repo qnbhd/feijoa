@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""PCA importance evaluator module."""
+
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
@@ -27,7 +29,25 @@ from ..jobs.job import Job
 from .evaluator import ImportanceEvaluator
 
 
+__all__ = ["PCAEvaluator"]
+
+
+# noinspection DuplicatedCode
 class PCAEvaluator(ImportanceEvaluator):
+    """Principal component analysis (PCA) importance evaluator.
+
+    .. code-block:: python
+
+        from feijoa.importance.pca import PCAEvaluator
+
+        job = ...
+        evaluator = PCAEvaluator()
+        imp = evaluator.do(job)
+
+        params = imp["params"]
+        importances = imp["importances"]
+    """
+
     def __init__(self):
         self.pca = PCA()
 

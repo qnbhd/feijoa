@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Parameters module."""
+
 import abc
 
 
@@ -34,6 +36,8 @@ from feijoa.exceptions import ParametersIncorrectInputValues
 
 
 class Parameter(metaclass=abc.ABCMeta):
+    """Base class of parameter."""
+
     def __init__(self, name: str):
         self.name = name
 
@@ -45,27 +49,82 @@ class Parameter(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def accept(self, v):
+        """Accept visitor.
+
+        Args:
+            v (Visitor):
+                ParametersVisitor instance.
+
+        Returns:
+            Any
+
+        """
+
         raise NotImplementedError()
 
     @abc.abstractmethod
     def seed(self):
+        """Make some legal value."""
+
         raise NotImplementedError()
 
     @abc.abstractmethod
     def is_primitive(self):
+        """Primitive parameter, such as integer, real."""
+
         raise NotImplementedError()
 
     @abc.abstractmethod
     def get_unit_value(self, value):
+        """Only for primitive parameters."""
+
         raise NotImplementedError()
 
     @property
     @abc.abstractmethod
     def meta(self):
+        """Meta information of parameter."""
+
         raise NotImplementedError()
 
 
 class Integer(Parameter):
+    """Integer parameter class.
+
+    Represents discrete integer parameters from Z-space.
+
+    Such parameters can be, for example, the number of
+    layers in neural networks or the number of neurons
+    in a hidden layer, max depth of tree.
+
+    Example:
+
+    .. code-block:: python
+
+        from feijoa.search.parameters import Integer
+
+        param = Integer("foo", low=0, high=10)
+
+    .. note:
+        In parameters creation strict-typing is used
+        for input values.
+
+    Args:
+        name (str):
+            Name of parameter.
+        low (int):
+            Lower bound of parameter.
+        high (int):
+            Upper bound of parameter.
+
+    Raises:
+        ParametersIncorrectInputValues:
+            If input values is not valid integer values.
+        AnyError:
+            If anything bad happens.
+
+    """
+
     def __init__(self, name: str, *, low: int, high: int):
         super().__init__(name)
 
@@ -112,6 +171,42 @@ class Integer(Parameter):
 
 
 class Real(Parameter):
+    """Real parameter class.
+
+    Represents real parameters from R-space.
+
+    Such parameters can be, for example, learning
+    rate of ML algorithm, or mutation rate in
+    genetic algorithms.
+
+    Example:
+
+    .. code-block:: python
+
+        from feijoa.search.parameters import Real
+
+        param = Real("foo", low=0.0, high=10.0)
+
+    Args:
+        name (str):
+            Name of parameter.
+        low (float):
+            Lower bound of parameter.
+        high (float):
+            Upper bound of parameter.
+
+    .. note:
+        In parameters creation strict-typing is used
+        for input values.
+
+    Raises:
+        ParametersIncorrectInputValues:
+            If input values is not valid real values.
+        AnyError:
+            If anything bad happens.
+
+    """
+
     def __init__(self, name: str, *, low: float, high: float):
         super().__init__(name)
 
@@ -157,6 +252,32 @@ class Real(Parameter):
 
 
 class Categorical(Parameter):
+    """Categorical parameter class.
+
+    Represents category parameters.
+
+    Such parameters can be, activation function,
+    or type of regression model in AutoML.
+
+    Args:
+        name (str):
+            Name of parameter.
+        choices (list):
+            List of choices, for example: ```['rbf', 'sigmoid']```
+
+    .. note:
+        In parameters creation strict-typing is used
+        for input values.
+
+    Raises:
+        ParametersIncorrectInputValues:
+            If input values is empty or exists
+            not unique values.
+        AnyError:
+            If anything bad happens.
+
+    """
+
     def __init__(self, name: str, *, choices):
         super().__init__(name)
 
@@ -193,14 +314,31 @@ class Categorical(Parameter):
 
 
 class ParametersVisitor(metaclass=abc.ABCMeta):
+    """Parameters abstract visitor
+
+    Used for iteration over collections
+    with parameters.
+
+    Raises:
+        AnyError:
+            If anything bad happens.
+
+    """
+
     @abc.abstractmethod
     def visit_integer(self, p: Integer):
+        """Visit integer parameter."""
+
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_real(self, p: Real):
+        """Visit real parameter."""
+
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_categorical(self, p: Categorical):
+        """Visit categorical parameter."""
+
         raise NotImplementedError()

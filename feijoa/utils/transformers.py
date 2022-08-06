@@ -19,13 +19,27 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import numpy as np
+
 from feijoa import Categorical
 from feijoa import Integer
 from feijoa import Real
-import numpy as np
 
 
 def transform(sol, search_space):
+    """Transform solutions into a dictionary.
+
+    Args:
+        sol (list | numpy.array):
+            Vector of parameter's values.
+        search_space:
+            Search space instance.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     configuration = dict()
 
     for value, param in zip(sol, search_space):
@@ -44,6 +58,20 @@ def transform(sol, search_space):
 
 
 def inverse_transform(configuration: dict, search_space):
+    """Transform dictionary (configuration)
+    to vector of parameter's values.
+
+    Args:
+        configuration (dict | Configuration):
+            Feijoa configuration.
+        search_space:
+            Search space instance.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     solution = np.zeros((len(configuration),), dtype=np.float64)
 
     for i, (key, value) in enumerate(configuration.items()):

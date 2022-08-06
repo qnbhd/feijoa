@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""SQLAlchemy models module."""
+
 import json
 
 from sqlalchemy import Column
@@ -33,10 +35,20 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.orm import relationship
 
 
+__all__ = [
+    "SearchSpaceModel",
+    "ParameterModel",
+    "JobModel",
+    "ExperimentModel",
+]
+
+
 _Base: DeclarativeMeta = declarative_base()
 
 
 class Json(TypeDecorator):
+    """Json column (temporary class)."""
+
     @property
     def python_type(self):
         return object

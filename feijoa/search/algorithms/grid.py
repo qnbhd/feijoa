@@ -19,11 +19,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Grid search class module."""
+
 from itertools import product
 import logging
 from typing import Generator
 from typing import List
 from typing import Optional
+
+import numpy
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.algorithms import SearchAlgorithm
@@ -31,7 +35,6 @@ from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import ParametersVisitor
 from feijoa.search.parameters import Real
-import numpy
 
 
 __all__ = ["GridSearch"]
@@ -39,14 +42,29 @@ __all__ = ["GridSearch"]
 log = logging.getLogger(__name__)
 
 
+# noinspection PyUnresolvedReferences
 class GridMaker(ParametersVisitor):
+    """Simple grid creation for different parameters.
+
+    Args:
+        EPS (float):
+            Sample rate for included-valued parameters
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     EPS = 0.1
 
     def visit_integer(self, p: Integer):
+        """Pick up integer grid."""
+
         return range(p.low, p.high + 1)
 
     def visit_real(self, p: Real):
+        """Pick up real grid."""
+
         return numpy.round(
             numpy.arange(
                 p.low, p.high + GridMaker.EPS, GridMaker.EPS
@@ -55,10 +73,22 @@ class GridMaker(ParametersVisitor):
         )
 
     def visit_categorical(self, p: Categorical):
+        """Pick up categorical grid."""
+
         return p.choices
 
 
 class GridSearch(SearchAlgorithm):
+    """Simple grid search.
+
+    Makes a full iteration over a manually
+    specified subset of hyperparameter spaces
+    of the algorithm.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     anchor = "grid"
     aliases = (
@@ -69,10 +99,17 @@ class GridSearch(SearchAlgorithm):
     def __init__(self, search_space, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.search_space = search_space
+
+        # grids for all parameters
+
         grids = [
             p.accept(GridMaker()) for p in self.search_space.params
         ]
+
+        # iterator for grid search
+
         self.prod_iter = product(*grids)
+
         self._ask_gen = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
@@ -104,5 +141,6 @@ class GridSearch(SearchAlgorithm):
             yield cfgs
 
     def tell(self, config, result):
-        # no needed
+        """No needed."""
+
         pass

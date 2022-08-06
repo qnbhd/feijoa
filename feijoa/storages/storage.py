@@ -32,80 +32,121 @@ __all__ = ["Storage"]
 
 class Storage(metaclass=abc.ABCMeta):
     def insert_job(self, job):
-        """
+        """Insert job into storage.
 
-        :param job:
-        :return:
+        Args:
+            job (Job):
+                Job instance.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def is_job_name_exists(self, name):
-        """
+        """Find job in storage.
 
-        :param name:
-        :return:
+        Args:
+            name (str):
+                Job name.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def get_job_id_by_name(self, name) -> Optional[int]:
-        """
+        """Get job by id in storage.
 
-        :param name:
-        :return:
+        Args:
+            name (str):
+                Name of job.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def insert_experiment(self, experiment):
-        """
+        """Insert experiment into storage.
 
-        :param experiment:
-        :return:
+        Args:
+            experiment (Experiment):
+                Experiment instance to insert.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def get_experiment(self, job_id, experiment_id):
-        """
+        """Get experiment from job.
 
-        :param job_id:
-        :param experiment_id:
-        :return:
+        Args:
+            job_id (int):
+                Job index.
+            experiment_id (int):
+                Experiment index.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def get_experiments_by_job_id(self, job_id) -> List[Experiment]:
-        """
+        """Get experiments from job
 
-        :param job_id:
-        :return:
+        Args:
+            job_id:
+                Index of job in storage.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def get_experiments_count(self, job_id) -> int:
-        """
+        """Get experiments count in specified job.
 
-        :param job_id:
-        :return:
+        Args:
+            job_id (int):
+                Job id.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         pass
 
     def best_experiment(self, job) -> Optional[Experiment]:
-        """
+        """Get best experiment from job.
 
-        :param job:
-        :return:
+        Args:
+            job (Job):
+                Job instance.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         experiments = self.get_experiments_by_job_id(job)
@@ -116,11 +157,16 @@ class Storage(metaclass=abc.ABCMeta):
         return min(experiments, key=lambda x: x.objective_result)  # type: ignore
 
     def top_experiments(self, job_id, n) -> List[Experiment]:
-        """
+        """Get top experiments from job.
+        Experiments is sorted by objective values.
 
-        :param job_id:
-        :param n:
-        :return:
+        Args:
+            job_id (int):
+                Job index.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         experiments = self.get_experiments_by_job_id(job_id)
@@ -129,9 +175,15 @@ class Storage(metaclass=abc.ABCMeta):
         return experiments[: min(len(experiments), n)]
 
     def get_search_space_by_job_id(self, job_id) -> SearchSpace:
-        """
+        """Get search space from existed job.
 
-        :param job_id:
+        Args:
+            job_id (int):
+                Job index.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         raise NotImplementedError()
@@ -139,13 +191,19 @@ class Storage(metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
     def jobs(self):
+        """Pick up jobs from storage."""
+
         raise NotImplementedError()
 
     @property
     def jobs_count(self):
+        """Get jobs count from storage."""
+
         return len(self.jobs)
 
     @property
     @abc.abstractmethod
     def version(self):
+        """Get version of database schema."""
+
         raise NotImplementedError()

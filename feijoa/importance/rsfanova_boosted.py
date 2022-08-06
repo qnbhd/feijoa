@@ -19,22 +19,47 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""fANOVA importances evaluator uses Rust
+implementation of fANOVA algorithm.
+"""
+
 import numpy as np
 from numpy import float64
+from sklearn.preprocessing import LabelEncoder
 
+from ..jobs.job import Job
 from ..utils.imports import ImportWrapper
+from .evaluator import ImportanceEvaluator
 
 
 with ImportWrapper():
     import rsfanova
 
-from sklearn.preprocessing import LabelEncoder
-
-from ..jobs.job import Job
-from .evaluator import ImportanceEvaluator
+__all__ = ["RsFanovaEvaluator"]
 
 
 class RsFanovaEvaluator(ImportanceEvaluator):
+    """fANOVA importance evaluator rust implementation
+    binding for https://github.com/sile/fanova
+
+    .. note::
+        This evaluator is experimental.
+
+    .. code-block:: python
+
+        from feijoa.importance.rsfanova_boosted import (
+            RsFanovaEvaluator,
+        )
+
+        job = ...
+        evaluator = RsFanovaEvaluator()
+        imp = evaluator.do(job)
+
+        params = imp["params"]
+        importances = imp["importances"]
+
+    """
+
     def do(self, job: Job):
         df = job.get_dataframe(brief=True, only_good=True)
         y = df["objective_result"]

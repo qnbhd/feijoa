@@ -19,6 +19,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Job class module."""
+
 import contextlib
 from datetime import datetime
 from functools import partial
@@ -32,9 +34,17 @@ from typing import Type
 from typing import Union
 import warnings
 
+import joblib
+import numpy as np
+import pandas as pd
+from rich.progress import Progress
+from sqlalchemy.engine.url import make_url
+from sqlalchemy.exc import ArgumentError
+
 from feijoa.exceptions import DuplicatedJobError
 from feijoa.exceptions import ExperimentNotFinishedError
 from feijoa.exceptions import InvalidOptimizer
+from feijoa.exceptions import InvalidSearchAlgorithmPassed
 from feijoa.exceptions import InvalidStoragePassed
 from feijoa.exceptions import InvalidStorageRFC1738
 from feijoa.exceptions import JobNotFoundError
@@ -54,12 +64,6 @@ from feijoa.search.parameters import Real
 from feijoa.search.seed import SeedAlgorithm
 from feijoa.storages import Storage
 from feijoa.storages.rdb.storage import RDBStorage
-import joblib
-import numpy as np
-import pandas as pd
-from rich.progress import Progress
-from sqlalchemy.engine.url import make_url
-from sqlalchemy.exc import ArgumentError
 
 
 __all__ = ["Job", "create_job", "load_job"]
@@ -71,8 +75,39 @@ log = logging.getLogger(__name__)
 
 
 class Job:
-    """
-    Facade of framework.
+    """Facade of framework, contains main logic
+    of optimization process.
+
+    Example:
+
+        .. code-block:: python
+
+            from feijoa.jobs import Job
+            from feijoa.storages.rdb.storage import RDBStorage
+            from feijoa.search.space import SearchSpace
+            from feijoa.search.bandit import ThompsonSampler
+
+            job = Job(
+                name="foo_job",
+                storage=RDBStorage("sqlite:///:memory:"),
+                search_space=SearchSpace(),
+                job_id=1,
+                optimizer=ThompsonSampler,
+            )
+
+    Args:
+        name (str):
+            Name of job.
+        storage (Storage):
+            Storage instance, which will be used to save the results
+        search_space (SearchSpace):
+            Search space of optimization problem.
+        optimizer (MetaSearchAlgorithm):
+            Optimizer, which will be used to algorithms manipulation.
+
+    Raises:
+        AnyError: If anything bad happens.
+
     """
 
     def __init__(
@@ -117,7 +152,12 @@ class Job:
         Load configurations with result
         and take params from best.
 
-        :return: the best parameters' dict.
+        Returns:
+            The best parameters' dict.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         return (
@@ -131,7 +171,12 @@ class Job:
         """
         Get the best result value by objective.
 
-        :return: float best value.
+        Returns:
+            Float best objective function value.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         return (
@@ -145,7 +190,12 @@ class Job:
         """
         Get the best experiment from job.
 
-        :return: best experiment.
+        Returns:
+            Best experiment of optimization session.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         return self.storage.best_experiment(self.id)
@@ -155,7 +205,12 @@ class Job:
         """
         Get all experiments.
 
-        :return:
+        Returns:
+            List of experiments.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         return self.storage.get_experiments_by_job_id(self.id)
@@ -163,8 +218,13 @@ class Job:
     @property
     def experiments_count(self) -> int:
         """
+        Get job experiments count.
 
-        :return:
+        Returns:
+            Experiments count.
+
+        Raises:
+            AnyError: If anything bad happens.
         """
 
         return self.storage.get_experiments_count(self.id)
@@ -173,14 +233,36 @@ class Job:
         """
         Get top-n experiments by objective.
 
-        :param n: max number of experiments.
-        :return: list of experiments
+        Args:
+            n (int):
+                Max count of top experiments.
+
+        Returns:
+            List of top-experiments sorted by objective value.
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         return self.storage.top_experiments(self.id, n)
 
     @property
     def rewards(self):
+        """
+        Obtaining the results of a strictly
+        monotonically decreasing sequence for
+        objective function values.
+
+        Returns:
+            Length of monotonically decreasing
+            sequence for objective function values
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         rewards = 0
         experiments = self.experiments
         m = float("+inf")
@@ -193,9 +275,34 @@ class Job:
         return rewards
 
     def setup_default_algo(self):
+        """
+        Setup default optimization algorithm (bayesian).
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         self.add_algorithm(BayesianAlgorithm(self.search_space))
 
     def _load_algo(self, algo_list=None):
+        """
+        Inject algorithms from algo_list to
+        current job.
+
+        Args:
+            algo_list (List[Union[str, SearchAlgorithm, Type[SearchAlgorithm]]):
+                array of algorithms.
+
+        Raises:
+            SearchAlgorithmNotFoundedError:
+                If passed the name of an algorithm that does not exist.
+            InvalidSearchAlgorithmPassed:
+                If passes not valid search algorithm.
+            AnyError: If anything bad happens.
+
+        """
+
         if self.seeds:
             self.add_algorithm(SeedAlgorithm(*self.seeds))
 
@@ -214,7 +321,7 @@ class Job:
                 elif issubclass(algo, SearchAlgorithm):
                     algo_cls = algo
                 else:
-                    raise SearchAlgorithmNotFoundedError()
+                    raise InvalidSearchAlgorithmPassed()
 
                 # noinspection PyArgumentList
                 self.add_algorithm(
@@ -225,7 +332,7 @@ class Job:
         self,
         objective: Callable,
         n_trials: int = 100,
-        n_proc: int = 1,
+        n_jobs: int = 1,
         n_points_iter: int = 1,
         algo_list: Optional[
             List[Union[str, Type[SearchAlgorithm]]]
@@ -235,15 +342,60 @@ class Job:
         use_numba_jit=False,
     ):
         """
-        :param objective: objective function
-        :param n_trials: count of max trials.
-        :param n_proc: max number of processes.
-        :param n_points_iter: configs per one iteration.
-        :param algo_list: chosen search algorithm's list.
-        :param clear: clear algo list or not.
-        :param progress_bar: show progress bar or not.
-        :param use_numba_jit: use numba jit or not (experimental).
-        :return: None
+        Do optimization for current job.
+
+        Example:
+
+            .. code-block:: python
+
+                from feijoa import create_job
+                from feijoa import Experiment
+                from feijoa import Real
+                from feijoa import SearchSpace
+
+
+                def objective(experiment: Experiment):
+                    x = experiment.params.get("x")
+                    y = experiment.params.get("y")
+                    return (
+                        (1.5 - x + x * y) ** 2
+                        + (2.25 - x + x * y**2) ** 2
+                        + (2.625 - x + x * y**3) ** 2
+                    )
+
+
+                space = SearchSpace()
+
+                space.insert(Real("x", low=0.0, high=5.0))
+                space.insert(Real("y", low=0.0, high=2.0))
+
+                job = create_job(search_space=space)
+                job.do(objective, n_trials=50)
+
+        Args:
+            objective:
+                Objective function.
+            n_trials (int):
+                Number of total runs.
+            n_jobs (int):
+                Job's count parallelization with `joblib` backend. if -1 passed => used max of CPU's.
+            algo_list (List[Union[str, SearchAlgorithm, Type[SearchAlgorithm]]):
+                array of algorithms.
+            n_points_iter (int):
+                The preferred number of configurations in one epoch. May have no effect for some algorithms.
+            clear (bool):
+                Clear algo list or not.
+            progress_bar (bool):
+                Show progress bar (rich) or not.
+            use_numba_jit (bool):
+                Use numba for objective evaluation speedup.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         # noinspection PyPep8Naming
@@ -294,7 +446,7 @@ class Job:
 
                 # noinspection PyUnresolvedReferences,PyBroadException
                 parallel = joblib.Parallel(
-                    n_jobs=n_proc, prefer="threads"
+                    n_jobs=n_jobs, prefer="threads"
                 )
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
@@ -310,10 +462,21 @@ class Job:
 
     def tell(self, experiment, result: Union[float, Result]):
         """
-        Finish concrete experiment.
+        Finish concrete experiment
+        and results to algorithms.
 
-        :return:
-        :raises:
+        Args:
+            experiment (Experiment):
+                Specified experiment.
+            result (Union[float, Result]):
+                Result for current experiment.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         objective = (
@@ -346,6 +509,17 @@ class Job:
         raise ExperimentNotFinishedError()
 
     def _tell_for_loaded(self, experiment: Experiment):
+        """
+        Tell results for loaded job.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         self.optimizer.tell(
             experiment.params, experiment.objective_result
         )
@@ -353,7 +527,20 @@ class Job:
     def ask(self, n: int) -> Optional[List[Experiment]]:
         """
         Ask for a new experiment.
-        :return:
+
+        Args:
+            n (int):
+                Preferred count of experiments:
+
+        .. note::
+            n may not affect on experiments count.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
         """
 
         configs = self.optimizer.ask(n)
@@ -361,18 +548,20 @@ class Job:
         if not configs:
             return configs
 
-        applyer = partial(
+        applicator = partial(
             Experiment,
             job_id=self.id,
             state=ExperimentState.WIP,
         )
 
         experiments = [
-            applyer(
+            applicator(
                 params=config,
-                id=self.experiments_count
-                + self.pending_experiments
-                + i,
+                id=(
+                    self.experiments_count
+                    + self.pending_experiments
+                    + i
+                ),
                 create_timestamp=datetime.timestamp(datetime.now()),
             )
             for i, config in enumerate(configs)
@@ -383,6 +572,26 @@ class Job:
         return experiments
 
     def get_dataframe(self, brief=False, desc=False, only_good=False):
+        """Make dataframe for current job.
+
+        Args:
+            brief (bool):
+                Make brief report without additional information.
+            desc (bool):
+                Fetch only descending by objective function values
+                experiments.
+            only_good (bool):
+                Fetch only correct (state='OK') experiments.
+
+        Returns:
+            Pandas dataframe, contains all information
+            about optimization session.
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         container = []
         m = float("+inf")
 
@@ -453,18 +662,56 @@ class Job:
 
     @property
     def dataframe(self):
+        """Get dataframe property."""
+
         return self.get_dataframe()
 
     def add_algorithm(self, algo: SearchAlgorithm):
+        """Add algorithm to job's optimizer
+
+        Arguments:
+            algo (SearchAlgorithm):
+                search algorithm instance.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         self.optimizer.add_algorithm(algo)
 
     def add_seed(self, seed):
+        """Add seed configuration to current job.
+
+        Args:
+            seed (dict):
+                Seed configuration,
+                which must be measured immediately.
+
+        Returns:
+            None
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         self.seeds.append(seed)
 
 
 def _load_storage(
     storage_or_name: Union[str, Optional[Storage]]
 ) -> Storage:
+    """
+    Load a storage object.
+
+    Args:
+        storage_or_name (Union[str, Optional[Storage]]) :
+            Storage instance or string with RFC1738 spec.
+    """
     if storage_or_name is None:
         return RDBStorage("sqlite:///:memory:")
 
@@ -497,12 +744,35 @@ def create_job(
     storage: Union[str, Optional[Storage]] = None,
     **kwargs,
 ):
-    """
+    """Create job instance
+    with specified parameters.
 
-    :param search_space:
-    :param name:
-    :param storage:
-    :return:
+    Example:
+
+        .. code-block:: python
+
+            from feijoa import create_job
+            from feijoa import SearchSpace
+
+            space = SearchSpace()
+
+            job = create_job(search_space=space)
+
+    Args:
+        search_space (SearchSpace):
+            Search space instance.
+        name (str):
+            Name of job.
+        storage:
+            Storage instance or string
+            with `RFC1738` spec.
+
+    Returns:
+        Job instance.
+
+    Raises:
+        AnyError: If anything bad happens.
+
     """
 
     name = name or "job" + datetime.now().strftime(
@@ -528,11 +798,33 @@ def load_job(
     storage: Optional[Union[str, Storage]] = None,
     **kwargs,
 ):
-    """
+    """Load existed job instance
+    with specified parameters.
 
-    :param name:
-    :param storage:
-    :return:
+    Example:
+
+        .. code-block:: python
+
+            from feijoa import load_job
+            from feijoa import SearchSpace
+
+            # job must be in storage
+
+            job = load_job(name="foo", storage="sqlite:///:memory:")
+
+    Args:
+        name (str):
+            Name of job.
+        storage:
+            Storage instance or string
+            with `RFC1738` spec.
+
+    Returns:
+        Job instance.
+
+    Raises:
+        AnyError: If anything bad happens.
+
     """
 
     storage = _load_storage(storage)

@@ -19,12 +19,23 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Different visitors module."""
+
 import random
 
 from feijoa.search.parameters import ParametersVisitor
 
 
 class Randomizer(ParametersVisitor):
+    """Randomizer for parameters visitor.
+
+    Generate random values for specified parameters.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     def __init__(self, seed=0):
         self.random_generator = random.Random(x=seed)
 

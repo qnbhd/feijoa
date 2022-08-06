@@ -19,15 +19,42 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Configuration model class module."""
+
 from pprint import pformat
 
 
+__all__ = ["Configuration"]
+
+
 class Configuration(dict):
+    """Configuration model, inherited from built-in dict.
+
+    Example:
+        .. code-block:: python
+
+            from feijoa.model.configuration import Configuration
+
+            configuration = Configuration(
+                {"foo": 1, "bar": 2}, requestor="simple", request_id=0
+            )
+
+    Args:
+        1st:
+            configuration dict.
+        requestor (str, optional):
+            Name of requestor (algorithm).
+        request_id (int, optional):
+            Index of requested configuration
+            for specified requestor.
+
+    """
+
     def __init__(
         self,
         *args,
         requestor="UNKNOWN",
-        request_id="UNKNOWN",
+        request_id=0,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)

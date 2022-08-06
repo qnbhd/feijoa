@@ -19,10 +19,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import plotly.graph_objs as go
+
 from feijoa import Real
 from feijoa import SearchSpace
 from feijoa.jobs.job import create_job
-import plotly.graph_objs as go
 
 
 def plot_optimization_history(
@@ -32,6 +33,26 @@ def plot_optimization_history(
     fig=None,
     only_best=True,
 ):
+    """Plot optimization history.
+
+    Args:
+        job (Job):
+            Job instance.
+        mode (str):
+            Plotly plot mode. Defaults to "lines+markers"
+        name (str):
+            Name of trace.
+        fig (go.Figure):
+            Plotly figure object.
+        only_best:
+            Plotly only bests results.
+            (Descending sequence by objective values)
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     df = job.get_dataframe(desc=True)
     obj = df["objective_result"]
     iterations = df["id"]
@@ -74,6 +95,23 @@ def plot_compare_jobs(
     fig=None,
     names=None,
 ):
+    """Plot comparison between jobs.
+
+    Args:
+        jobs (List[Job]):
+            List of jobs.
+        mode (str):
+            Plotly plot mode. Defaults to "lines+markers"
+        names (List[str]):
+            Names of traces.
+        fig (go.Figure):
+            Plotly figure object.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     if isinstance(names, list) and len(names) != len(jobs):
         raise ValueError(f"Names must contains {len(jobs)} values.")
 

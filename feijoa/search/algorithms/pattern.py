@@ -35,10 +35,34 @@ from feijoa.search.visitors import Randomizer
 log = logging.getLogger(__name__)
 
 
-class TemplateSearchAlgorithm(SearchAlgorithm):
+class PatternSearch(SearchAlgorithm):
+    """Pattern search implementation.
+
+    The result can be used for functions that are
+    not its continuous or differentiable. One such
+    search method is "convergence" (see below), based
+    on the theory of positive reasons. The optimization
+    turns into the best match (the solution with the
+    smallest error value) in the multidimensional
+    analytical possibility space.
+
+    See more: https://en.wikipedia.org/wiki/Pattern_search_(optimization)
+
+    Implementation based on: https://github.com/jansel/opentuner/blob/master/opentuner/search/patternsearch.py
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     anchor = "template"
-    aliases = ("TemplateSearch", "template")
+    aliases = (
+        "PatternSearch",
+        "pattern",
+        "patternsearch",
+        "TemplateSearch",
+        "templatesearch",
+    )
 
     def __init__(self, search_space: SearchSpace, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,6 +88,8 @@ class TemplateSearchAlgorithm(SearchAlgorithm):
         yield [Configuration(center, requestor=self.name)]
 
         def set_unit_value(p, config, uv):
+            """Set unit value."""
+
             low, high = p.low, p.high
 
             if isinstance(p, Integer):

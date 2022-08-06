@@ -19,12 +19,45 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Base importance evaluator class module."""
+
 import abc
 
 from feijoa.jobs.job import Job
 
 
+__all__ = ["ImportanceEvaluator"]
+
+
 class ImportanceEvaluator(metaclass=abc.ABCMeta):
+    """
+    Base importance evaluator.
+
+    Measures the excessive amount of hyperparameter
+    taken per feature value. Helps to select only the most
+    influential hyperparameters for their tuning.
+    Does not require additional measurements.
+
+    .. note::
+        This version does not apply the study of the influence
+        of a combination of hyperparameters.
+    """
+
     @abc.abstractmethod
     def do(self, job: Job):
+        """
+        Calculate hyperparameters importance.
+
+        Args:
+            job (Job) : Specified job.
+
+        Returns:
+            Dict with keys `params` and `importances`
+                `params` contains names of parameters,
+                `importances` contains list of importances.
+
+        Raises:
+            AnyError: If anything bad happens.
+        """
+
         raise NotImplementedError()

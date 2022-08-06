@@ -19,11 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Bayesian optimization module."""
+
 import inspect
 from typing import Generator
 from typing import List
 from typing import Optional
-import warnings
+
+import numpy as np
+from scipy.stats import norm
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.gaussian_process import GaussianProcessRegressor
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.algorithms import SearchAlgorithm
@@ -31,16 +37,62 @@ from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import Real
 from feijoa.search.visitors import Randomizer
-import numpy as np
-from scipy.stats import norm
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.gaussian_process import GaussianProcessRegressor
+
+
+__all__ = ["BayesianAlgorithm"]
 
 
 # noinspection PyPep8Naming
 class BayesianAlgorithm(SearchAlgorithm):
+    """Bayesian optimization algorithm.
+
+    Bayesian optimization is a global optimization
+    method for an unknown function (black box) with noise.
+    Bayesian optimization applied to hyperparameters
+    optimization builds a stochastic model of the mapping
+    function from hyperparameter value to an objective
+    function applied on the test set. By iteratively
+    applying a perspective hyperparameter configuration
+    based on the current model and then updating it,
+    Bayesian optimization seeks to gather as much
+    information as possible about that function and,
+    in particular, the location of the optimum. The method
+    attempts to balance probing (hyperparameters for which
+    the change is least reliably known) and exploitation
+    (hyperparameters that are expected to be closest to
+    the optimum). In practice, Bayesian optimization
+    has shown better results with less computation compared
+    to grid search and random search due to the ability
+    to judge the quality of experiments even before they
+    are performed.
+
+    Args:
+        search_space (SearchSpace):
+            Search space instance.
+        acq_function (str):
+            Acquisition function.
+            Can be `pi`, `ucb`, `ei` with Gaussian Regressor
+            Or `mc` - experimental, `lfboei`, `lfbopi`
+        regressor:
+            Regression model, must have
+                - fit(X, y)
+                - predict_proba(X)
+                - predict(X)
+            methods. For example, you
+            can use regressor from sklearn package
+            (https://scikit-learn.org/)
+
+    .. note::
+        `lfbopi` and `lfboei` taked from publication:
+         https://arxiv.org/abs/2206.13035
+
+    .. note::
+        `mc` - experimental function.
+
+    """
 
     anchor = "bayesian"
+
     aliases = (
         "BayesianAlgorithm",
         "bayesian",
@@ -57,10 +109,17 @@ class BayesianAlgorithm(SearchAlgorithm):
     ):
 
         super().__init__(*args, **kwargs)
+
         self.search_space = search_space
+
+        # build regression model
+
         self.model = (
             regressor() if inspect.isclass(regressor) else regressor
         )
+
+        # low and high bound of
+        # target hyperparameters
 
         self.bounds = []
 
@@ -72,40 +131,91 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         self.bounds = np.array(self.bounds)
 
+        # trials pool for fitting
+
         self.X = np.empty(shape=(0, len(self.search_space)))
+
+        # results pool for fitting
+
         self.y = np.empty(shape=(0,))
+
+        # setup random generator
+
         self.random_generator = np.random.RandomState(0)
-        self.n_warmup = 5
+
+        # setup acquisition function
+
         self.acq_function = (
             acq_function
             if isinstance(self.model, GaussianProcessRegressor)
             else "mc"
         )
+
+        # setup readable name
         self._name = f"Bayesian<{type(self.model).__name__}({self.acq_function})>"
+
         self._ask_gen = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
+
         if not self._ask_gen:
+            # build ask generator
             self._ask_gen = self._ask(n)
+
         return next(self._ask_gen)
 
-    def _to_gt_config(self, x):
+    def _to_feijoa_config(self, x):
+        """Build feijoa-format
+        configuration from vec x.
+
+        Args:
+            x (numpy.array):
+                Input x vector for transformation.
+
+        Returns:
+            Feijoa-format configuration (dict).
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         configuration = {}
 
         for p, v in zip(self.search_space, x):
             if isinstance(p, Real):
                 configuration[p.name] = v
 
+            # make math rounding
+
             rounded = int(v + (0.5 if v > 0 else -0.5))
 
             if isinstance(p, Integer):
                 configuration[p.name] = rounded
+
+            # pick up needed categorical value
+
             elif isinstance(p, Categorical):
                 configuration[p.name] = p.choices[rounded]
 
         return configuration
 
     def _to_gp_config(self, cfg):
+        """Build vec from Feijoa-format
+        configuration.
+
+        Args:
+            cfg (dict | Configuration):
+                Input configuration for transformation.
+
+        Returns:
+            Values vector (numpy.array).
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
         vec = []
 
         for p_name, v in cfg.items():
@@ -120,6 +230,10 @@ class BayesianAlgorithm(SearchAlgorithm):
         return vec
 
     def _ask(self, n: int) -> Generator:
+        """Main ask generator."""
+
+        # make some warmup configurations
+
         randomizer = Randomizer()
         random_samples = [
             Configuration(
@@ -142,27 +256,29 @@ class BayesianAlgorithm(SearchAlgorithm):
             for c in x:
                 configurations.append(
                     Configuration(
-                        self._to_gt_config(c), requestor=self.name
+                        self._to_feijoa_config(c), requestor=self.name
                     )
                 )
             yield configurations
             self.model.fit(self.X, self.y)
 
     def acquisition(self, X_samples):
+        """Acquisition function for bayesian optimization"""
+
         yhat = self.model.predict(self.X)
         best = min(yhat)
 
         if self.acq_function == "mc":
+            # experimental, research only
+
             mean = self.model.predict(X_samples)
-            warnings.warn(
-                "Not correct acquisition function, research only"
-            )
             negative = np.where(mean - best < 0)
             mean[negative] = 0
             return mean - best
 
         if self.acq_function == "lfboei":
             # https://arxiv.org/abs/2206.13035
+
             tau = np.quantile(self.y, q=0.33)
             classified = np.greater_equal(self.y, tau)
             x1, z1 = self.X[classified], classified[classified]
@@ -186,6 +302,7 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         if self.acq_function == "lfbopi":
             # https://arxiv.org/abs/2206.13035
+
             tau = np.quantile(self.y, q=0.33)
             classified = np.greater_equal(self.y, tau)
             clf = RandomForestClassifier(n_jobs=-1)
@@ -195,6 +312,8 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         mean, std = self.model.predict(X_samples, return_std=True)
         kappa = 2.5
+
+        # regular acquisition functions.
 
         if self.acq_function == "poi":
             probs = norm.cdf((mean - best) / (std + 1e-9))
@@ -207,6 +326,8 @@ class BayesianAlgorithm(SearchAlgorithm):
             return mean + kappa * std
 
     def opt_acquisition(self, n: int):
+        """Optimize acquisition function."""
+
         n_warmup = 10000
 
         x_tries = self.random_generator.uniform(
@@ -221,6 +342,8 @@ class BayesianAlgorithm(SearchAlgorithm):
         return minima_x
 
     def tell(self, config, result):
+        """Tell configuration's result."""
+
         vec = np.array(self._to_gp_config(config))
 
         self.X = np.concatenate([self.X, vec.reshape(1, -1)])

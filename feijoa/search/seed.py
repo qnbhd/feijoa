@@ -32,6 +32,19 @@ log = logging.getLogger(__name__)
 
 
 class SeedAlgorithm(SearchAlgorithm):
+    """Seed algorithm used for measuring.
+
+    Some known configurations and give a
+    good basis for the rest of the algorithms.
+
+    Args:
+        seeds:
+            List of seed configurations.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
 
     anchor = "seed"
     aliases = (

@@ -1,26 +1,7 @@
-# MIT License
-#
-# Copyright (c) 2021-2022 Templin Konstantin
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 from typing import List
 from typing import Optional
+
+import pytest
 
 from feijoa import create_job
 from feijoa import Experiment
@@ -28,6 +9,7 @@ from feijoa import load_job
 from feijoa import Real
 from feijoa import SearchSpace
 from feijoa.exceptions import DuplicatedJobError
+from feijoa.exceptions import InvalidSearchAlgorithmPassed
 from feijoa.exceptions import InvalidStoragePassed
 from feijoa.exceptions import InvalidStorageRFC1738
 from feijoa.exceptions import JobNotFoundError
@@ -35,7 +17,6 @@ from feijoa.exceptions import SearchAlgorithmNotFoundedError
 from feijoa.jobs.job import _load_storage
 from feijoa.models import Result
 from feijoa.search.algorithms import SearchAlgorithm
-import pytest
 
 
 def test_job():
@@ -112,7 +93,7 @@ def test_incorrect_algo_passed():
         def tell(self, experiment: Experiment):
             pass
 
-    with pytest.raises(SearchAlgorithmNotFoundedError):
+    with pytest.raises(InvalidSearchAlgorithmPassed):
         job.do(lambda: 1, algo_list=[IncorrectAlgo])
 
 

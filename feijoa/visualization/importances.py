@@ -19,20 +19,37 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Importances plot module."""
+
+import numpy as np
+import plotly.graph_objs as go
+
 from feijoa import Categorical
 from feijoa import create_job
 from feijoa import Real
 from feijoa import SearchSpace
 from feijoa.importance.mdi import MDIEvaluator
 from feijoa.importance.rsfanova_boosted import RsFanovaEvaluator
-import numpy as np
-import plotly.graph_objs as go
 
 
 def plot_importances(
     job,
     fig=None,
 ):
+    """Plot the importances for
+    a specified job.
+
+    Args:
+        job (Job):
+            Job instance.
+        fig (go.Figure):
+            Plotly figure object.
+
+    Raises:
+        AnyError: If anything bad happens.
+
+    """
+
     fig = fig or go.Figure()
 
     importance_evaluator = MDIEvaluator()
@@ -45,7 +62,6 @@ def plot_importances(
     rsfanova_importance = rsfanova_evaluator.do(job)["importance"]
     importance = mdi_importance + rsfanova_importance
     importance = importance / 2
-    # importance = MinMaxScaler().fit_transform(importance.reshape(-1, 1)).flat
 
     fig.add_bar(
         x=params,
@@ -87,7 +103,7 @@ def main():
     job = create_job(search_space=space)
     job.do(
         objective,
-        n_proc=-1,
+        n_jobs=-1,
         n_trials=100,
         algo_list=["bayesian"],
         progress_bar=True,
