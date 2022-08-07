@@ -187,15 +187,11 @@ examples/gcc/utils/.DS_Store
 /examples/gcc/a-raytracer.cpp.opt-record.json.gz
 /examples/gcc_matrixmultiply.ipynb
 /examples/gcc_raytracer.ipynb
-/examples/notebooks/aecli.db
-/examples/notebooks/mlp_tuning.ipynb
-/examples/notebooks/perceptron.db
 /examples/notebooks/*.db
 /examples/*.db
 .DS_Store
 .vscode
 /tests/images/
-/examples/bo.ipynb
 
 **/catboost_info
 **/*.out

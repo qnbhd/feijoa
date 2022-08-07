@@ -1,6 +1,7 @@
 [project]
 name = "feijoa"
-dynamic = ["version"]
+#dynamic = ["version"]
+version = "0.1.6"
 description = "Hyperparameter's optimization framework"
 authors = [
     {name = "Konstantin Templin", email = "1qnbhd@gmail.com"}
@@ -42,7 +43,7 @@ classifiers = [
 [build-system]
 requires = [
     "setuptools>=45",
-    "setuptools_scm>=6.2",
+#    "setuptools_scm>=6.2",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -54,10 +55,10 @@ exclude = ["tests", "docs", "examples"]
 dev = ["pytest>=7.0.1", "isort>=5.8.0", "flake8>=4.0.1", "pytest-cov>=3.0.0", "importlib-metadata"]
 all = ["click>=8.0.4", "numba>=0.53.1", "tinydb>=4.7.0", "executor>=23.2", "scikit-optimize>=0.9.0"]
 
-[tool.setuptools_scm]
-write_to = "feijoa/_version.py"
-local_scheme = "no-local-version"
-version_scheme = "python-simplified-semver"
+#[tool.setuptools_scm]
+#write_to = "feijoa/_version.py"
+#local_scheme = "no-local-version"
+#version_scheme = "python-simplified-semver"
 
 [tool.black]
 line-length = 70
