@@ -36,6 +36,7 @@ def plot_edf(
     job,
     fig=None,
     name=None,
+    invert_objective=False,
 ):
     """Plot the EDF of a job.
 
@@ -46,6 +47,12 @@ def plot_edf(
             Plotly figure object.
         name:
             Name of trace.
+        invert_objective (bool):
+            For the maximization task, it is
+            necessary to invert the value of
+            the view function, in this case,
+            you must check this box to get
+            corrective values
 
     Raises:
         AnyError: If anything bad happens.
@@ -55,7 +62,9 @@ def plot_edf(
     name = name or job.name
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
-    objectives = df["objective_result"]
+    objectives = df["objective_result"] * (
+        1 if not invert_objective else -1
+    )
     min_value, max_value = objectives.min(), objectives.max()
     lspace = np.linspace(min_value, max_value, 100)
 

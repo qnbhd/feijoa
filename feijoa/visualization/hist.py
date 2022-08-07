@@ -31,6 +31,7 @@ from feijoa import SearchSpace
 def plot_objective_hist(
     job,
     fig=None,
+    invert_objective=False,
 ):
     """Plot objective hists for
     a specified job.
@@ -40,6 +41,12 @@ def plot_objective_hist(
             Job instance.
         fig (go.Figure):
             Plotly figure object.
+        invert_objective (bool):
+            For the maximization task, it is
+            necessary to invert the value of
+            the view function, in this case,
+            you must check this box to get
+            corrective values
 
     Raises:
         AnyError: If anything bad happens.
@@ -48,8 +55,11 @@ def plot_objective_hist(
 
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
+    objectives = df["objective_result"] * (
+        1 if not invert_objective else -1
+    )
 
-    fig.add_histogram(x=df["objective_result"], nbinsx=100)
+    fig.add_histogram(x=objectives, nbinsx=100)
 
     fig.update_layout(
         title="Objective result histogram",

@@ -69,6 +69,7 @@ from feijoa.storages.rdb.storage import RDBStorage
 __all__ = ["Job", "create_job", "load_job"]
 
 from feijoa.utils.imports import ImportWrapper
+from feijoa.utils.misc import in_notebook
 
 
 log = logging.getLogger(__name__)
@@ -440,6 +441,16 @@ class Job:
                     : min(len(configurations), n_trials)
                 ]
 
+                if len(configurations) + trials > n_trials:
+
+                    log.warning(
+                        f"Requestor: <{configurations[0].params.requestor}>"
+                        f" requires a large number of launches to work"
+                        f"correctly. this logic will change in the future."
+                    )
+
+                    # TODO (qnbhd): fix this logic
+
                 configurations_len = len(configurations)
                 trials += configurations_len
                 bar.update(task, advance=configurations_len)
@@ -459,6 +470,11 @@ class Job:
                     configurations, results
                 ):
                     self.tell(experiment, result)
+
+        if in_notebook:
+            from IPython.display import clear_output
+
+            clear_output(wait=False)
 
     def tell(self, experiment, result: Union[float, Result]):
         """
