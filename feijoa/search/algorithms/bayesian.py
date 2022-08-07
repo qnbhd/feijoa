@@ -81,6 +81,8 @@ class BayesianAlgorithm(SearchAlgorithm):
             methods. For example, you
             can use regressor from sklearn package
             (https://scikit-learn.org/)
+        n_warmup (int):
+            Warmup points count.
 
     .. note::
         `lfbopi` and `lfboei` taked from publication:
@@ -105,6 +107,7 @@ class BayesianAlgorithm(SearchAlgorithm):
         *args,
         acq_function="ei",
         regressor=GaussianProcessRegressor,
+        n_warmup=5,
         **kwargs,
     ):
 
@@ -150,6 +153,10 @@ class BayesianAlgorithm(SearchAlgorithm):
             if isinstance(self.model, GaussianProcessRegressor)
             else "mc"
         )
+
+        # warmup points
+
+        self.n_warmup = n_warmup
 
         # setup readable name
         self._name = f"Bayesian<{type(self.model).__name__}({self.acq_function})>"
@@ -243,7 +250,7 @@ class BayesianAlgorithm(SearchAlgorithm):
                 },
                 requestor=self.name,
             )
-            for _ in range(n)
+            for _ in range(self.n_warmup)
         ]
 
         yield random_samples

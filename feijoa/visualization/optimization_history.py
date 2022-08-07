@@ -32,6 +32,7 @@ def plot_optimization_history(
     name=None,
     fig=None,
     only_best=True,
+    invert_objective=False,
 ):
     """Plot optimization history.
 
@@ -47,6 +48,13 @@ def plot_optimization_history(
         only_best:
             Plotly only bests results.
             (Descending sequence by objective values)
+        invert_objective (bool):
+            For the maximization task, it is
+            necessary to invert the value of
+            the view function, in this case,
+            you must check this box to get
+            corrective values
+
 
     Raises:
         AnyError: If anything bad happens.
@@ -54,7 +62,7 @@ def plot_optimization_history(
     """
 
     df = job.get_dataframe(desc=True)
-    obj = df["objective_result"]
+    obj = df["objective_result"] * (1 if not invert_objective else -1)
     iterations = df["id"]
     name = name or job.name
 
@@ -94,6 +102,7 @@ def plot_compare_jobs(
     mode="lines+markers",
     fig=None,
     names=None,
+    invert_objective=False,
 ):
     """Plot comparison between jobs.
 
@@ -106,6 +115,12 @@ def plot_compare_jobs(
             Names of traces.
         fig (go.Figure):
             Plotly figure object.
+        invert_objective (bool):
+            For the maximization task, it is
+            necessary to invert the value of
+            the view function, in this case,
+            you must check this box to get
+            corrective values
 
     Raises:
         AnyError: If anything bad happens.

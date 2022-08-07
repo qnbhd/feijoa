@@ -58,7 +58,7 @@ def pad(string: str, width: int, filler=" ", fill_chars=3):
     return f"{string[:width - 3]}{filler * fill_chars}"
 
 
-def plot_evaluations(job, params=None):
+def plot_evaluations(job, params=None, invert_objective=False):
     """Plot evaluations of job.
 
     Args:
@@ -66,6 +66,12 @@ def plot_evaluations(job, params=None):
             Job instance.
         params (list):
             List of parameters to plot.
+        invert_objective (bool):
+            For the maximization task, it is
+            necessary to invert the value of
+            the view function, in this case,
+            you must check this box to get
+            corrective values
 
     Raises:
         AnyError: If anything bad happens.
@@ -73,7 +79,9 @@ def plot_evaluations(job, params=None):
     """
 
     df = job.get_dataframe(brief=True, only_good=True)
-    objectives = df["objective_result"]
+    objectives = df["objective_result"] * (
+        1 if not invert_objective else -1
+    )
     df.drop(columns=["id", "objective_result"], inplace=True)
     params = params or df.columns
 

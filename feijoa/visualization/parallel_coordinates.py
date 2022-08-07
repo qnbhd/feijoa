@@ -60,6 +60,7 @@ def pad(string: str, width: int, filler=" ", fill_chars=3):
 def plot_parallel_coordinates(
     job,
     params=None,
+    invert_objective=False,
 ):
     """Plot the parallel coordinates for
     a specified job.
@@ -69,6 +70,12 @@ def plot_parallel_coordinates(
             Job instance.
         params (list):
             Parameters names to plot.
+        invert_objective (bool):
+            For the maximization task, it is
+            necessary to invert the value of
+            the view function, in this case,
+            you must check this box to get
+            corrective values
 
     Raises:
         AnyError: If anything bad happens.
@@ -76,7 +83,9 @@ def plot_parallel_coordinates(
     """
 
     df = job.get_dataframe(brief=True, only_good=True)
-    objectives = df["objective_result"]
+    objectives = df["objective_result"] * (
+        1 if not invert_objective else -1
+    )
     df.drop(columns=["id", "objective_result"], inplace=True)
     omin = objectives.min()
     omax = objectives.max()
