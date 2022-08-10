@@ -36,7 +36,8 @@ __all__ = ["FanovaEvaluator"]
 
 
 class FanovaEvaluator(ImportanceEvaluator):
-    """fANOVA importance evaluator.
+    """
+    fANOVA importance evaluator.
 
     An Efficient Approach for Assessing Hyperparameter Importance
     https://ml.informatik.uni-freiburg.de/wp-content/uploads/papers/14-ICML-HyperparameterAssessment.pdf

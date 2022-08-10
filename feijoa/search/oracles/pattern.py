@@ -26,7 +26,7 @@ from typing import List
 from typing import Optional
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.parameters import Integer
 from feijoa.search.space import SearchSpace
 from feijoa.search.visitors import Randomizer
@@ -35,8 +35,9 @@ from feijoa.search.visitors import Randomizer
 log = logging.getLogger(__name__)
 
 
-class PatternSearch(SearchAlgorithm):
-    """Pattern search implementation.
+class Pattern(Oracle):
+    """
+    Pattern search implementation.
 
     The result can be used for functions that are
     not its continuous or differentiable. One such

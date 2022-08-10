@@ -20,6 +20,22 @@ feijoa.utils.logging module
    :undoc-members:
    :show-inheritance:
 
+feijoa.utils.misc module
+------------------------
+
+.. automodule:: feijoa.utils.misc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+feijoa.utils.mixins module
+--------------------------
+
+.. automodule:: feijoa.utils.mixins
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 feijoa.utils.transformers module
 --------------------------------
 

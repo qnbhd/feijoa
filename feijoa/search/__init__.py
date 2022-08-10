@@ -20,10 +20,3 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Search module."""
-
-from .parameters import Categorical
-from .parameters import Integer
-from .parameters import ParametersVisitor
-from .parameters import Real
-from .roundrobin import RoundRobinMeta
-from .space import SearchSpace

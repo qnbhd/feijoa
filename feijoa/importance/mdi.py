@@ -34,7 +34,8 @@ __all__ = ["MDIEvaluator"]
 
 # noinspection DuplicatedCode
 class MDIEvaluator(ImportanceEvaluator):
-    """Mean decrease impurity (MDI) importance evaluator.
+    """
+    Mean decrease impurity (MDI) importance evaluator.
 
     .. code-block:: python
 

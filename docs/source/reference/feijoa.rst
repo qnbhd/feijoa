@@ -10,6 +10,7 @@ Subpackages
    feijoa.importance
    feijoa.jobs
    feijoa.models
+   feijoa.plugins
    feijoa.search
    feijoa.storages
    feijoa.utils

@@ -24,15 +24,16 @@ from typing import List
 from typing import Optional
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.visitors import Randomizer
 
 
-__all__ = ["RandomSearch"]
+__all__ = ["Random"]
 
 
-class RandomSearch(SearchAlgorithm):
-    """Simple random search.
+class Random(Oracle):
+    """
+    Simple random search.
 
     Random search replaces the exhaustive
     search of all combinations with a
@@ -42,7 +43,7 @@ class RandomSearch(SearchAlgorithm):
     generalized to continuous and mixed spaces.
     Random search can outperform lattice search,
     especially if only a small number of hyperparameters
-    affects the performance of the algorithm.
+    affects the performance of the oracle.
 
     Raises:
         AnyError: If anything bad happens.

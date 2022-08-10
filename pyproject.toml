@@ -1,6 +1,6 @@
 [project]
 name = "feijoa"
-#dynamic = ["version"]
+dynamic = ["version"]
 version = "0.1.6"
 description = "Hyperparameter's optimization framework"
 authors = [
@@ -13,14 +13,15 @@ urls = {Repository = "https://github.com/qnbhd/feijoa"}
 readme = "README.md"
 keywords = ["hyperparameters", "BBO", "optimization", "autotuning"]
 license = {text = "MIT"}
-requires-python = ">=3.6"
+requires-python = ">=3.7"
 dependencies = [
     "numpy>=1.19.5", "pandas>=0.25.3",
     "rich>=10.11.0", "pydantic>=1.7.4",
     "mabalgs>=0.6.8", "plotly>=5.9.0",
     "PyYAML>=6.0", "scikit-learn>=0.24.2",
     "joblib>=1.1.0",
-    "SQLAlchemy>=1.4.39"
+    "SQLAlchemy>=1.4.39",
+    "ply>=3.11"
 ]
 classifiers = [
         "Intended Audience :: Science/Research",
@@ -43,7 +44,7 @@ classifiers = [
 [build-system]
 requires = [
     "setuptools>=45",
-#    "setuptools_scm>=6.2",
+    "setuptools_scm>=6.2",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -55,10 +56,10 @@ exclude = ["tests", "docs", "examples"]
 dev = ["pytest>=7.0.1", "isort>=5.8.0", "flake8>=4.0.1", "pytest-cov>=3.0.0", "importlib-metadata"]
 all = ["click>=8.0.4", "numba>=0.53.1", "tinydb>=4.7.0", "executor>=23.2", "scikit-optimize>=0.9.0"]
 
-#[tool.setuptools_scm]
-#write_to = "feijoa/_version.py"
-#local_scheme = "no-local-version"
-#version_scheme = "python-simplified-semver"
+[tool.setuptools_scm]
+write_to = "feijoa/_version.py"
+local_scheme = "no-local-version"
+version_scheme = "python-simplified-semver"
 
 [tool.black]
 line-length = 70
@@ -88,3 +89,8 @@ log_cli_level = "DEBUG"
 log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
 log_cli_date_format = "%Y-%m-%d %H:%M:%S"
 addopts = "--color=yes"
+
+[tool.pydocstyle]
+inherit = false
+ignore = 'D100,D104,D107,D202,D203,D212,D400,D401,D405,D406,D407,D415'
+match = '.*\.py'

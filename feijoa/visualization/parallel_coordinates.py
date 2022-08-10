@@ -19,23 +19,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import logging
+"""Parallel coordinates plot module."""
 
 import numpy as np
 import plotly.graph_objs as go
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import LabelEncoder
-
-from feijoa import Categorical
-from feijoa import create_job
-from feijoa import Integer
-from feijoa import Real
-from feijoa import SearchSpace
-from feijoa.search.algorithms.bayesian import BayesianAlgorithm
 
 
 def pad(string: str, width: int, filler=" ", fill_chars=3):
-    """Pads a string to a given width.
+    """
+    Pads a string to a given width.
 
     Args:
         string (str):
@@ -62,7 +55,8 @@ def plot_parallel_coordinates(
     params=None,
     invert_objective=False,
 ):
-    """Plot the parallel coordinates for
+    """
+    Plot the parallel coordinates for
     a specified job.
 
     Args:
@@ -141,50 +135,3 @@ def plot_parallel_coordinates(
     layout = go.Layout(title="Parallel Coordinate Plot")
     fig = go.Figure(data=tr, layout=layout)
     return fig
-
-
-def objective(experiment):
-    x = experiment.params.get("x")
-    y = experiment.params.get("y")
-    z = experiment.params.get("z")
-    w = experiment.params.get("w")
-
-    u = (
-        (1.5 - x + x * y) ** 2
-        + (2.25 - x + x * y**2) ** 2
-        + (2.625 - x + x * y**3) ** 2
-    )
-
-    u += 1 if z == "foo" else -1
-    u -= w
-    return u
-
-
-def main():
-    space = SearchSpace()
-
-    space.insert(Real("x", low=0.0, high=3.0))
-    space.insert(Real("y", low=0.0, high=1.0))
-    space.insert(Categorical("z", choices=["foo", "bar"]))
-    space.insert(Integer("w", low=0, high=4))
-
-    ba = BayesianAlgorithm(
-        search_space=space, regressor=RandomForestRegressor(n_jobs=-1)
-    )
-
-    job = create_job(search_space=space)
-    logging.basicConfig(level="DEBUG")
-    job.do(
-        objective,
-        n_jobs=-1,
-        n_trials=50,
-        algo_list=[ba],
-        progress_bar=True,
-        use_numba_jit=True,
-    )
-    fig = plot_parallel_coordinates(job, params=["x", "y", "w"])
-    fig.show()
-
-
-if __name__ == "__main__":
-    main()

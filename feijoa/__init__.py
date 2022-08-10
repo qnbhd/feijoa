@@ -29,11 +29,11 @@ __version__ = "0.1.0"
 __feijoa_folder__: str = os.path.join(dirname(abspath(__file__)))
 __project_folder__: str = dirname(__feijoa_folder__)
 
-from .jobs import create_job
-from .jobs import load_job
+from .jobs.job import create_job
+from .jobs.job import load_job
 from .models import Experiment
-from .search import Categorical
-from .search import Integer
-from .search import Real
-from .search import SearchSpace
+from .search.parameters import Categorical
+from .search.parameters import Integer
+from .search.parameters import Real
+from .search.space import SearchSpace
 from .storages import Storage

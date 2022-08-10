@@ -30,21 +30,22 @@ from typing import Optional
 import numpy
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import ParametersVisitor
 from feijoa.search.parameters import Real
 
 
-__all__ = ["GridSearch"]
+__all__ = ["Grid"]
 
 log = logging.getLogger(__name__)
 
 
 # noinspection PyUnresolvedReferences
 class GridMaker(ParametersVisitor):
-    """Simple grid creation for different parameters.
+    """
+    Simple grid creation for different parameters.
 
     Args:
         EPS (float):
@@ -78,12 +79,13 @@ class GridMaker(ParametersVisitor):
         return p.choices
 
 
-class GridSearch(SearchAlgorithm):
-    """Simple grid search.
+class Grid(Oracle):
+    """
+    Simple grid search.
 
     Makes a full iteration over a manually
     specified subset of hyperparameter spaces
-    of the algorithm.
+    of the oracle.
 
     Raises:
         AnyError: If anything bad happens.

@@ -25,17 +25,18 @@ from typing import List
 from typing import Optional
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 
 
 log = logging.getLogger(__name__)
 
 
-class SeedAlgorithm(SearchAlgorithm):
-    """Seed algorithm used for measuring.
+class SeedOracle(Oracle):
+    """
+    Seed oracle used for measuring.
 
     Some known configurations and give a
-    good basis for the rest of the algorithms.
+    good basis for the rest of the oracles.
 
     Args:
         seeds:
@@ -48,7 +49,7 @@ class SeedAlgorithm(SearchAlgorithm):
 
     anchor = "seed"
     aliases = (
-        "SeedAlgorithm",
+        "SeedOracle",
         "seed",
     )
 

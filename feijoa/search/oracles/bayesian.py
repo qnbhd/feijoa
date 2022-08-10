@@ -22,29 +22,36 @@
 """Bayesian optimization module."""
 
 import inspect
+import logging
 from typing import Generator
 from typing import List
 from typing import Optional
 
 import numpy as np
 from scipy.stats import norm
+
+# noinspection PyUnresolvedReferences
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import Real
 from feijoa.search.visitors import Randomizer
 
 
-__all__ = ["BayesianAlgorithm"]
+__all__ = ["Bayesian"]
 
 
-# noinspection PyPep8Naming
-class BayesianAlgorithm(SearchAlgorithm):
-    """Bayesian optimization algorithm.
+log = logging.getLogger(__name__)
+
+
+class Bayesian(Oracle):
+    """
+    Bayesian optimization oracle.
 
     Bayesian optimization is a global optimization
     method for an unknown function (black box) with noise.
@@ -96,7 +103,7 @@ class BayesianAlgorithm(SearchAlgorithm):
     anchor = "bayesian"
 
     aliases = (
-        "BayesianAlgorithm",
+        "BayesianOracle",
         "bayesian",
         "bayes",
     )
@@ -106,16 +113,25 @@ class BayesianAlgorithm(SearchAlgorithm):
         search_space,
         *args,
         acq_function="ei",
-        regressor=GaussianProcessRegressor,
+        regressor="GaussianProcessRegressor",
         n_warmup=5,
+        plugins=None,
         **kwargs,
     ):
 
         super().__init__(*args, **kwargs)
 
+        plugins = plugins or []
+
+        for p in plugins:
+            self.attach(p)
+
         self.search_space = search_space
 
         # build regression model
+
+        # TODO (qnbhd): elliminate globals
+        regressor = globals()[regressor]
 
         self.model = (
             regressor() if inspect.isclass(regressor) else regressor
@@ -172,7 +188,8 @@ class BayesianAlgorithm(SearchAlgorithm):
         return next(self._ask_gen)
 
     def _to_feijoa_config(self, x):
-        """Build feijoa-format
+        """
+        Build feijoa-format
         configuration from vec x.
 
         Args:
@@ -208,7 +225,8 @@ class BayesianAlgorithm(SearchAlgorithm):
         return configuration
 
     def _to_gp_config(self, cfg):
-        """Build vec from Feijoa-format
+        """
+        Build vec from Feijoa-format
         configuration.
 
         Args:
@@ -355,3 +373,14 @@ class BayesianAlgorithm(SearchAlgorithm):
 
         self.X = np.concatenate([self.X, vec.reshape(1, -1)])
         self.y = np.concatenate([self.y, [result]])
+
+        if len(self.y) > 5:
+            self.notify("on_tell", config, result)
+
+    def update(self, event, subject, *args, **kwargs):
+        log.info(
+            f"Event: {event},"
+            f"Subject: {subject}"
+            f"Args: {args}"
+            f"Kwargs: {kwargs}"
+        )

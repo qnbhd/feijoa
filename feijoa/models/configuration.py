@@ -28,22 +28,26 @@ __all__ = ["Configuration"]
 
 
 class Configuration(dict):
-    """Configuration model, inherited from built-in dict.
+    """
+    Configuration model, inherited from built-in dict.
 
     Example:
-        .. code-block:: python
 
-            from feijoa.model.configuration import Configuration
+    .. code-block:: python
 
-            configuration = Configuration(
-                {"foo": 1, "bar": 2}, requestor="simple", request_id=0
-            )
+        from feijoa.model.configuration import Configuration
+
+        configuration = Configuration(
+            {"foo": 1, "bar": 2},
+            requestor="simple",
+            request_id=0,
+        )
 
     Args:
         1st:
             configuration dict.
         requestor (str, optional):
-            Name of requestor (algorithm).
+            Name of requestor (oracle).
         request_id (int, optional):
             Index of requested configuration
             for specified requestor.

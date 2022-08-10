@@ -29,7 +29,8 @@ from pydantic import BaseModel
 
 # noinspection PyUnresolvedReferences
 class Result(BaseModel):
-    """Result model.
+    """
+    Result model.
 
     Args:
         objective_result (float):

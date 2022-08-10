@@ -39,7 +39,8 @@ from feijoa.storages.storage import Storage
 
 
 class RDBStorage(Storage):
-    """Relational Database Storage.
+    """
+    Relational Database Storage.
 
     Uses SQLAlchemy framework.
 

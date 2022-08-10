@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Base class of search algorithms."""
+"""Base class of search oracles."""
 
 import abc
 from typing import List
@@ -28,36 +28,40 @@ from typing import Optional
 from feijoa.models.configuration import Configuration
 
 
-__all__ = ["SearchAlgorithm"]
+__all__ = ["Oracle"]
+
+from feijoa.utils.mixins import Observer
+from feijoa.utils.mixins import Subject
 
 
-class SearchAlgorithm(metaclass=abc.ABCMeta):
-    """Base class of search algorithms.
+class Oracle(Subject, Observer, metaclass=abc.ABCMeta):
+    """
+    Base class of search oracles.
 
     Have a simple ask-tell interface.
 
     When creating the possibility of implementing
-    algorithms, it is desirable that the constructor
+    oracles, it is desirable that the constructor
     arguments should not contain any dependencies on
     feijoa, except for SearchSpace. This decision is
-    made to keep the algorithms easy to use without
+    made to keep the oracles easy to use without
     initializing feijoa components.
 
-    All algorithms must implement:
+    All oracles must implement:
 
         anchor:
-            Name of algorithm, which
-            used for dynamic searching all algorithms
+            Name of oracle, which
+            used for dynamic searching all oracles
             in project.
 
         aliases:
-            synonyms for algorithm name.
+            synonyms for oracle name.
 
         ask(n):
             Get k <= n configurations.
 
         tell(configuration, result):
-            Tell algorithm measured result for
+            Tell oracle measured result for
             configuration
 
 
@@ -68,24 +72,26 @@ class SearchAlgorithm(metaclass=abc.ABCMeta):
 
     def __init__(self, *args, **kwargs):
         self._name = self.__class__.__name__
+        self.subscribers = []
 
     @property
     @abc.abstractmethod
     def anchor(self):
-        """Name used for dynamic algorithm detection."""
+        """Name used for dynamic oracle detection."""
 
         raise NotImplementedError()
 
     @property
     @abc.abstractmethod
     def aliases(self):
-        """Synonyms for algorithm name."""
+        """Synonyms for oracle name."""
 
         raise NotImplementedError()
 
     @abc.abstractmethod
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
-        """Get configurations from algorithm.
+        """
+        Get configurations from oracle.
 
         Args:
             n (int, optional):
@@ -108,7 +114,8 @@ class SearchAlgorithm(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def tell(self, config, result):
-        """Tell configuration's result to algorithm
+        """
+        Tell configuration's result to oracle
         to accumulate information model.
 
         Args:
@@ -134,12 +141,25 @@ class SearchAlgorithm(metaclass=abc.ABCMeta):
 
     @property
     def name(self):
-        """Name of algorithm."""
+        """Name of oracle."""
 
         return self._name
 
     @name.setter
     def name(self, v):
-        """Name setter for algorithm."""
+        """Name setter for oracle."""
 
         self._name = v
+
+    def attach(self, observer: Observer) -> None:
+        self.subscribers.append(observer)
+
+    def detach(self, observer: Observer) -> None:
+        self.subscribers.remove(observer)
+
+    def notify(self, event, *args, **kwargs):
+        for observer in self.subscribers:
+            observer.update(event, self, *args, **kwargs)
+
+    def update(self, event, subject, *args, **kwargs):
+        pass

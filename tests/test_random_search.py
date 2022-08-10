@@ -38,7 +38,7 @@ def test_random_search():
         return (1 - x) ** 2 + (1 - y) ** 2
 
     job = create_job(search_space=space)
-    job.do(objective, n_trials=10, algo_list=["random"])
+    job.do(objective, n_trials=10, optimizer="ucb<random>")
 
     assert job.best_parameters == {
         "w": "foo",

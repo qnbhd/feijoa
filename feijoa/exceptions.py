@@ -22,7 +22,7 @@
 
 __all__ = [
     "DBVersionError",
-    "SearchAlgorithmNotFoundedError",
+    "SearchOracleNotFoundedError",
     "DuplicatedJobError",
     "JobNotFoundError",
     "ExperimentNotFinishedError",
@@ -46,16 +46,17 @@ class DBVersionError(FeijoaError):
     """
 
 
-class SearchAlgorithmNotFoundedError(FeijoaError):
+class SearchOracleNotFoundedError(FeijoaError):
     """
-    Raises if the chosen search algorithm
+    Raises if the chosen search oracle
     not founded.
     """
 
 
-class InvalidSearchAlgorithmPassed(FeijoaError):
-    """Raises if the specified object is
-    not valid SearchAlgorithm.
+class InvalidSearchOraclePassed(FeijoaError):
+    """
+    Raises if the specified object is
+    not valid SearchOracle.
     """
 
 
@@ -76,7 +77,7 @@ class JobNotFoundError(FeijoaError):
 class ExperimentNotFinishedError(FeijoaError):
     """
     Raises if an attempt was made to inform
-    the search algorithms that the experiment
+    the search oracles that the experiment
     was not completed. To complete the experiment,
     you must call the .success_finish() method
     """
@@ -100,15 +101,21 @@ class InvalidStoragePassed(FeijoaError):
 
 
 class InvalidStorageRFC1738(FeijoaError):
-    """Raises if you could not parse rfc1738 URL
-    from specified string."""
+    """
+    Raises if you could not parse rfc1738 URL
+    from specified string.
+    """
 
 
 class InvalidOptimizer(FeijoaError):
-    """Raises if specified optimizer class doesn't
-    inherit from MetaSearchAlgorithm"""
+    """
+    Raises if specified optimizer class
+    doesn't inherit from MetaSearchOracle.
+    """
 
 
 class PackageNotInstalledError(FeijoaError):
-    """Raises if an attempt to import a package
-    was not successful"""
+    """
+    Raises if an attempt to import a
+    package was not successful.
+    """

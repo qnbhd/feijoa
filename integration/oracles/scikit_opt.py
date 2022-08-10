@@ -31,7 +31,7 @@ from numpy.ma import MaskedArray
 import sklearn.utils.fixes
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import Real
@@ -44,10 +44,10 @@ sklearn.utils.fixes.MaskedArray = MaskedArray
 with ImportWrapper():
     import skopt
 
-__all__ = ["SkoptBayesianAlgorithm"]
+__all__ = ["Skopt"]
 
 
-class SkoptBayesianAlgorithm(SearchAlgorithm):
+class Skopt(Oracle):
     """Bayesian algorithm implementation with
     `scikit-optimize` backend.
 

@@ -47,17 +47,18 @@ class ImportWrapper:
 
 
 def import_or_skip(module, reason=""):
-    """Import module or skip test in
-    pytest framework.
+    """
+    Import module or skip test in
+        pytest framework.
 
-    Args:
-        module:
-            Python module.
-        reason:
-            Reason of skipping.
+        Args:
+            module:
+                Python module.
+            reason:
+                Reason of skipping.
 
-    Raises:
-        AnyError: If anything bad happens.
+        Raises:
+            AnyError: If anything bad happens.
 
     """
 

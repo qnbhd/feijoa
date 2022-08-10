@@ -24,10 +24,6 @@
 import numpy as np
 import plotly.graph_objs as go
 
-from feijoa import Categorical
-from feijoa import create_job
-from feijoa import Real
-from feijoa import SearchSpace
 from feijoa.importance.mdi import MDIEvaluator
 from feijoa.importance.rsfanova_boosted import RsFanovaEvaluator
 
@@ -36,7 +32,8 @@ def plot_importances(
     job,
     fig=None,
 ):
-    """Plot the importances for
+    """
+    Plot the importances for
     a specified job.
 
     Args:
@@ -89,30 +86,3 @@ def objective(experiment):
     ob += -10 if u == "bar" else 0
     # ob = x + np.sqrt(y)
     return ob
-
-
-def main():
-    space = SearchSpace()
-
-    space.insert(Real("x", low=0.1, high=3.0))
-    space.insert(Real("y", low=0.1, high=3.0))
-    space.insert(Real("z", low=0.1, high=3.0))
-    space.insert(Real("w", low=0.0, high=3.0))
-    space.insert(Categorical("u", choices=["foo", "bar"]))
-
-    job = create_job(search_space=space)
-    job.do(
-        objective,
-        n_jobs=-1,
-        n_trials=100,
-        algo_list=["bayesian"],
-        progress_bar=True,
-        use_numba_jit=True,
-    )
-
-    fig = plot_importances(job)
-    fig.show()
-
-
-if __name__ == "__main__":
-    main()

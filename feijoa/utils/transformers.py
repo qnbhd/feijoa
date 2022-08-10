@@ -21,22 +21,23 @@
 # SOFTWARE.
 import numpy as np
 
-from feijoa import Categorical
-from feijoa import Integer
-from feijoa import Real
+from feijoa.search.parameters import Categorical
+from feijoa.search.parameters import Integer
+from feijoa.search.parameters import Real
 
 
 def transform(sol, search_space):
-    """Transform solutions into a dictionary.
+    """
+    Transform solutions into a dictionary.
 
-    Args:
-        sol (list | numpy.array):
-            Vector of parameter's values.
-        search_space:
-            Search space instance.
+        Args:
+            sol (list | numpy.array):
+                Vector of parameter's values.
+            search_space:
+                Search space instance.
 
-    Raises:
-        AnyError: If anything bad happens.
+        Raises:
+            AnyError: If anything bad happens.
 
     """
 
@@ -58,17 +59,18 @@ def transform(sol, search_space):
 
 
 def inverse_transform(configuration: dict, search_space):
-    """Transform dictionary (configuration)
-    to vector of parameter's values.
+    """
+    Transform dictionary (configuration)
+        to vector of parameter's values.
 
-    Args:
-        configuration (dict | Configuration):
-            Feijoa configuration.
-        search_space:
-            Search space instance.
+        Args:
+            configuration (dict | Configuration):
+                Feijoa configuration.
+            search_space:
+                Search space instance.
 
-    Raises:
-        AnyError: If anything bad happens.
+        Raises:
+            AnyError: If anything bad happens.
 
     """
 
