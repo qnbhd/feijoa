@@ -26,8 +26,9 @@ from datetime import datetime
 from functools import partial
 import inspect
 import logging
-from typing import Any, ContextManager
+from typing import Any
 from typing import Callable
+from typing import ContextManager
 from typing import List
 from typing import Optional
 from typing import Union
@@ -359,7 +360,7 @@ class Job:
         dela = joblib.delayed(objective)
 
         progress: ContextManager = (
-            Progress(transient=True, disable=not progress_bar) # type: ignore
+            Progress(transient=True, disable=not progress_bar)  # type: ignore
             if progress_bar
             else contextlib.nullcontext()
         )

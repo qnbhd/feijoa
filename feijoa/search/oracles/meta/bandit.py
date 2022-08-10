@@ -21,7 +21,8 @@
 # SOFTWARE.
 from collections import Counter
 import logging
-from typing import Tuple, Type
+from typing import Tuple
+from typing import Type
 
 from mab import algs
 import numpy as np

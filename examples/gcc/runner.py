@@ -26,11 +26,11 @@ import os
 import subprocess
 
 import click
-
-from feijoa.utils.logging import init
 from examples.gcc.utils.extractor import extract
 from examples.gcc.utils.run_tools import continue_job
 from examples.gcc.utils.run_tools import run_job
+
+from feijoa.utils.logging import init
 
 
 now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")

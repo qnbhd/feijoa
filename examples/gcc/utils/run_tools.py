@@ -28,7 +28,8 @@ from os.path import abspath
 from os.path import dirname
 import platform
 import random
-from typing import Optional, Dict
+from typing import Dict
+from typing import Optional
 from typing import Tuple
 from typing import Union
 
