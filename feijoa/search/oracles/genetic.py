@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Genetic algorithms with `pymoo` backend module."""
+"""Genetic oracles with `pymoo` backend module."""
 
 import logging
 import time
@@ -42,7 +42,7 @@ with ImportWrapper():
     from pymoo.algorithms.base.local import LocalSearch
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
+from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import Real
@@ -52,8 +52,11 @@ from feijoa.utils.transformers import transform
 
 de = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.de")
 ga = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.ga")
-cmaes = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.cmaes")
+cmaes = LazyModuleImportProxy(
+    "pymoo.algorithms.soo.nonconvex.cmaes" ""
+)
 brkga = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.brkga")
+
 direct = LazyModuleImportProxy(
     "pymoo.algorithms.soo.nonconvex.direct"
 )
@@ -71,20 +74,21 @@ sres = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.sres")
 log = logging.getLogger(__name__)
 
 
-class Genetic(SearchAlgorithm):
+class Genetic(Oracle):
 
-    """Genetic algorithms with `pymoo` backend.
+    """
+    Genetic oracles with `pymoo` backend.
     Pymoo link: https://pymoo.org/.
 
     Args:
         algorithm_cls:
-            Pymoo algorithm class.
+            Pymoo oracle class.
 
     Raises:
         AnyError: If anything bad happens.
 
     .. note::
-        This set of algorithms is experimental.
+        This set of oracles is experimental.
 
     """
 
@@ -122,10 +126,10 @@ class Genetic(SearchAlgorithm):
 
         self.algorithm = self.algorithm_cls(**kwargs)
 
-        # let the algorithm object never terminate and let the loop control it
+        # let the oracle object never terminate and let the loop control it
         self.termination = NoTermination()
 
-        # create an algorithm object that never terminates
+        # create an oracle object that never terminates
         self.algorithm.setup(
             self.problem, termination=self.termination
         )
@@ -133,7 +137,7 @@ class Genetic(SearchAlgorithm):
         self.args = args
         self.kwargs = kwargs
 
-        self.algorithm.start_time = time.time()
+        self.algorithm_cls.start_time = time.time()
 
         # fix the random seed manually
         np.random.seed(0)
@@ -151,15 +155,16 @@ class Genetic(SearchAlgorithm):
             )
         return next(self._ask_gen)
 
+    # noinspection PyUnusedLocal
     def _ask(self, n: int) -> Generator:
-        """Main ask generator for genetic algorithms."""
+        """Main ask generator for genetic oracles."""
 
         n_gen = 0
 
         while True:
             self.pop = self.algorithm.ask()
 
-            # get the design space values of the algorithm
+            # get the design space values of the oracle
             X = self.pop.get("X")
 
             log.debug(f"Generation: {n_gen} for {self.name}")
@@ -173,9 +178,7 @@ class Genetic(SearchAlgorithm):
                     requestor=self.name,
                     request_id=i,
                 )
-                for i, (individual, solution) in enumerate(
-                    zip(self.pop, X)
-                )
+                for i, solution in enumerate(X)
             ]
 
             yield configs
@@ -193,7 +196,7 @@ class Genetic(SearchAlgorithm):
             self.pool.append(self.pop[config.request_id])
             return
 
-        # take experience from other algorithms
+        # take experience from other oracles
 
         x0 = Individual()
 
@@ -219,7 +222,7 @@ class Genetic(SearchAlgorithm):
                     "x0": Population(individuals=np.array(self.pool))
                 }
 
-            # restart our algorithm
+            # restart our oracle
             self.algorithm = self.algorithm_cls(
                 *self.args, **self.kwargs, **params
             )

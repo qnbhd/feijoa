@@ -36,7 +36,8 @@ __all__ = ["SearchSpace"]
 
 
 class SearchSpace:
-    """Search space class.
+    """
+    Search space class.
 
     Represents cartesian multiplication of
     set of available values for every
@@ -118,11 +119,12 @@ class SearchSpace:
 
     @classmethod
     def from_db_parameters(cls, parameters):
-        """Build search space from db representation
-        of parameters.
+        """
+        Build search space from db representation
+                of parameters.
 
-        Raises:
-            AnyError: If anything bad happens.
+                Raises:
+                    AnyError: If anything bad happens.
 
         """
 
@@ -144,17 +146,18 @@ class SearchSpace:
 
 
 def parameter_factory(**kwargs):
-    """Create parameters from dict representation.
+    """
+    Create parameters from dict representation.
 
-    Args:
-        kwargs (Dict[str]):
-            Dict with information about parameter.
+        Args:
+            kwargs (Dict[str]):
+                Dict with information about parameter.
 
-    Returns:
-        Parameter builded from kwargs.
+        Returns:
+            Parameter builded from kwargs.
 
-    Raises:
-        AnyError: If anything bad happens.
+        Raises:
+            AnyError: If anything bad happens.
 
     """
 
@@ -181,7 +184,8 @@ def parameter_factory(**kwargs):
 
 
 def from_yaml(yaml_file: str) -> SearchSpace:
-    """Load search space from yaml file."""
+    """
+    Load search space from yaml file."""
 
     warnings.warn(
         "Function `from_yaml` is deprecated."

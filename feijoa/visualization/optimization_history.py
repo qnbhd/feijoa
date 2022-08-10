@@ -19,11 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-import plotly.graph_objs as go
+"""Optimization history plot module."""
 
-from feijoa import Real
-from feijoa import SearchSpace
-from feijoa.jobs.job import create_job
+import plotly.graph_objs as go
 
 
 def plot_optimization_history(
@@ -34,7 +32,8 @@ def plot_optimization_history(
     only_best=True,
     invert_objective=False,
 ):
-    """Plot optimization history.
+    """
+    Plot optimization history.
 
     Args:
         job (Job):
@@ -104,7 +103,8 @@ def plot_compare_jobs(
     names=None,
     invert_objective=False,
 ):
-    """Plot comparison between jobs.
+    """
+    Plot comparison between jobs.
 
     Args:
         jobs (List[Job]):
@@ -131,6 +131,7 @@ def plot_compare_jobs(
         raise ValueError(f"Names must contains {len(jobs)} values.")
 
     names = names or [job.name for job in jobs]
+    print(names)
 
     fig = fig or go.Figure()
 
@@ -138,30 +139,3 @@ def plot_compare_jobs(
         plot_optimization_history(job, mode, name, fig)
 
     return fig
-
-
-def objective(experiment):
-    x = experiment.params.get("x")
-    y = experiment.params.get("y")
-    return (
-        (1.5 - x + x * y) ** 2
-        + (2.25 - x + x * y**2) ** 2
-        + (2.625 - x + x * y**3) ** 2
-    )
-
-
-def main():
-    space = SearchSpace()
-
-    space.insert(Real("x", low=0.0, high=5.0))
-    space.insert(Real("y", low=0.0, high=2.0))
-
-    job = create_job(search_space=space)
-    job.do(objective, n_trials=30)
-
-    fig = plot_optimization_history(job, only_best=False)
-    fig.show()
-
-
-if __name__ == "__main__":
-    main()

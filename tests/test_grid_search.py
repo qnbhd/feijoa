@@ -24,7 +24,7 @@ def test_grid_search():
     # total experiments must be 36
 
     job = create_job(search_space=space)
-    job.do(objective, n_trials=50, algo_list=["grid"])
+    job.do(objective, n_trials=50, optimizer="ucb<grid>")
 
     experiments_params = [e.params for e in job.experiments]
 

@@ -34,7 +34,8 @@ __all__ = ["PCAEvaluator"]
 
 # noinspection DuplicatedCode
 class PCAEvaluator(ImportanceEvaluator):
-    """Principal component analysis (PCA) importance evaluator.
+    """
+        Principal component analysis (PCA) importance evaluator.
 
     .. code-block:: python
 

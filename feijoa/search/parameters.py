@@ -49,7 +49,8 @@ class Parameter(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def accept(self, v):
-        """Accept visitor.
+        """
+        Accept visitor.
 
         Args:
             v (Visitor):
@@ -89,7 +90,8 @@ class Parameter(metaclass=abc.ABCMeta):
 
 
 class Integer(Parameter):
-    """Integer parameter class.
+    """
+    Integer parameter class.
 
     Represents discrete integer parameters from Z-space.
 
@@ -171,13 +173,14 @@ class Integer(Parameter):
 
 
 class Real(Parameter):
-    """Real parameter class.
+    """
+    Real parameter class.
 
     Represents real parameters from R-space.
 
     Such parameters can be, for example, learning
-    rate of ML algorithm, or mutation rate in
-    genetic algorithms.
+    rate of ML oracle, or mutation rate in
+    genetic oracles.
 
     Example:
 
@@ -252,7 +255,8 @@ class Real(Parameter):
 
 
 class Categorical(Parameter):
-    """Categorical parameter class.
+    """
+    Categorical parameter class.
 
     Represents category parameters.
 
@@ -314,14 +318,15 @@ class Categorical(Parameter):
 
 
 class ParametersVisitor(metaclass=abc.ABCMeta):
-    """Parameters abstract visitor
+    """
+    Parameters abstract visitor
 
-    Used for iteration over collections
-    with parameters.
+        Used for iteration over collections
+        with parameters.
 
-    Raises:
-        AnyError:
-            If anything bad happens.
+        Raises:
+            AnyError:
+                If anything bad happens.
 
     """
 

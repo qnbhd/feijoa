@@ -44,10 +44,10 @@ from feijoa import create_job
 from feijoa import Experiment
 from feijoa import load_job
 from feijoa import SearchSpace
-from feijoa.search import ParametersVisitor
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import Parameter
+from feijoa.search.parameters import ParametersVisitor
 from feijoa.search.parameters import Real
 
 
@@ -433,7 +433,7 @@ def run_gcc(
     n_trials,
     source_file,
     objective_metric,
-    algorithms=None,
+    optimizer,
 ):
     """Runs the GCC example.
 
@@ -449,9 +449,9 @@ def run_gcc(
         iterations (int):
             Count of iteration to get
             specified accuracy.
-        algorithms:
-            List of names, classes or specified instances
-            of algorithms.
+        optimizer (str):
+            Feijoa's optimizer format
+            optimizer string.
 
     Raises:
         AnyError: If anything bad happens.
@@ -459,7 +459,6 @@ def run_gcc(
     """
 
     # noinspection PyProtectedMember
-    job._load_algo(algo_list=algorithms)
 
     baselines = run_baselines(toolchain, source_file, iterations)
 
@@ -475,8 +474,9 @@ def run_gcc(
     job.do(
         obj,
         n_trials=n_trials,
+        n_points_iter=10,
         n_jobs=-1,
-        algo_list=["bayesian", "template", "random"],
+        optimizer=optimizer,
         use_numba_jit=False,
     )
 
@@ -492,7 +492,7 @@ def run_job(
     storage,
     job_name,
     objective_metric,
-    *algorithms,
+    optimizer,
 ):
     """Only run wrapper for GCC example.
 
@@ -514,16 +514,14 @@ def run_job(
         iterations (int):
             Count of iteration to get
             specified accuracy.
-        algorithms:
-            List of names, classes or specified instances
-            of algorithms.
+        optimizer (str):
+            Feijoa's optimizer format
+            optimizer string.
 
     Raises:
         AnyError: If anything bad happens.
 
     """
-
-    algorithms = algorithms or ["bayesian"]
 
     space = SearchSpace.from_yaml_file(search_space_file)
     job = create_job(
@@ -536,7 +534,7 @@ def run_job(
         n_trials,
         source_file,
         objective_metric,
-        algorithms=algorithms,
+        optimizer=optimizer,
     )
     return baselines, job
 
@@ -549,6 +547,7 @@ def continue_job(
     storage,
     job_name,
     objective_metric,
+    optimizer,
 ):
     """Continue command for GCC example.
 
@@ -568,6 +567,9 @@ def continue_job(
         iterations (int):
             Count of iteration to get
             specified accuracy.
+        optimizer (str):
+            Feijoa's optimizer format
+            optimizer string.
 
     Raises:
         AnyError: If anything bad happens.
@@ -582,5 +584,6 @@ def continue_job(
         n_trials,
         source_file,
         objective_metric,
+        optimizer=optimizer,
     )
     return baselines, job

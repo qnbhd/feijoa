@@ -25,7 +25,7 @@ def objective(experiment: Experiment):
     )
 
 
-def test_template_search():
+def test_pattern_search():
     space = SearchSpace()
 
     space.insert(Real("x", low=0.0, high=5.0))
@@ -33,4 +33,4 @@ def test_template_search():
     space.insert(Categorical("z", choices=["foo", "bar"]))
 
     job = create_job(search_space=space)
-    job.do(objective, n_trials=200, algo_list=["template"])
+    job.do(objective, n_trials=200, optimizer="ucb<pattern>")

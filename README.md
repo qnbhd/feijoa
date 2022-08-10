@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="600" height="250" src="https://raw.githubusercontent.com/qnbhd/feijoa/349a89b36206a4d1b96036c02657fab247c68307/docs/feijoa_logo.svg">
+    <img width="600" height="250" src="https://raw.githubusercontent.com/qnbhd/feijoa/fd74c0662911c8e4aff50db05471aa89115145d8/docs/source/feijoa_logo_rtd.svg">
 </p>
 
 <div align="center">
