@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Meta algorithm base class module."""
+"""Meta oracle base class module."""
 
 import abc
 import logging
@@ -28,26 +28,30 @@ from typing import List
 from typing import Optional
 
 from feijoa.models.configuration import Configuration
-from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.search.seed import SeedAlgorithm
+from feijoa.search.oracles.oracle import Oracle
+from feijoa.utils.imports import LazyModuleImportProxy
+
+
+seed = LazyModuleImportProxy("feijoa.search.seed")
 
 
 log = logging.getLogger(__name__)
 
 
-class MetaSearchAlgorithm(SearchAlgorithm):
-    """Meta-search algorithm.
+class MetaOracle(Oracle):
+    """
+    Meta-search oracle.
 
-    Used for pick up algorithms.
+    Used for pick up oracles.
 
     Raises:
         AnyError: If anything bad happens.
 
     """
 
-    def __init__(self, *algorithms, **kwargs):
-        super().__init__(*algorithms, **kwargs)
-        self.algorithms = list(algorithms)
+    def __init__(self, *oracles, **kwargs):
+        super().__init__(*oracles, **kwargs)
+        self.oracles = list(oracles)
         self.ask_gen = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
@@ -58,43 +62,45 @@ class MetaSearchAlgorithm(SearchAlgorithm):
     def _ask(self, n: int) -> Generator:
         prev_picked = ""
 
-        # pick up all seed's algorithms
+        # pick up all seed's oracles
 
-        seed_algorithms = [
-            a for a in self.algorithms if isinstance(a, SeedAlgorithm)
+        seed_oracles = [
+            a for a in self.oracles if isinstance(a, seed.SeedOracle)
         ]
 
-        # remove all seed's algorithms
+        # remove all seed's oracles
 
-        for algo in seed_algorithms:
-            self.remove_algorithm(algo)
+        for oracle in seed_oracles:
+            self.remove_oracle(oracle)
 
-        if seed_algorithms:
+        if seed_oracles:
             log.debug("Let's measure seed configurations!")
-            for algo in seed_algorithms:
-                configs = algo.ask(n)
+            for oracle in seed_oracles:
+                configs = oracle.ask(n)
                 yield configs
 
         while True:
-            for algo in self.order:
-                if not prev_picked or prev_picked != algo.name:
-                    log.debug(f"Pick {algo.name}")
-                configs = algo.ask(n)
+            for oracle in self.order:
+                if not prev_picked or prev_picked != oracle.name:
+                    log.debug(f"Pick {oracle.name}")
+                configs = oracle.ask(n)
                 yield configs
-                prev_picked = algo.name
+                prev_picked = oracle.name
 
     def tell(self, config, result):
-        """Tell results to all search algorithms"""
+        """
+        Tell results to all search oracles"""
 
-        for algo in self.algorithms:
-            algo.tell(config, result)
+        for oracle in self.oracles:
+            oracle.tell(config, result)
 
-    def add_algorithm(self, algo: SearchAlgorithm):
-        """Append algorithm to algorithms list.
+    def add_oracle(self, oracle: Oracle):
+        """
+        Append oracle to oracles list.
 
         Args:
-            algo (SearchAlgorithm):
-                search algorithm instance.
+            oracle (Oracle):
+                search oracle instance.
 
         Returns:
             None
@@ -104,16 +110,17 @@ class MetaSearchAlgorithm(SearchAlgorithm):
 
         """
 
-        self.algorithms.append(algo)
+        self.oracles.append(oracle)
 
     @abc.abstractmethod
-    def remove_algorithm(self, algo: SearchAlgorithm):
-        """Remove algorithm from inner techniques
-        pool in meta-technique.
+    def remove_oracle(self, oracle: Oracle):
+        """
+        Remove oracle from inner oracles
+        pool in meta-oracle.
 
         Args:
-            algo (SearchAlgorithm):
-                search algorithm instance.
+            oracle (Oracle):
+                search oracle instance.
 
         Returns:
             None
@@ -126,6 +133,6 @@ class MetaSearchAlgorithm(SearchAlgorithm):
     @property
     @abc.abstractmethod
     def order(self):
-        """Get order for algorithms."""
+        """Get order for oracles."""
 
         raise NotImplementedError()

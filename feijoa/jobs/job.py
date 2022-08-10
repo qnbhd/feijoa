@@ -30,7 +30,6 @@ from typing import Any
 from typing import Callable
 from typing import List
 from typing import Optional
-from typing import Type
 from typing import Union
 import warnings
 
@@ -44,24 +43,25 @@ from sqlalchemy.exc import ArgumentError
 from feijoa.exceptions import DuplicatedJobError
 from feijoa.exceptions import ExperimentNotFinishedError
 from feijoa.exceptions import InvalidOptimizer
-from feijoa.exceptions import InvalidSearchAlgorithmPassed
+from feijoa.exceptions import InvalidSearchOraclePassed
 from feijoa.exceptions import InvalidStoragePassed
 from feijoa.exceptions import InvalidStorageRFC1738
 from feijoa.exceptions import JobNotFoundError
-from feijoa.exceptions import SearchAlgorithmNotFoundedError
+from feijoa.exceptions import SearchOracleNotFoundedError
 from feijoa.models import Experiment
 from feijoa.models import Result
 from feijoa.models.experiment import ExperimentState
-from feijoa.search import SearchSpace
-from feijoa.search.algorithms import get_algo
-from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.search.algorithms.bayesian import BayesianAlgorithm
-from feijoa.search.bandit import ThompsonSampler
-from feijoa.search.meta import MetaSearchAlgorithm
+from feijoa.search.oracles.bayesian import Bayesian
+from feijoa.search.oracles.finder import get_algo
+from feijoa.search.oracles.finder import maker
+from feijoa.search.oracles.finder import Oracle
+from feijoa.search.oracles.meta.bandit import ThompsonSampler
+from feijoa.search.oracles.meta.meta import MetaOracle
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
 from feijoa.search.parameters import Real
-from feijoa.search.seed import SeedAlgorithm
+from feijoa.search.seed import SeedOracle
+from feijoa.search.space import SearchSpace
 from feijoa.storages import Storage
 from feijoa.storages.rdb.storage import RDBStorage
 
@@ -76,7 +76,8 @@ log = logging.getLogger(__name__)
 
 
 class Job:
-    """Facade of framework, contains main logic
+    """
+    Facade of framework, contains main logic
     of optimization process.
 
     Example:
@@ -93,7 +94,7 @@ class Job:
                 storage=RDBStorage("sqlite:///:memory:"),
                 search_space=SearchSpace(),
                 job_id=1,
-                optimizer=ThompsonSampler,
+                optimizer="ucb<bayesian>",
             )
 
     Args:
@@ -103,8 +104,8 @@ class Job:
             Storage instance, which will be used to save the results
         search_space (SearchSpace):
             Search space of optimization problem.
-        optimizer (MetaSearchAlgorithm):
-            Optimizer, which will be used to algorithms manipulation.
+        optimizer (MetaOracle):
+            Optimizer, which will be used to oracles manipulation.
 
     Raises:
         AnyError: If anything bad happens.
@@ -126,13 +127,11 @@ class Job:
         self.pruners = pruners
         self.id = job_id
 
-        if issubclass(type(optimizer), MetaSearchAlgorithm):
+        if issubclass(type(optimizer), MetaOracle):
             self.optimizer = optimizer
-        elif not issubclass(
-            type(optimizer), MetaSearchAlgorithm
-        ) and (
+        elif not issubclass(type(optimizer), MetaOracle) and (
             not inspect.isclass(optimizer)
-            or not issubclass(optimizer, MetaSearchAlgorithm)
+            or not issubclass(optimizer, MetaOracle)
         ):
             raise InvalidOptimizer()
         else:
@@ -275,59 +274,20 @@ class Job:
 
         return rewards
 
-    def setup_default_algo(self):
+    @staticmethod
+    def setup_default_algo():
         """
-        Setup default optimization algorithm (bayesian).
+        Setup default optimization oracle (bayesian).
 
         Raises:
             AnyError: If anything bad happens.
 
         """
 
-        self.add_algorithm(BayesianAlgorithm(self.search_space))
-
-    def _load_algo(self, algo_list=None):
-        """
-        Inject algorithms from algo_list to
-        current job.
-
-        Args:
-            algo_list (List[Union[str, SearchAlgorithm, Type[SearchAlgorithm]]):
-                array of algorithms.
-
-        Raises:
-            SearchAlgorithmNotFoundedError:
-                If passed the name of an algorithm that does not exist.
-            InvalidSearchAlgorithmPassed:
-                If passes not valid search algorithm.
-            AnyError: If anything bad happens.
-
-        """
-
-        if self.seeds:
-            self.add_algorithm(SeedAlgorithm(*self.seeds))
-
-        if not algo_list:
-            self.add_algorithm(BayesianAlgorithm(self.search_space))
-        else:
-            for algo in algo_list:
-                if isinstance(algo, str):
-                    try:
-                        algo_cls = get_algo(algo)
-                    except SearchAlgorithmNotFoundedError:
-                        raise SearchAlgorithmNotFoundedError()
-                elif isinstance(algo, SearchAlgorithm):
-                    self.add_algorithm(algo)
-                    continue
-                elif issubclass(algo, SearchAlgorithm):
-                    algo_cls = algo
-                else:
-                    raise InvalidSearchAlgorithmPassed()
-
-                # noinspection PyArgumentList
-                self.add_algorithm(
-                    algo_cls(search_space=self.search_space)
-                )
+        warnings.warn(
+            "Calling this method has no effects."
+            " The logic of this method will be revised."
+        )
 
     def do(
         self,
@@ -335,10 +295,7 @@ class Job:
         n_trials: int = 100,
         n_jobs: int = 1,
         n_points_iter: int = 1,
-        algo_list: Optional[
-            List[Union[str, Type[SearchAlgorithm]]]
-        ] = None,
-        clear=True,
+        optimizer="bayesian",
         progress_bar=True,
         use_numba_jit=False,
     ):
@@ -380,12 +337,10 @@ class Job:
                 Number of total runs.
             n_jobs (int):
                 Job's count parallelization with `joblib` backend. if -1 passed => used max of CPU's.
-            algo_list (List[Union[str, SearchAlgorithm, Type[SearchAlgorithm]]):
-                array of algorithms.
+            optimizer (str):
+                Optimizer according to feijoa's optimizer's spec.
             n_points_iter (int):
-                The preferred number of configurations in one epoch. May have no effect for some algorithms.
-            clear (bool):
-                Clear algo list or not.
+                The preferred number of configurations in one epoch. May have no effect for some oracles.
             progress_bar (bool):
                 Show progress bar (rich) or not.
             use_numba_jit (bool):
@@ -399,18 +354,10 @@ class Job:
 
         """
 
-        # noinspection PyPep8Naming
+        self.optimizer = maker(optimizer, self.search_space)
 
-        if clear:
-            cls = type(self.optimizer)
-            self.optimizer = cls()
-
-        if (
-            algo_list
-            or algo_list is None
-            and not self.optimizer.algorithms
-        ):
-            self._load_algo(algo_list)
+        if self.seeds:
+            self.optimizer.oracles.insert(0, SeedOracle(*self.seeds))
 
         if use_numba_jit:
             with ImportWrapper():
@@ -446,7 +393,7 @@ class Job:
                     log.warning(
                         f"Requestor: <{configurations[0].params.requestor}>"
                         f" requires a large number of launches to work"
-                        f"correctly. this logic will change in the future."
+                        f" correctly. this logic will change in the future."
                     )
 
                     # TODO (qnbhd): fix this logic
@@ -479,7 +426,7 @@ class Job:
     def tell(self, experiment, result: Union[float, Result]):
         """
         Finish concrete experiment
-        and results to algorithms.
+        and results to oracles.
 
         Args:
             experiment (Experiment):
@@ -588,7 +535,8 @@ class Job:
         return experiments
 
     def get_dataframe(self, brief=False, desc=False, only_good=False):
-        """Make dataframe for current job.
+        """
+        Make dataframe for current job.
 
         Args:
             brief (bool):
@@ -682,12 +630,13 @@ class Job:
 
         return self.get_dataframe()
 
-    def add_algorithm(self, algo: SearchAlgorithm):
-        """Add algorithm to job's optimizer
+    def add_algorithm(self, oracle: Oracle):
+        """
+        Add oracle to job's optimizer
 
         Arguments:
-            algo (SearchAlgorithm):
-                search algorithm instance.
+            oracle (Oracle):
+                search oracle instance.
 
         Returns:
             None
@@ -697,10 +646,17 @@ class Job:
 
         """
 
-        self.optimizer.add_algorithm(algo)
+        warnings.warn(
+            "This method is deprecated. Please use"
+            " `optimizer` argument in do method instead.",
+            DeprecationWarning,
+        )
+
+        self.optimizer.add_oracle(oracle)
 
     def add_seed(self, seed):
-        """Add seed configuration to current job.
+        """
+        Add seed configuration to current job.
 
         Args:
             seed (dict):
@@ -760,8 +716,8 @@ def create_job(
     storage: Union[str, Optional[Storage]] = None,
     **kwargs,
 ):
-    """Create job instance
-    with specified parameters.
+    """
+    Create job instance with specified parameters.
 
     Example:
 
@@ -814,8 +770,8 @@ def load_job(
     storage: Optional[Union[str, Storage]] = None,
     **kwargs,
 ):
-    """Load existed job instance
-    with specified parameters.
+    """
+    Load existed job instance with specified parameters.
 
     Example:
 

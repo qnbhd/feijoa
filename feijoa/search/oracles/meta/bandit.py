@@ -21,12 +21,13 @@
 # SOFTWARE.
 from collections import Counter
 import logging
+from typing import Tuple
 
 from mab import algs
 import numpy as np
 
-from feijoa.search.algorithms import SearchAlgorithm
-from feijoa.search.meta import MetaSearchAlgorithm
+from feijoa.search.oracles.meta.meta import MetaOracle
+from feijoa.search.oracles.oracle import Oracle
 
 
 log = logging.getLogger(__name__)
@@ -55,17 +56,17 @@ def relative_change_d1(x_cur: float, x_prev: float):
     )
 
 
-class UCB1(MetaSearchAlgorithm):
-
-    """UCB1 bandit algorithm.
+class UCB1(MetaOracle):
+    """
+    UCB1 bandit oracle.
 
     Used for the optimal choice of optimization strategy
 
     Args:
         algorithms:
-            List of algorithms.
+            List of oracles.
         algo_select_count (int):
-            Count of algorithms to yield (with ranking).
+            Count of oracles to yield (with ranking).
 
     Raises:
         AnyError: If anything bad happens.
@@ -73,7 +74,7 @@ class UCB1(MetaSearchAlgorithm):
     """
 
     anchor = "UCB1"
-    aliases = ("UCB1",)
+    aliases: Tuple = ("UCB1", "ucb1", "ucb")
 
     STRATEGY = algs.UCB1
 
@@ -82,19 +83,19 @@ class UCB1(MetaSearchAlgorithm):
         self.mab = None
         self.name2index = dict()
         self.results = []
-        self.algo_select_count: int = algo_select_count
+        self.oracles_select_count: int = algo_select_count
         self.mult = 10
         self.rewards = Counter()
 
-    def add_algorithm(self, algo):
-        self.algorithms.append(algo)
+    def add_oracle(self, oracle):
+        self.oracles.append(oracle)
 
-    def remove_algorithm(self, algo: SearchAlgorithm):
-        self.algorithms.remove(algo)
+    def remove_oracle(self, oracle: Oracle):
+        self.oracles.remove(oracle)
         self._fix_names()
-        self.mab = self.STRATEGY(len(self.algorithms))
+        self.mab = self.STRATEGY(len(self.oracles))
         self.name2index = {
-            algo.name: i for i, algo in enumerate(self.algorithms)
+            oracle.name: i for i, oracle in enumerate(self.oracles)
         }
 
         for algo_index, reward in self.rewards.items():
@@ -102,44 +103,47 @@ class UCB1(MetaSearchAlgorithm):
                 self.mab.reward(algo_index)
 
     def _fix_names(self):
-        """Needed for make unique algorithms names."""
+        """Needed for make unique oracles names."""
 
         names = set()
-        for a in self.algorithms:
+        for a in self.oracles:
             while a.name in names:
                 a.name += "@"
             names.add(a.name)
 
     @property
     def order(self):
-        """Get order for algorithms.
+        """
+        Get order for oracles.
 
-        Raises:
-            AnyError: If anything bad happens.
+                Raises:
+                    AnyError: If anything bad happens.
 
         """
 
         if not self.mab:
             self._fix_names()
-            self.mab = self.STRATEGY(len(self.algorithms))
+            self.mab = self.STRATEGY(len(self.oracles))
             self.name2index = {
-                algo.name: i for i, algo in enumerate(self.algorithms)
+                oracle.name: i
+                for i, oracle in enumerate(self.oracles)
             }
 
         _, ranking = self.mab.select()
-        index = max(len(self.algorithms), self.algo_select_count)
+        index = max(len(self.oracles), self.oracles_select_count)
         ranking_chunk = ranking[:index]
 
-        return [self.algorithms[i] for i in ranking_chunk]
+        return [self.oracles[i] for i in ranking_chunk]
 
     def tell(self, config, result):
-        """Tell results to all search algorithms.
+        """
+        Tell results to all search oracles.
 
-        An adaptive strategy is used with increasing
-        reward upon convergence.
+                An adaptive strategy is used with increasing
+                reward upon convergence.
 
-        Raises:
-            AnyError: If anything bad happens.
+                Raises:
+                    AnyError: If anything bad happens.
 
         """
 
@@ -150,13 +154,13 @@ class UCB1(MetaSearchAlgorithm):
             self.mult = int(self.mult * 1.2)
 
         has_reward = False
-        algo_index = None
+        oracle_index = None
 
         if (
             np.isfinite(result)
             and config.requestor in self.name2index
         ):
-            algo_index = self.name2index[config.requestor]
+            oracle_index = self.name2index[config.requestor]
 
             if self.results:
                 m = min(self.results)
@@ -174,8 +178,8 @@ class UCB1(MetaSearchAlgorithm):
 
         if has_reward:
             for _ in range(reward_multiplier):
-                self.mab.reward(algo_index)
-                self.rewards[algo_index] += 1
+                self.mab.reward(oracle_index)
+                self.rewards[oracle_index] += 1
             log.debug(
                 f"Reward <{reward_multiplier}> "
                 f"for {config.requestor} with result: {result}"
@@ -183,14 +187,14 @@ class UCB1(MetaSearchAlgorithm):
 
         self.results.append(result)
 
-        for algo in self.algorithms:
-            algo.tell(config, result)
+        for oracle in self.oracles:
+            oracle.tell(config, result)
 
 
 class UCBTuned(UCB1):
 
     anchor = "UCBTuned"
-    aliases = ("UCBTuned",)
+    aliases = ("UCBTuned", "ucbtuned")
 
     STRATEGY = algs.UCBTuned
 
@@ -198,6 +202,6 @@ class UCBTuned(UCB1):
 class ThompsonSampler(UCB1):
 
     anchor = "ThompsonSampler"
-    aliases = ("ThompsonSampler",)
+    aliases = ("ThompsonSampler", "thompson", "th")
 
     STRATEGY = algs.ThompsomSampling

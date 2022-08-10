@@ -9,14 +9,14 @@ from feijoa import load_job
 from feijoa import Real
 from feijoa import SearchSpace
 from feijoa.exceptions import DuplicatedJobError
-from feijoa.exceptions import InvalidSearchAlgorithmPassed
 from feijoa.exceptions import InvalidStoragePassed
 from feijoa.exceptions import InvalidStorageRFC1738
 from feijoa.exceptions import JobNotFoundError
-from feijoa.exceptions import SearchAlgorithmNotFoundedError
+from feijoa.exceptions import SearchOracleNotFoundedError
+
+# noinspection PyProtectedMember
 from feijoa.jobs.job import _load_storage
 from feijoa.models import Result
-from feijoa.search.algorithms import SearchAlgorithm
 
 
 def test_job():
@@ -56,7 +56,7 @@ def test_create_load_job():
     job = create_job(
         search_space=space, name="foo", storage="sqlite:///foo.db"
     )
-    job.do(objective, n_trials=10, algo_list=["random"])
+    job.do(objective, n_trials=10, optimizer="ucb<random>")
 
     assert (
         isinstance(job.experiments, list)
@@ -79,62 +79,12 @@ def test_create_load_job():
     print(job2.get_dataframe(desc=True))
 
 
-def test_incorrect_algo_passed():
+def test_incorrect_oracle_passed():
     space = SearchSpace()
     job = create_job(search_space=space)
 
-    with pytest.raises(SearchAlgorithmNotFoundedError):
-        job.do(lambda: 1, algo_list=["some_incorrect"])
-
-    class IncorrectAlgo:
-        def ask(self) -> Optional[List[Experiment]]:
-            pass
-
-        def tell(self, experiment: Experiment):
-            pass
-
-    with pytest.raises(InvalidSearchAlgorithmPassed):
-        job.do(lambda: 1, algo_list=[IncorrectAlgo])
-
-
-def test_correct_algo_subclass_passed():
-    space = SearchSpace()
-    job = create_job(search_space=space)
-
-    class CorrectAlgo(SearchAlgorithm):
-
-        anchor = "CorrectAlgo"
-        aliases = ("CorrectAlgo",)
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        def ask(self, n: int = 1) -> Optional[List[Experiment]]:
-            pass
-
-        def tell(self, config, result):
-            pass
-
-    job.do(lambda: 1, algo_list=[CorrectAlgo])
-
-
-def test_no_configurations_warning():
-    space = SearchSpace()
-    job = create_job(search_space=space)
-
-    class SomeAlgo(SearchAlgorithm):
-
-        anchor = "SomeAlgo"
-        aliases = ("SomeAlgo",)
-
-        def ask(self, n: int = 1) -> Optional[List[Experiment]]:
-            return None
-
-        def tell(self, config, result):
-            pass
-
-    with pytest.warns(UserWarning, match="No new configurations."):
-        job.do(space, algo_list=[SomeAlgo()])
+    with pytest.raises(SearchOracleNotFoundedError):
+        job.do(lambda: 1, optimizer="ucb<some_incorrect>")
 
 
 def test_job_duplicated_error():

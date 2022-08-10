@@ -27,14 +27,15 @@ from rich.traceback import install
 
 
 def init(verbose=False):
-    """Init logging.
+    """
+    Init logging.
 
-    Args:
-        verbose (bool):
-            Verbose level (DEBUG) or not (INFO).
+        Args:
+            verbose (bool):
+                Verbose level (DEBUG) or not (INFO).
 
-    Raises:
-        AnyError: If anything bad happens.
+        Raises:
+            AnyError: If anything bad happens.
 
     """
 

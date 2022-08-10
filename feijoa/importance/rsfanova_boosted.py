@@ -19,8 +19,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""fANOVA importances evaluator uses Rust
-implementation of fANOVA algorithm.
+"""
+fANOVA importances evaluator uses Rust
+implementation of fANOVA oracle.
 """
 
 import numpy as np
@@ -39,7 +40,8 @@ __all__ = ["RsFanovaEvaluator"]
 
 
 class RsFanovaEvaluator(ImportanceEvaluator):
-    """fANOVA importance evaluator rust implementation
+    """
+    fANOVA importance evaluator rust implementation
     binding for https://github.com/sile/fanova
 
     .. note::

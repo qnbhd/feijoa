@@ -20,7 +20,7 @@ def test_seed():
 
     job = create_job(search_space=space)
     job.add_seed({"x": 1.0, "y": 1.0})
-    job.do(objective, n_trials=50, n_jobs=1, algo_list=["grid"])
+    job.do(objective, n_trials=50, n_jobs=1, optimizer="ucb<grid>")
 
     assert job.best_parameters == {"x": 1.0, "y": 1.0}
-    # assert job.best_experiment.requestor == "SeedAlgorithm"
+    # assert job.best_experiment.requestor == "SeedOracle"

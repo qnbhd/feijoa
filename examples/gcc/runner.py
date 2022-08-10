@@ -22,7 +22,8 @@
 from datetime import datetime
 import json
 import logging
-import sys
+import os
+import subprocess
 
 import click
 
@@ -32,13 +33,30 @@ from utils.run_tools import continue_job
 from utils.run_tools import run_job
 
 
-print(sys.path)
-
 now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")
 
 init(verbose=True)
 
 log = logging.getLogger(__name__)
+
+
+def command_exists(command):
+    try:
+        devnull = open(os.devnull, "w")
+        subprocess.call(
+            [command], stdout=devnull, stderr=subprocess.STDOUT
+        )
+        return True
+    except OSError:
+        return False
+
+
+def validate_cli_command(ctx, param, value):
+    if not command_exists(value):
+        raise click.BadParameter(
+            f"CLI command `{value}` not founded."
+        )
+    return value
 
 
 @click.group()
@@ -47,13 +65,19 @@ def cli():
 
 
 @click.command(name="run")
-@click.option("--toolchain", type=str, required=True)
-@click.option("--search-space", type=str, required=True)
-@click.option("--source-file", type=str, required=True)
+@click.option(
+    "--toolchain",
+    type=str,
+    callback=validate_cli_command,
+    required=True,
+)
+@click.option("--search-space", type=click.File("r"), required=True)
+@click.option("--source-file", type=click.File("r"), required=True)
 @click.option("--iterations", type=int, default=5)
 @click.option("--n-trials", type=int, default=100)
 @click.option("--storage", type=str, default=f"sqlite:///{now}.db")
 @click.option("--job-name", type=str, default=now)
+@click.option("--optimizer", type=str, default="ucb<bayesian>")
 def run_cmd(
     toolchain,
     search_space,
@@ -62,17 +86,19 @@ def run_cmd(
     iterations,
     storage,
     job_name,
+    optimizer,
 ):
     init(verbose=True)
     baselines, job = run_job(
         toolchain,
-        search_space,
-        source_file,
+        search_space.name,
+        source_file.name,
         n_trials,
         iterations,
         storage,
         job_name,
         "time",
+        optimizer=optimizer,
     )
     log.info("Baselines:")
     log.info(json.dumps(baselines, indent=2))
@@ -80,11 +106,17 @@ def run_cmd(
 
 
 @click.command(name="continue")
-@click.option("--toolchain", type=str, required=True)
-@click.option("--source-file", type=str, required=True)
+@click.option(
+    "--toolchain",
+    type=str,
+    callback=validate_cli_command,
+    required=True,
+)
+@click.option("--source-file", type=click.File("r"), required=True)
 @click.option("--iterations", type=int, default=5)
 @click.option("--storage", type=str, required=True)
 @click.option("--job-name", type=str, required=True)
+@click.option("--optimizer", type=str, default="ucb<bayesian>")
 def continue_cmd(
     toolchain,
     source_file,
@@ -92,16 +124,18 @@ def continue_cmd(
     iterations,
     storage,
     job_name,
+    optimizer,
 ):
     init(verbose=True)
     baselines, job = continue_job(
         toolchain,
-        source_file,
+        source_file.name,
         n_trials,
         iterations,
         storage,
         job_name,
         "time",
+        optimizer=optimizer,
     )
     log.info("Baselines:")
     log.info(baselines)

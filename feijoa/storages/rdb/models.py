@@ -46,7 +46,7 @@ __all__ = [
 _Base: DeclarativeMeta = declarative_base()
 
 
-class Json(TypeDecorator):
+class Json(TypeDecorator):  # type: ignore
     """Json column (temporary class)."""
 
     @property
@@ -68,19 +68,19 @@ class Json(TypeDecorator):
             return None
 
 
-class SearchSpaceModel(_Base):
+class SearchSpaceModel(_Base):  # type: ignore
     __tablename__ = "search_space"
 
     id = Column(Integer, primary_key=True)
 
 
-class ParameterModel(_Base):
+class ParameterModel(_Base):  # type: ignore
     __tablename__ = "parameter"
 
     id = Column(Integer, primary_key=True)
-    search_space_id = Column(ForeignKey(SearchSpaceModel.id))
+    search_space_id = Column(ForeignKey(SearchSpaceModel.id))  # type: ignore
     search_space = relationship(
-        SearchSpaceModel, backref="parameters"
+        SearchSpaceModel, backref="parameters"  # type: ignore
     )
 
     name = Column(String)
@@ -88,24 +88,24 @@ class ParameterModel(_Base):
     meta = Column(Json)
 
 
-class JobModel(_Base):
+class JobModel(_Base):  # type: ignore
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    search_space_id = Column(ForeignKey(SearchSpaceModel.id))
-    search_space = relationship(SearchSpaceModel, backref="jobs")
+    search_space_id = Column(ForeignKey(SearchSpaceModel.id))  # type: ignore
+    search_space = relationship(SearchSpaceModel, backref="jobs")  # type: ignore
 
     def __repr__(self):
         return f"Job<{self.id}, {self.name}"
 
 
-class ExperimentModel(_Base):
+class ExperimentModel(_Base):  # type: ignore
     __tablename__ = "experiments"
 
     id = Column(Integer, primary_key=True)
-    job_id = Column(ForeignKey(JobModel.id), primary_key=True)
-    job = relationship(JobModel, backref="experiments")
+    job_id = Column(ForeignKey(JobModel.id), primary_key=True)  # type: ignore
+    job = relationship(JobModel, backref="experiments")  # type: ignore
     state = Column(String)
     hash = Column(String)
     objective_result = Column(Float)

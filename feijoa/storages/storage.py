@@ -32,7 +32,8 @@ __all__ = ["Storage"]
 
 class Storage(metaclass=abc.ABCMeta):
     def insert_job(self, job):
-        """Insert job into storage.
+        """
+        Insert job into storage.
 
         Args:
             job (Job):
@@ -47,7 +48,8 @@ class Storage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def is_job_name_exists(self, name):
-        """Find job in storage.
+        """
+        Find job in storage.
 
         Args:
             name (str):
@@ -62,7 +64,8 @@ class Storage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_job_id_by_name(self, name) -> Optional[int]:
-        """Get job by id in storage.
+        """
+        Get job by id in storage.
 
         Args:
             name (str):
@@ -77,7 +80,8 @@ class Storage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def insert_experiment(self, experiment):
-        """Insert experiment into storage.
+        """
+        Insert experiment into storage.
 
         Args:
             experiment (Experiment):
@@ -92,7 +96,8 @@ class Storage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_experiment(self, job_id, experiment_id):
-        """Get experiment from job.
+        """
+        Get experiment from job.
 
         Args:
             job_id (int):
@@ -109,7 +114,8 @@ class Storage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_experiments_by_job_id(self, job_id) -> List[Experiment]:
-        """Get experiments from job
+        """
+        Get experiments from job
 
         Args:
             job_id:
@@ -124,7 +130,8 @@ class Storage(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def get_experiments_count(self, job_id) -> int:
-        """Get experiments count in specified job.
+        """
+        Get experiments count in specified job.
 
         Args:
             job_id (int):
@@ -138,7 +145,8 @@ class Storage(metaclass=abc.ABCMeta):
         pass
 
     def best_experiment(self, job) -> Optional[Experiment]:
-        """Get best experiment from job.
+        """
+        Get best experiment from job.
 
         Args:
             job (Job):
@@ -157,7 +165,8 @@ class Storage(metaclass=abc.ABCMeta):
         return min(experiments, key=lambda x: x.objective_result)  # type: ignore
 
     def top_experiments(self, job_id, n) -> List[Experiment]:
-        """Get top experiments from job.
+        """
+        Get top experiments from job.
         Experiments is sorted by objective values.
 
         Args:
@@ -175,7 +184,8 @@ class Storage(metaclass=abc.ABCMeta):
         return experiments[: min(len(experiments), n)]
 
     def get_search_space_by_job_id(self, job_id) -> SearchSpace:
-        """Get search space from existed job.
+        """
+        Get search space from existed job.
 
         Args:
             job_id (int):

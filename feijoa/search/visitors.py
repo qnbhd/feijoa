@@ -27,7 +27,8 @@ from feijoa.search.parameters import ParametersVisitor
 
 
 class Randomizer(ParametersVisitor):
-    """Randomizer for parameters visitor.
+    """
+    Randomizer for parameters visitor.
 
     Generate random values for specified parameters.
 

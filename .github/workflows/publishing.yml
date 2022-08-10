@@ -33,3 +33,4 @@ jobs:
         with:
             password: ${{ secrets.PYPI_API_TOKEN }}
             verbose: true
+            skip_existing: true

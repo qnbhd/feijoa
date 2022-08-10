@@ -19,24 +19,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+"""Evaluations plot module."""
+
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-from feijoa import create_job
-from feijoa.search.algorithms.bayesian import BayesianAlgorithm
-from feijoa.search.algorithms.genetic import CMAES
-from feijoa.search.algorithms.genetic import PSO
-from feijoa.search.algorithms.pattern import PatternSearch
-from feijoa.search.algorithms.randomized import RandomSearch
-from feijoa.search.bandit import ThompsonSampler
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Real
-from feijoa.search.space import SearchSpace
-from feijoa.utils.logging import init
-
 
 def pad(string: str, width: int, filler=" ", fill_chars=3):
-    """Pads a string to a given width.
+    """
+    Pads a string to a given width.
 
     Args:
         string (str):
@@ -59,7 +50,8 @@ def pad(string: str, width: int, filler=" ", fill_chars=3):
 
 
 def plot_evaluations(job, params=None, invert_objective=False):
-    """Plot evaluations of job.
+    """
+    Plot evaluations of job.
 
     Args:
         job (Job):
@@ -200,66 +192,3 @@ def plot_evaluations(job, params=None, invert_objective=False):
             )
 
     return fig
-
-
-def objective(experiment):
-    x = experiment.params.get("x")
-    y = experiment.params.get("y")
-    z = experiment.params.get("z")
-    w = experiment.params.get("w")
-    fast = experiment.params.get("fast")
-    u = (
-        (
-            (1.5 - x + x * y) ** 2
-            + (2.25 - x + x * y**2) ** 2
-            + (2.625 - x + x * y**3) ** 2
-        )
-        - 0.1 * z
-        - 0.5 * w
-    )
-
-    if fast == "foo":
-        u -= 10
-    elif fast == "bar":
-        pass
-    else:
-        u -= 5
-
-    return u
-
-
-def main():
-    space = SearchSpace()
-
-    init(verbose=True)
-
-    space.insert(Real("x", low=0.0, high=3.0))
-    space.insert(Real("y", low=0.0, high=1.0))
-    space.insert(Real("z", low=0.0, high=1.0))
-    space.insert(Real("w", low=0.0, high=1.0))
-    space.insert(Categorical("fast", choices=["foo", "bar", "zoo"]))
-
-    bayesian = BayesianAlgorithm(search_space=space)
-    template = PatternSearch(search_space=space)
-    cmaes = CMAES(search_space=space)
-    pso_ = PSO(search_space=space)
-    rnd = RandomSearch(search_space=space)
-
-    thompson = ThompsonSampler(bayesian, template, rnd, cmaes, pso_)
-
-    job = create_job(search_space=space)
-    job.do(
-        objective,
-        n_jobs=-1,
-        n_trials=100,
-        algo_list=[thompson],
-        progress_bar=True,
-        use_numba_jit=True,
-    )
-
-    fig = plot_evaluations(job)
-    fig.show()
-
-
-if __name__ == "__main__":
-    main()

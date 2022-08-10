@@ -51,7 +51,8 @@ class ExperimentState(str, Enum):
 
 # noinspection PyUnresolvedReferences
 class Experiment(BaseModel):
-    """Experiment model.
+    """
+    Experiment model.
 
     Lifecycle of experiment:
 
@@ -104,7 +105,8 @@ class Experiment(BaseModel):
         orm_mode = True
 
     def apply(self, result):
-        """Apply result to experiment.
+        """
+        Apply result to experiment.
 
         Args:
             result (float):

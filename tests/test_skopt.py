@@ -31,4 +31,4 @@ def test_skopt():
     space.insert(Categorical("w", choices=["foo"]))
 
     job = create_job(search_space=space)
-    job.do(objective, n_trials=10, algo_list=["skopt"])
+    job.do(objective, n_trials=10, optimizer="ucb<skopt>")

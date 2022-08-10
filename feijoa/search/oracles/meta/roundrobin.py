@@ -19,13 +19,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-"""Round robin meta algorithm module."""
+"""Round robin meta oracle module."""
 
 from collections import deque
 import logging
 
-from feijoa.search.algorithms.algorithm import SearchAlgorithm
-from feijoa.search.meta import MetaSearchAlgorithm
+from feijoa.search.oracles.meta.meta import MetaOracle
+from feijoa.search.oracles.oracle import Oracle
 
 
 log = logging.getLogger(__name__)
@@ -33,8 +33,9 @@ log = logging.getLogger(__name__)
 __all__ = ["RoundRobinMeta"]
 
 
-class RoundRobinMeta(MetaSearchAlgorithm):
-    """RoundRobin meta algorithm.
+class RoundRobinMeta(MetaOracle):
+    """
+    RoundRobin meta oracle.
 
     Raises:
         AnyError: If anything bad happens.
@@ -46,17 +47,17 @@ class RoundRobinMeta(MetaSearchAlgorithm):
 
     def __init__(self, *algorithms):
         super().__init__(*algorithms)
-        self.algo_deq = None
+        self.oracle_deque = None
 
     @property
     def order(self):
         # noinspection PyUnresolvedReferences
-        if not self.algo_deq:
-            self.algo_deq = deque(self.algorithms)
+        if not self.oracle_deque:
+            self.oracle_deque = deque(self.oracles)
 
-        self.algo_deq.rotate(1)
-        return self.algo_deq
+        self.oracle_deque.rotate(1)
+        return self.oracle_deque
 
-    def remove_algorithm(self, algo: SearchAlgorithm):
-        self.algo_deq.remove(algo)
-        self.algorithms.remove(algo)
+    def remove_oracle(self, oracle: Oracle):
+        self.oracle_deque.remove(oracle)
+        self.oracles.remove(oracle)
