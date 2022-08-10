@@ -28,6 +28,7 @@ from pydantic import BaseModel
 
 
 # noinspection PyUnresolvedReferences
+# pyre-ignore[13]:
 class Result(BaseModel):
     """
     Result model.

@@ -21,7 +21,7 @@
 # SOFTWARE.
 from collections import Counter
 import logging
-from typing import Tuple
+from typing import Tuple, Type
 
 from mab import algs
 import numpy as np
@@ -76,7 +76,7 @@ class UCB1(MetaOracle):
     anchor = "UCB1"
     aliases: Tuple = ("UCB1", "ucb1", "ucb")
 
-    STRATEGY = algs.UCB1
+    STRATEGY: Type = algs.UCB1
 
     def __init__(self, *algorithms, algo_select_count=3):
         super().__init__(*algorithms)

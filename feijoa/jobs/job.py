@@ -26,7 +26,7 @@ from datetime import datetime
 from functools import partial
 import inspect
 import logging
-from typing import Any
+from typing import Any, ContextManager
 from typing import Callable
 from typing import List
 from typing import Optional
@@ -119,7 +119,6 @@ class Job:
         search_space: SearchSpace,
         job_id: int,
         pruners: Any = None,
-        optimizer=ThompsonSampler,
     ):
 
         self.name = name
@@ -127,16 +126,8 @@ class Job:
         self.pruners = pruners
         self.id = job_id
 
-        if issubclass(type(optimizer), MetaOracle):
-            self.optimizer = optimizer
-        elif not issubclass(type(optimizer), MetaOracle) and (
-            not inspect.isclass(optimizer)
-            or not issubclass(optimizer, MetaOracle)
-        ):
-            raise InvalidOptimizer()
-        else:
-            self.optimizer = optimizer()
-
+        # noinspection PyTypeChecker
+        self.optimizer: MetaOracle = None  # type: ignore
         self.search_space = search_space
         self.pending_experiments = 0
 
@@ -367,14 +358,15 @@ class Job:
 
         dela = joblib.delayed(objective)
 
-        progress = (
-            Progress(transient=True, disable=not progress_bar)
+        progress: ContextManager = (
+            Progress(transient=True, disable=not progress_bar) # type: ignore
             if progress_bar
             else contextlib.nullcontext()
         )
 
         trials = 0
         with progress as bar:  # type: ignore
+            # pyre-ignore[16]:
             task = bar.add_task("Optimizing", total=n_trials)
             while trials < n_trials:
                 configurations = self.ask(n_points_iter)
@@ -400,6 +392,7 @@ class Job:
 
                 configurations_len = len(configurations)
                 trials += configurations_len
+                # pyre-ignore[16]:
                 bar.update(task, advance=configurations_len)
 
                 # noinspection PyUnresolvedReferences,PyBroadException
@@ -509,7 +502,7 @@ class Job:
         configs = self.optimizer.ask(n)
 
         if not configs:
-            return configs
+            return None
 
         applicator = partial(
             Experiment,

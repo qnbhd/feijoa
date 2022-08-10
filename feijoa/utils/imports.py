@@ -80,5 +80,5 @@ class LazyModuleImportProxy(types.ModuleType):
         self.__dict__.update(module.__dict__)
         return module
 
-    def __getattr__(self, item: str) -> Any:
-        return getattr(self._load(), item)
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._load(), name)

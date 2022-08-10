@@ -164,8 +164,8 @@ class TinyDBStorage(Storage):
             experiments.append(exp)
         return experiments
 
-    def get_experiments_count(self, job) -> int:
-        return len(self.get_experiments_by_job_id(job))
+    def get_experiments_count(self, job_id) -> int:
+        return len(self.get_experiments_by_job_id(job_id))
 
     @property
     def jobs(self):

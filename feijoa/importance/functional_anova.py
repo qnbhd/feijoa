@@ -29,6 +29,7 @@ from .evaluator import ImportanceEvaluator
 
 
 with ImportWrapper():
+    # pyre-ignore[21]:
     from fanova import fANOVA
 
 

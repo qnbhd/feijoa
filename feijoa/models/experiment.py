@@ -50,6 +50,7 @@ class ExperimentState(str, Enum):
 
 
 # noinspection PyUnresolvedReferences
+# pyre-ignore[13]:
 class Experiment(BaseModel):
     """
     Experiment model.

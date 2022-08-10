@@ -28,7 +28,7 @@ from os.path import abspath
 from os.path import dirname
 import platform
 import random
-from typing import Optional
+from typing import Optional, Dict
 from typing import Tuple
 from typing import Union
 
@@ -293,7 +293,7 @@ def objective(
 
     """
 
-    metrics = {
+    metrics: Dict[str, float] = {
         "compile_time": ERROR_RESULT,
         "time": ERROR_RESULT,
         "size": ERROR_RESULT,
@@ -322,8 +322,10 @@ def objective(
     if not compile_result:
         with suppress(FileNotFoundError):
             os.remove(binary_out)
+        # pyre-ignore[16]:
         return experiment.metrics[objective_metric]
 
+    # pyre-ignore[16]:
     experiment.metrics["compile_time"] = compile_result
 
     run_result = run_binary(binary_out, iterations)

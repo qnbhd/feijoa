@@ -94,7 +94,7 @@ class DomainReducer(Plugin):
 
         self.c_hat: np.ndarray = np.array([])
         self.r: np.ndarray = np.array([])
-        self.contraction_rate: np.ndarray = np.array([])
+        self.contraction_rate: float = 0.0
         self.c: np.ndarray = np.array([])
         self.gamma: np.ndarray = np.array([])
 
@@ -148,6 +148,7 @@ class DomainReducer(Plugin):
 
         self.current_d = (
             2.0
+            # pyre-ignore[58]:
             * (self.current_optimal - self.previous_optimal)
             / self.r
         )

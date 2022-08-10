@@ -28,9 +28,9 @@ import subprocess
 import click
 
 from feijoa.utils.logging import init
-from utils.extractor import extract
-from utils.run_tools import continue_job
-from utils.run_tools import run_job
+from examples.gcc.utils.extractor import extract
+from examples.gcc.utils.run_tools import continue_job
+from examples.gcc.utils.run_tools import run_job
 
 
 now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")

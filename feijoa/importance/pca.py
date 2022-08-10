@@ -62,6 +62,7 @@ class PCAEvaluator(ImportanceEvaluator):
             X[cat] = encoder.fit_transform(X[cat])
 
         self.pca.fit(X, y)
+        # pyre-ignore[16]:
         importance = np.array(self.pca.explained_variance_)
         completed = dict()
         completed["parameters"] = X.columns
