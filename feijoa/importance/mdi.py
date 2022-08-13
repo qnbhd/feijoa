@@ -56,9 +56,7 @@ class MDIEvaluator(ImportanceEvaluator):
 
     def __init__(self, *, n_trees: int = 64, max_depth: int = 64):
         self.forest = RandomForestRegressor(
-            n_estimators=n_trees,
-            max_depth=max_depth,
-            random_state=0,
+            n_estimators=n_trees, max_depth=max_depth, random_state=0,
         )
 
     def do(self, job: Job):

@@ -31,6 +31,7 @@ from feijoa.utils.imports import ImportWrapper
 with ImportWrapper():
     from tinydb import Query, TinyDB
     from tinydb.table import Document
+    from tinydb.operations import set as tinydb_set
 
 from feijoa.exceptions import DBVersionError
 from feijoa.exceptions import InsertExperimentWithTheExistedId
@@ -78,6 +79,7 @@ class TinyDBStorage(Storage):
         doc = {
             "name": job.name,
             "id": job.id,
+            "last_optimizer": job.optimizer_name_dsl,
         }
 
         self.jobs_table.insert(doc)
@@ -94,6 +96,11 @@ class TinyDBStorage(Storage):
             }
             self.parameters_table.insert(param_model)
 
+    def update_optimizer_name_by_job_id(self, job_id, name):
+        self.jobs_table.update(
+            tinydb_set("last_optimizer", name), Query().id == "John"
+        )
+
     def get_search_space_by_job_id(self, job_id) -> SearchSpace:
         parameters = self.parameters_table.search(
             Query().job_id == job_id
@@ -105,6 +112,18 @@ class TinyDBStorage(Storage):
             )
             pool.append(mod)
         return SearchSpace.from_db_parameters(pool)
+
+    def get_optimizer_name_by_job_id(self, job_id) -> Optional[str]:
+        jobs = self.jobs_table.search(Query().id == job_id)
+
+        if not len(jobs):
+            return None
+
+        assert len(jobs) == 1
+
+        job, *_ = jobs
+
+        return job.optimizer_name_dsl
 
     def get_job_id_by_name(self, name) -> Optional[int]:
         jobs = self.jobs_table.search(Query().name == name)

@@ -17,6 +17,7 @@ def test_rdb_storage():
             self.search_space = SearchSpace()
             self.search_space.insert(Real("x", low=0.0, high=1.0))
             self.search_space.insert(Real("y", low=0.0, high=1.0))
+            self.optimizer_name_dsl = ""
 
     ex = Experiment(
         id=0,
@@ -64,8 +65,8 @@ def test_integrated_rdb_storage():
         y = experiment.params.get("y")
         return (
             (1.5 - x + x * y) ** 2
-            + (2.25 - x + x * y**2) ** 2
-            + (2.625 - x + x * y**3) ** 2
+            + (2.25 - x + x * y ** 2) ** 2
+            + (2.625 - x + x * y ** 3) ** 2
         )
 
     space.insert(Real("x", low=0.0, high=5.0))

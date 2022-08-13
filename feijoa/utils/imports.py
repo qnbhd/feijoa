@@ -23,8 +23,6 @@ import importlib
 import types
 from typing import Any
 
-import pytest
-
 from feijoa.exceptions import PackageNotInstalledError
 
 
@@ -61,6 +59,7 @@ def import_or_skip(module, reason=""):
             AnyError: If anything bad happens.
 
     """
+    import pytest
 
     try:
         return pytest.importorskip(module, reason=reason)

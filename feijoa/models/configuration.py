@@ -55,11 +55,7 @@ class Configuration(dict):
     """
 
     def __init__(
-        self,
-        *args,
-        requestor="UNKNOWN",
-        request_id=0,
-        **kwargs,
+        self, *args, requestor="UNKNOWN", request_id=0, **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.requestor = requestor

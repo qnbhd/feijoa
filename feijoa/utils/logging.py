@@ -58,6 +58,7 @@ def init(verbose=False):
         "numba",
         "matplotlib",
         "executor",
+        "sqlalchemy",
     )
 
     for log_name in excluded_loggers:

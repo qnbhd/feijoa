@@ -32,6 +32,8 @@ __all__ = [
     "ParametersVisitor",
 ]
 
+import numpy as np
+
 from feijoa.exceptions import ParametersIncorrectInputValues
 
 
@@ -85,6 +87,13 @@ class Parameter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def meta(self):
         """Meta information of parameter."""
+
+        raise NotImplementedError()
+
+    @property
+    @abc.abstractmethod
+    def bounds(self):
+        """Bounds of parameter."""
 
         raise NotImplementedError()
 
@@ -148,6 +157,10 @@ class Integer(Parameter):
         return (
             f"Integer('{self.name}, low={self.low}, high={self.high})"
         )
+
+    @property
+    def bounds(self):
+        return np.array([self.low, self.high])
 
     def accept(self, v):
         return v.visit_integer(self)
@@ -233,6 +246,10 @@ class Real(Parameter):
             f"Real('{self.name}', low={self.low}, high={self.high})"
         )
 
+    @property
+    def bounds(self):
+        return np.array([self.low, self.high])
+
     def accept(self, v):
         return v.visit_real(self)
 
@@ -298,6 +315,10 @@ class Categorical(Parameter):
 
     def __repr__(self):
         return f"Categorical('{self.name}', choices={self.choices})"
+
+    @property
+    def bounds(self):
+        return np.array([0, len(self.choices) - 1])
 
     def accept(self, v):
         return v.visit_categorical(self)

@@ -63,6 +63,36 @@ class Storage(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
+    def get_optimizer_name_by_job_id(self, job_id) -> Optional[str]:
+        """
+        Get optimizer name by id in storage.
+
+        Args:
+            job_id (int):
+                Job index.
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
+    @abc.abstractmethod
+    def update_optimizer_name_by_job_id(self, job_id, name):
+        """
+        Update optimizer name by id in storage.
+
+        Args:
+            job_id (int):
+                Job index.
+            name (str):
+                New optimizer name.
+
+        Raises:
+            AnyError: If anything bad happens.
+
+        """
+
+    @abc.abstractmethod
     def get_job_id_by_name(self, name) -> Optional[int]:
         """
         Get job by id in storage.

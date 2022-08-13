@@ -75,8 +75,22 @@ class RDBStorage(Storage):
             id=job.id,
             name=job.name,
             search_space_id=search_space_model.id,
+            last_optimizer=job.optimizer_name_dsl,
         )
         self.session.add(job_model)
+        self.session.commit()
+
+    def get_optimizer_name_by_job_id(self, job_id) -> Optional[str]:
+        job_model = (
+            self.session.query(JobModel).filter_by(id=job_id).one()
+        )
+        optimizer = job_model.last_optimizer
+        return optimizer
+
+    def update_optimizer_name_by_job_id(self, job_id, name):
+        self.session.query(JobModel).filter_by(id=job_id).update(
+            {"last_optimizer": name}
+        )
         self.session.commit()
 
     def get_search_space_by_job_id(self, job_id):

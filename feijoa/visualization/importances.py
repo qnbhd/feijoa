@@ -29,8 +29,7 @@ from feijoa.importance.rsfanova_boosted import RsFanovaEvaluator
 
 
 def plot_importances(
-    job,
-    fig=None,
+    job, fig=None,
 ):
     """
     Plot the importances for
@@ -61,8 +60,7 @@ def plot_importances(
     importance = importance / 2
 
     fig.add_bar(
-        x=params,
-        y=importance,
+        x=params, y=importance,
     )
 
     fig.update_layout(

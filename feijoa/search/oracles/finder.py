@@ -10,6 +10,7 @@ from feijoa import __feijoa_folder__
 from feijoa.exceptions import PackageNotInstalledError
 from feijoa.exceptions import SearchOracleNotFoundedError
 from feijoa.plugins.plugin import Plugin
+from feijoa.search.oracles.meta.bandit import UCB1
 from feijoa.search.oracles.meta.meta import MetaOracle
 from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.space import SearchSpace
@@ -167,7 +168,9 @@ def maker(line, search_space: SearchSpace):
         for p in plugins:
             p.subscribers = [oracle_instance]
 
-        return oracle_instance
+        top_oracle_instance = UCB1(oracle_instance)
+
+        return top_oracle_instance
 
     top_oracle_cls = get_top_oracle(top_oracle)
 

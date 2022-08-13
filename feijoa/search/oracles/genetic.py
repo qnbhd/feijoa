@@ -102,17 +102,9 @@ class Genetic(Oracle):
 
         self.search_space = search_space
 
-        self.bounds = np.zeros((len(self.search_space), 2))
-
-        for i, p in enumerate(self.search_space):
-            if isinstance(p, (Integer, Real)):
-                self.bounds[i, :] = np.array([p.low, p.high])
-            if isinstance(p, Categorical):
-                self.bounds[i, :] = np.array([0, len(p.choices) - 1])
-
         # parse lower and upper bounds
-        self.xl = self.bounds[:, 0]
-        self.xu = self.bounds[:, 1]
+        self.xl = self.search_space.bounds[:, 0]
+        self.xu = self.search_space.bounds[:, 1]
 
         self._ask_gen = None
 
@@ -171,10 +163,7 @@ class Genetic(Oracle):
 
             configs = [
                 Configuration(
-                    transform(
-                        solution,
-                        self.search_space,
-                    ),
+                    transform(solution, self.search_space,),
                     requestor=self.name,
                     request_id=i,
                 )

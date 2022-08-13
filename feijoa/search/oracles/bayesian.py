@@ -31,22 +31,122 @@ import numpy as np
 from scipy.stats import norm
 
 # noinspection PyUnresolvedReferences
+# noinspection PyUnresolvedReferences
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
 from feijoa.search.visitors import Randomizer
+from feijoa.utils.transformers import inverse_transform
+from feijoa.utils.transformers import transform
 
 
-__all__ = ["Bayesian"]
-
+__all__ = ["Bayesian", "acquisition"]
 
 log = logging.getLogger(__name__)
+
+
+# noinspection PyPep8Naming
+def acquisition(
+    model, kind, X_samples, X, y, random_state=None, **kwargs
+):
+    """
+    Acquisition function for bayesian optimization.
+
+    Args:
+        model:
+            Regressor model, must be fitted.
+            Typically, Gaussian
+        kind:
+            Kind of acquisition function.
+            Choices: ei, poi, ucb (only for GPR),
+            lfboei, lfbopi, naive0 - model free.
+        X_samples (numpy.ndarray):
+            X samples to predict.
+        X (numpy.ndarray):
+            Features matrix.
+        y (numpy.ndarray):
+            Target values for X.
+        random_state (int | None):
+            Random state seed.
+
+    Returns:
+        Value of acquisition function.
+
+    """
+
+    if kind == "naive0":
+        # experimental, research only
+        return model.predict(X_samples)
+
+    if kind == "lfboei":
+        # https://arxiv.org/abs/2206.13035
+
+        tau = np.quantile(y, q=0.33)
+        classified = np.greater_equal(y, tau)
+        x1, z1 = X[classified], classified[classified]
+        x0, z0 = X, np.zeros_like(classified)
+        w1 = (tau - y)[classified]
+        w1 = w1 / np.mean(w1)
+        w0 = 1 - z0
+
+        x = np.concatenate([x1, x0], axis=0)
+        z = np.concatenate([z1, z0], axis=0)
+
+        s1 = x1.shape[0]
+        s0 = x0.shape[0]
+
+        w = np.concatenate(
+            [w1 * (s1 + s0) / s1, w0 * (s1 + s0) / s0],
+            axis=0,  # pragma: no mutate
+        )
+        w = w / np.mean(w)
+
+        clf = RandomForestClassifier(
+            n_jobs=-1, random_state=random_state
+        )  # pragma: no mutate
+        clf.fit(x, z, sample_weight=w)
+        y_pred = clf.predict_proba(X_samples)[:, 1]
+        return y_pred
+
+    if kind == "lfbopoi":
+        # https://arxiv.org/abs/2206.13035
+
+        tau = np.quantile(y, q=0.33)
+        classified = np.greater_equal(y, tau)
+        clf = RandomForestClassifier(
+            n_jobs=-1, random_state=random_state
+        )
+        clf.fit(X, classified)
+        y_pred = clf.predict_proba(X_samples)[:, 1]
+        return y_pred
+
+    assert isinstance(model, GaussianProcessRegressor), (
+        "Model must be sklearn.GaussianProcessRegressor"
+        "for classical ei, poi, ucb acquisition functions."
+    )
+
+    mean, std = model.predict(X_samples, return_std=True)
+    best = min(mean)
+    kappa = 2.5
+
+    # regular acquisition functions.
+
+    if kind == "poi":
+        probs = norm.cdf((mean - best) / std)
+        return probs
+
+    elif kind == "ei":
+        a = mean - best
+        z = a / std
+        return a * norm.cdf(z) + std * norm.pdf(z)
+
+    elif kind == "ucb":
+        return mean + kappa * std
+
+    raise ValueError("Not correct acquisition function kind.")
 
 
 class Bayesian(Oracle):
@@ -76,11 +176,11 @@ class Bayesian(Oracle):
     Args:
         search_space (SearchSpace):
             Search space instance.
-        acq_function (str):
+        acq (str):
             Acquisition function.
             Can be `pi`, `ucb`, `ei` with Gaussian Regressor
-            Or `mc` - experimental, `lfboei`, `lfbopi`
-        regressor:
+            Or `naive0` - experimental, `lfboei`, `lfbopi`
+        regr:
             Regression model, must have
                 - fit(X, y)
                 - predict_proba(X)
@@ -96,7 +196,7 @@ class Bayesian(Oracle):
          https://arxiv.org/abs/2206.13035
 
     .. note::
-        `mc` - experimental function.
+        `naive0` - experimental function.
 
     """
 
@@ -112,8 +212,8 @@ class Bayesian(Oracle):
         self,
         search_space,
         *args,
-        acq_function="ei",
-        regressor="GaussianProcessRegressor",
+        acq="ei",
+        regr="GaussianProcessRegressor",
         n_warmup=5,
         plugins=None,
         **kwargs,
@@ -121,9 +221,8 @@ class Bayesian(Oracle):
 
         super().__init__(*args, **kwargs)
 
-        plugins = plugins or []
-
-        for p in plugins:
+        for p in plugins or []:
+            # TODO (qnbhd): add task case with plugin.
             self.attach(p)
 
         self.search_space = search_space
@@ -131,24 +230,13 @@ class Bayesian(Oracle):
         # build regression model
 
         # TODO (qnbhd): elliminate globals
-        regressor = globals()[regressor]
+        regr = globals()[regr]
 
-        self.model = (
-            regressor() if inspect.isclass(regressor) else regressor
-        )
+        self.model = regr() if inspect.isclass(regr) else regr
 
-        # low and high bound of
-        # target hyperparameters
+        # take bounds
 
-        self.bounds = []
-
-        for p in self.search_space:
-            if isinstance(p, (Integer, Real)):
-                self.bounds.append((p.low, p.high))
-            if isinstance(p, Categorical):
-                self.bounds.append((0, len(p.choices) - 1))
-
-        self.bounds = np.array(self.bounds)
+        self.bounds = search_space.bounds
 
         # trials pool for fitting
 
@@ -164,14 +252,21 @@ class Bayesian(Oracle):
 
         # setup acquisition function
 
-        self.acq_function = (
-            acq_function
-            if isinstance(self.model, GaussianProcessRegressor)
-            else "mc"
-        )
+        if not isinstance(self.model, GaussianProcessRegressor):
+            choices = ["lfboei", "lfbopoi", "naive0"]
+            if acq in choices:
+                self.acq_function = acq
+            else:
+                raise ValueError(
+                    f"Acquisition function `{acq}` not"
+                    f" available with `{regr}` regressor."
+                )
+        else:
+            self.acq_function = acq
+
+        log.critical(f"ACQ function: {self.acq_function}")
 
         # warmup points
-
         self.n_warmup = n_warmup
 
         # setup readable name
@@ -180,79 +275,14 @@ class Bayesian(Oracle):
         self._ask_gen = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
+        # TODO (qnbhd): add test case on configurations
+        #  per emit count
 
         if not self._ask_gen:
             # build ask generator
             self._ask_gen = self._ask(n)
 
         return next(self._ask_gen)
-
-    def _to_feijoa_config(self, x):
-        """
-        Build feijoa-format
-        configuration from vec x.
-
-        Args:
-            x (numpy.array):
-                Input x vector for transformation.
-
-        Returns:
-            Feijoa-format configuration (dict).
-
-        Raises:
-            AnyError: If anything bad happens.
-
-        """
-
-        configuration = {}
-
-        for p, v in zip(self.search_space, x):
-            if isinstance(p, Real):
-                configuration[p.name] = v
-
-            # make math rounding
-
-            rounded = int(v + (0.5 if v > 0 else -0.5))
-
-            if isinstance(p, Integer):
-                configuration[p.name] = rounded
-
-            # pick up needed categorical value
-
-            elif isinstance(p, Categorical):
-                configuration[p.name] = p.choices[rounded]
-
-        return configuration
-
-    def _to_gp_config(self, cfg):
-        """
-        Build vec from Feijoa-format
-        configuration.
-
-        Args:
-            cfg (dict | Configuration):
-                Input configuration for transformation.
-
-        Returns:
-            Values vector (numpy.array).
-
-        Raises:
-            AnyError: If anything bad happens.
-
-        """
-
-        vec = []
-
-        for p_name, v in cfg.items():
-            p = self.search_space.get(p_name)
-
-            if isinstance(p, (Integer, Real)):
-                vec.append(v)
-            if isinstance(p, Categorical):
-                index = p.choices.index(v)
-                vec.append(index)
-
-        return vec
 
     def _ask(self, n: int) -> Generator:
         """Main ask generator."""
@@ -281,100 +311,45 @@ class Bayesian(Oracle):
             for c in x:
                 configurations.append(
                     Configuration(
-                        self._to_feijoa_config(c), requestor=self.name
+                        transform(c, self.search_space),
+                        requestor=self.name,
                     )
                 )
             yield configurations
             self.model.fit(self.X, self.y)
 
-    def acquisition(self, X_samples):
-        """Acquisition function for bayesian optimization"""
-
-        yhat = self.model.predict(self.X)
-        best = min(yhat)
-
-        if self.acq_function == "mc":
-            # experimental, research only
-
-            mean = self.model.predict(X_samples)
-            negative = np.where(mean - best < 0)
-            mean[negative] = 0
-            return mean - best
-
-        if self.acq_function == "lfboei":
-            # https://arxiv.org/abs/2206.13035
-
-            tau = np.quantile(self.y, q=0.33)
-            classified = np.greater_equal(self.y, tau)
-            x1, z1 = self.X[classified], classified[classified]
-            x0, z0 = self.X, np.zeros_like(classified)
-            w1 = (tau - self.y)[classified]
-            w1 = w1 / np.mean(w1)
-            w0 = 1 - z0
-            x = np.concatenate([x1, x0], axis=0)
-            z = np.concatenate([z1, z0], axis=0)
-            s1 = x1.shape[0]
-            s0 = x0.shape[0]
-            w = np.concatenate(
-                [w1 * (s1 + s0) / s1, w0 * (s1 + s0) / s0], axis=0
-            )
-            w = w / np.mean(w)
-
-            clf = RandomForestClassifier(n_jobs=-1)
-            clf.fit(x, z, sample_weight=w)
-            y_pred = clf.predict_proba(X_samples)[:, 1]
-            return y_pred
-
-        if self.acq_function == "lfbopi":
-            # https://arxiv.org/abs/2206.13035
-
-            tau = np.quantile(self.y, q=0.33)
-            classified = np.greater_equal(self.y, tau)
-            clf = RandomForestClassifier(n_jobs=-1)
-            clf.fit(self.X, classified)
-            y_pred = clf.predict_proba(X_samples)[:, 1]
-            return y_pred
-
-        mean, std = self.model.predict(X_samples, return_std=True)
-        kappa = 2.5
-
-        # regular acquisition functions.
-
-        if self.acq_function == "poi":
-            probs = norm.cdf((mean - best) / (std + 1e-9))
-            return probs
-        elif self.acq_function == "ei":
-            a = mean - best
-            z = a / std
-            return a * norm.cdf(z) + std * norm.pdf(z)
-        elif self.acq_function == "ucb":
-            return mean + kappa * std
-
     def opt_acquisition(self, n: int):
         """Optimize acquisition function."""
 
-        n_warmup = 10000
+        n_samples = 100000
 
-        x_tries = self.random_generator.uniform(
+        X_samples = self.random_generator.uniform(
             self.bounds[:, 0],
             self.bounds[:, 1],
-            size=(n_warmup, self.bounds.shape[0]),
+            size=(n_samples, self.bounds.shape[0]),
         )
 
-        scores = self.acquisition(x_tries)
-        minima_x = x_tries[scores.argsort()[:n]]
+        scores = acquisition(
+            self.model, self.acq_function, X_samples, self.X, self.y
+        )
+
+        assert len(scores) == n_samples
+
+        minima_x = X_samples[scores.argsort()[:n]]
 
         return minima_x
 
     def tell(self, config, result):
         """Tell configuration's result."""
 
-        vec = np.array(self._to_gp_config(config))
+        vec = np.array(inverse_transform(config, self.search_space))
 
-        self.X = np.concatenate([self.X, vec.reshape(1, -1)])
+        self.X = np.concatenate(
+            [self.X, vec.reshape(1, -1)]
+        )  # pragma: no mutate
         self.y = np.concatenate([self.y, [result]])
 
-        if len(self.y) > 5:
+        if len(self.y) > 5:  # pragma: no mutate
             self.notify("on_tell", config, result)
 
     def update(self, event, subject, *args, **kwargs):

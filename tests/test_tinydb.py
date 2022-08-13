@@ -64,6 +64,7 @@ def test_load_job_by_id():
             self.search_space = SearchSpace()
             self.search_space.insert(Real("x", low=0.0, high=1.0))
             self.search_space.insert(Real("y", low=0.0, high=1.0))
+            self.optimizer_name_dsl = ""
 
     job = _Job(0, "foo")
 

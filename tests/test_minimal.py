@@ -13,8 +13,8 @@ def objective(experiment: Experiment):
     y = experiment.params.get("y")
     return (
         (1.5 - x + x * y) ** 2
-        + (2.25 - x + x * y**2) ** 2
-        + (2.625 - x + x * y**3) ** 2
+        + (2.25 - x + x * y ** 2) ** 2
+        + (2.625 - x + x * y ** 3) ** 2
     )
 
 
@@ -40,7 +40,7 @@ def test_job_with_oracle_ensemble():
     space.insert(Real("x", low=0.0, high=5.0))
     space.insert(Real("y", low=0.0, high=2.0))
 
-    job = create_job(search_space=space, optimizer=ThompsonSampler)
+    job = create_job(search_space=space)
 
     job.do(
         objective,

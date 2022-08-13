@@ -29,10 +29,7 @@ __all__ = ["plot_edf"]
 
 
 def plot_edf(
-    job,
-    fig=None,
-    name=None,
-    invert_objective=False,
+    job, fig=None, name=None, invert_objective=False,
 ):
     """
     Plot the EDF of a job.
@@ -70,12 +67,7 @@ def plot_edf(
     )
 
     fig.add_trace(
-        go.Scatter(
-            x=lspace,
-            y=dist,
-            mode="lines",
-            name=f"{name}",
-        )
+        go.Scatter(x=lspace, y=dist, mode="lines", name=f"{name}",)
     )
 
     fig.update_layout(

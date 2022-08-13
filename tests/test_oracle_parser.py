@@ -149,6 +149,21 @@ from feijoa.utils._oracle_parser import _OracleParser
                 "top-oracle": "bayesian",
             },
         ),
+        (
+            "ucb<bayesian[acq=naive0, regr=RandomForestRegressor]>",
+            {
+                "oracles": [
+                    {
+                        "name": "bayesian",
+                        "params": {
+                            "acq": "naive0",
+                            "regr": "RandomForestRegressor",
+                        },
+                    }
+                ],
+                "top-oracle": "ucb",
+            },
+        ),
     ],
 )
 def test_oracle_parser_correct(input_line, expected):
@@ -164,10 +179,7 @@ def test_oracle_parser_correct(input_line, expected):
             "SyntaxError('Error while parsing at end of line."
             " Description:\n\tERROR: Error  : WORD ANGLEBRACKETL WORD . $end')",
         ),
-        (
-            "ucb<>",
-            "Error parsing `>` at 1 line in 4 position.",
-        ),
+        ("ucb<>", "Error parsing `>` at 1 line in 4 position.",),
         (
             "ucb<bayesian>[1=1]",
             "Error parsing `1` at 1 line in 14 position.",

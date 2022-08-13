@@ -25,9 +25,7 @@ import plotly.graph_objs as go
 
 
 def plot_objective_hist(
-    job,
-    fig=None,
-    invert_objective=False,
+    job, fig=None, invert_objective=False,
 ):
     """
     Plot objective hists for

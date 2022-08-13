@@ -24,6 +24,7 @@
 from typing import List
 import warnings
 
+import numpy as np
 import yaml
 
 from feijoa.search.parameters import Categorical
@@ -95,6 +96,12 @@ class SearchSpace:
 
     def __len__(self):
         return len(self.params)
+
+    @property
+    def bounds(self):
+        """Get bounds from search space"""
+
+        return np.array([p.bounds for p in self])
 
     @classmethod
     def from_yaml(cls, yaml_string):

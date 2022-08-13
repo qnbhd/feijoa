@@ -70,9 +70,7 @@ class Skopt(Oracle):
         super().__init__(**kwargs)
 
         self.skopt_space = self._make_space(search_space)
-        self.optimizer_instance = skopt.Optimizer(
-            self.skopt_space, "GBRT"
-        )
+        self.optimizer_instance = skopt.Optimizer(self.skopt_space)
 
         self.ask_generator: Optional[Generator] = None
 
