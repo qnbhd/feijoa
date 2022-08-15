@@ -19,6 +19,9 @@ numba>=0.53.1
 executor>=23.2
 ply>=3.11
 pymoo>=0.6.0
+dash
+paretoset
+ujson
 
 furo>=2022.4.7
 importlib_metadata

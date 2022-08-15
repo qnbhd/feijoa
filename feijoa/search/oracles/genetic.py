@@ -43,9 +43,6 @@ with ImportWrapper():
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
 from feijoa.utils.transformers import inverse_transform
 from feijoa.utils.transformers import transform
 

@@ -14,17 +14,15 @@ import numpy as np
 import numpy.random
 import pandas as pd
 from paretoset import paretorank
-from paretoset import paretoset
 from problem import Problem
 import psutil
 
 from feijoa import create_job
 from feijoa.utils.logging import init
 
-from problems import (
+from problems.synthetic import (
     Beale, Rastrigin, Rosenbrock, Sphere,
     Uni1, Uni2, Acley, Holder, IrisKNN
-
 )
 
 init(verbose=True)
@@ -180,9 +178,9 @@ class Suite:
             total_df = pd.DataFrame.from_dict(results)
             problem_df = total_df[
                 total_df["problem"] == problem_name
-            ][["best", "time", "mem_mean", "dist"]]
+            ][["best", "time", "dist"]]
             ranks = paretorank(
-                problem_df, sense=["min", "min", "min", "min"]
+                problem_df, sense=["min", "min", "min"]
             )
             pareto_ranking.extend(ranks)
 
@@ -190,20 +188,6 @@ class Suite:
                 self.storage.set_pareto_ranking(trial_id, rank)
 
         total_df = pd.DataFrame.from_dict(results)
-
-        # pareto_ranking = []
-        #
-        # for problem in set(results['problem']):
-        #     problem_df = total_df[total_df['problem'] == problem][['best', 'time', 'mem_mean', 'dist']]
-        #     ranks = paretorank(problem_df, sense=["min", "min", "min", "min"])
-        #     pareto_ranking.extend(ranks)
-        #
-        # assert len(pareto_ranking) == len(results['optimizer'])
-        #
-        # total_df['pareto_ranking'] = pareto_ranking
-        #
-        # for trial_id, rank in zip(trial_indexes, pareto_ranking):
-        #     self.storage.set_pareto_ranking(trial_id, rank)
 
         return total_df
 
@@ -227,42 +211,40 @@ def cli():
 def run(database):
     test_suite = Suite(database)
 
-    for i in [10, 15, 20, 50, 100, 300]:
-        test_suite.add_problem(Rosenbrock(), iterations=i, name=f'rosen_{i}')
-        test_suite.add_problem(Rastrigin(), iterations=i, name=f'rastrigin_{i}')
-        test_suite.add_problem(Beale(), iterations=i, name=f'beale_{i}')
-        test_suite.add_problem(Sphere(), iterations=i, name=f'sphere_{i}')
-        test_suite.add_problem(Uni1(), iterations=i, name=f'uni1_{i}')
-        test_suite.add_problem(Uni2(), iterations=i, name=f'uni2_{i}')
-        test_suite.add_problem(Acley(), iterations=i, name=f'ackley_{i}')
+    for i in range(5, 300, 10):
+        # test_suite.add_problem(Rosenbrock(), iterations=i, name=f'rosen')
+        # test_suite.add_problem(Rastrigin(), iterations=i, name=f'rastrigin')
+        # test_suite.add_problem(Beale(), iterations=i, name=f'beale')
+        # test_suite.add_problem(Sphere(), iterations=i, name=f'sphere')
+        # test_suite.add_problem(Uni1(), iterations=i, name=f'uni1')
+        # test_suite.add_problem(Uni2(), iterations=i, name=f'uni2')
+        # test_suite.add_problem(Acley(), iterations=i, name=f'ackley')
         test_suite.add_problem(Holder(), iterations=i, name=f'holder_{i}')
         test_suite.add_problem(IrisKNN(), iterations=i, name=f'irisknn_{i}')
 
     test_suite.add_optimizer("bayesian[acq=lfboei]")
     test_suite.add_optimizer("bayesian[acq=lfbopoi]")
     test_suite.add_optimizer("bayesian[acq=ucb]")
-    test_suite.add_optimizer("bayesian[acq=poi]")
-    test_suite.add_optimizer("bayesian")
-    test_suite.add_optimizer("bayesian[acq=lfboei]+reducer")
-    test_suite.add_optimizer("bayesian[acq=lfbopoi]+reducer")
-    test_suite.add_optimizer("bayesian[acq=ucb]+reducer")
-    test_suite.add_optimizer("bayesian[acq=poi]+reducer")
-    test_suite.add_optimizer("bayesian+reducer")
     test_suite.add_optimizer("cmaes")
-    test_suite.add_optimizer("grid")
     test_suite.add_optimizer("pattern")
     test_suite.add_optimizer("pso")
-    test_suite.add_optimizer("ucb<bayesian,cmaes,pso,random>")
+    test_suite.add_optimizer("ucb<bayesian,cmaes>")
+    test_suite.add_optimizer("ucb<bayesian+reducer,cmaes>")
+    test_suite.add_optimizer("ucb<bayesian[acq=lfbopoi],cmaes>")
+    test_suite.add_optimizer("ucb<bayesian,pso>")
+    test_suite.add_optimizer("ucb<bayesian[acq=lfbopoi],pso>")
+    test_suite.add_optimizer("th<pso,cmaes>")
     test_suite.add_optimizer("de")
-    test_suite.add_optimizer("brkga")
     test_suite.add_optimizer("nichega")
-    test_suite.add_optimizer("sres")
     test_suite.add_optimizer("isres")
     test_suite.add_optimizer(
         "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]>"
     )
     test_suite.add_optimizer(
         "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]+reducer>"
+    )
+    test_suite.add_optimizer(
+        "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor], pso>"
     )
 
     df = test_suite.run()
@@ -283,8 +265,46 @@ def load_dataframe(database):
     print(df)
 
 
+@click.command()
+@click.option("--database", type=str, required=True)
+@click.option("--problem", type=str, required=True)
+@click.option("--iterations", type=int, default=None)
+@click.option("--feature", 'features', type=str, multiple=True)
+def calculate_ranking(database, problem, iterations, features):
+    print(features)
+
+    pd.set_option("display.max_colwidth", None)
+    pd.set_option('display.max_rows', 500)
+    pd.set_option('display.max_columns', 500)
+    pd.set_option('display.width', 1000)
+    pd.set_option('display.float_format', lambda x: '%.5f' % x)
+
+    features = ['best:min']
+
+    directions = []
+    metrics = []
+
+    for feature in features:
+        metric, direction = feature.split(':')
+        directions.append(direction)
+        metrics.append(metric)
+
+    storage = BenchesStorage(database)
+    trials = storage.load_trials(problem, iterations)
+    dataframe = pd.DataFrame.from_dict(trials)
+    dataframe.drop(columns=['pareto_ranking'], inplace=True)
+    problem_df = dataframe[metrics]
+    ranks = paretorank(
+        problem_df, sense=directions
+    )
+    print(dataframe.columns)
+    dataframe['rank'] = [1/rank for rank in ranks]
+    print(dataframe[['problem', 'best', 'optimizer', 'rank']])
+
+
 cli.add_command(run)
 cli.add_command(load_dataframe)
+cli.add_command(calculate_ranking)
 
 
 def get_machine_info():

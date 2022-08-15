@@ -1,3 +1,6 @@
+from functools import lru_cache, wraps
+from time import monotonic_ns
+
 from sqlalchemy import Column
 from sqlalchemy import create_engine
 from sqlalchemy import Float
@@ -16,8 +19,44 @@ from sqlalchemy.orm import sessionmaker
 _Base: DeclarativeMeta = declarative_base()
 
 
+def timed_lru_cache(
+    _func=None, *, seconds: int = 7000, maxsize: int = 128, typed: bool = False
+):
+    """ Extension over existing lru_cache with timeout
+    :param seconds: timeout value
+    :param maxsize: maximum size of the cache
+    :param typed: whether different keys for different types of cache keys
+    """
+
+    def wrapper_cache(f):
+        # create a function wrapped with traditional lru_cache
+        f = lru_cache(maxsize=maxsize, typed=typed)(f)
+        # convert seconds to nanoseconds to set the expiry time in nanoseconds
+        f.delta = seconds * 10 ** 9
+        f.expiration = monotonic_ns() + f.delta
+
+        @wraps(f)  # wraps is used to access the decorated function attributes
+        def wrapped_f(*args, **kwargs):
+            if monotonic_ns() >= f.expiration:
+                # if the current cache expired of the decorated function then
+                # clear cache for that function and set a new cache value with new expiration time
+                f.cache_clear()
+                f.expiration = monotonic_ns() + f.delta
+            return f(*args, **kwargs)
+
+        wrapped_f.cache_info = f.cache_info
+        wrapped_f.cache_clear = f.cache_clear
+        return wrapped_f
+
+    # To allow decorator to be used without arguments
+    if _func is None:
+        return wrapper_cache
+    else:
+        return wrapper_cache(_func)
+
+
 class MachineInfoModel(_Base):
-    __tablename__ = "machine"
+    __tablename__ = "machines"
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -48,7 +87,7 @@ class MachineInfoModel(_Base):
 
 
 class TrialModel(_Base):  # type: ignore
-    __tablename__ = "trial"
+    __tablename__ = "trials"
 
     id = Column(Integer, primary_key=True)
 
@@ -194,8 +233,22 @@ class BenchesStorage:
 
         self.session.commit()
 
-    def load_trials(self):
-        trials = self.session.query(TrialModel).all()
+    @timed_lru_cache(seconds=10)
+    def get_unique_problems(self):
+        query = '''SELECT DISTINCT problem from trials;'''
+        records = self.session.execute(query).all()
+        return [r.problem for r in records]
+
+    @timed_lru_cache(seconds=10)
+    def load_trials(self, problem=None, iterations=None):
+        if problem and iterations:
+            trials = self.session.query(TrialModel).\
+                filter_by(problem=problem, iterations=iterations).all()
+        elif problem and problem != 'all':
+            trials = self.session.query(TrialModel). \
+                filter_by(problem=problem).all()
+        else:
+            trials = self.session.query(TrialModel).all()
 
         data = {
             "optimizer": [],
@@ -226,10 +279,12 @@ class BenchesStorage:
 
         return data
 
+    @timed_lru_cache(seconds=10)
     def get_total_ranking(self):
-        ranking = self.session.execute(
-            r"select optimizer, AVG(pareto_ranking) as ranking from trial group by optimizer;"
-        ).all()
+        query = f"select *, AVG(pareto_ranking) as ranking" \
+                f" from trials group by optimizer;"
+
+        ranking = self.session.execute(query).all()
 
         result = {
             "optimizer": [],
@@ -239,5 +294,19 @@ class BenchesStorage:
         for record in ranking:
             result["optimizer"].append(record.optimizer)
             result["ranking"].append(1 / record.ranking)
+            result["optimizer"].append(record.optimizer)
+            result["problem"].append(record.problem)
+            result["best"].append(record.best)
+            result["mem_peak"].append(record.mem_peak)
+            result["mem_mean"].append(record.mem_mean)
+            result["iterations"].append(record.iterations)
+            result["time"].append(record.time)
+            result["dist"].append(record.dist)
+            result["iterations_before_best"].append(
+                record.iterations_before_best
+            )
 
         return result
+
+
+
