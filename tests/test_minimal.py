@@ -13,8 +13,8 @@ def objective(experiment: Experiment):
     y = experiment.params.get("y")
     return (
         (1.5 - x + x * y) ** 2
-        + (2.25 - x + x * y ** 2) ** 2
-        + (2.625 - x + x * y ** 3) ** 2
+        + (2.25 - x + x * y**2) ** 2
+        + (2.625 - x + x * y**3) ** 2
     )
 
 
@@ -28,7 +28,7 @@ def test_minimal():
     job.do(
         objective,
         n_trials=50,
-        optimizer="ucb<bayesian+reducer, cmaes, pso>",
+        optimizer="ucb<template,bayesian>",
     )
 
     assert abs(job.best_value - 0) < 5

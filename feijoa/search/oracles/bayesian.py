@@ -213,6 +213,7 @@ class Bayesian(Oracle):
         search_space,
         *args,
         acq="ei",
+        seed=0,
         regr="GaussianProcessRegressor",
         n_warmup=5,
         plugins=None,
@@ -246,9 +247,6 @@ class Bayesian(Oracle):
 
         self.y = np.empty(shape=(0,))
 
-        # setup random generator
-
-        self.random_generator = np.random.RandomState(0)
 
         # setup acquisition function
 
@@ -289,7 +287,7 @@ class Bayesian(Oracle):
 
         # make some warmup configurations
 
-        randomizer = Randomizer()
+        randomizer = Randomizer(self.seed)
         random_samples = [
             Configuration(
                 {
@@ -323,14 +321,15 @@ class Bayesian(Oracle):
 
         n_samples = 100000
 
-        X_samples = self.random_generator.uniform(
+        X_samples = np.random.uniform(
             self.bounds[:, 0],
             self.bounds[:, 1],
             size=(n_samples, self.bounds.shape[0]),
         )
 
         scores = acquisition(
-            self.model, self.acq_function, X_samples, self.X, self.y
+            self.model, self.acq_function, X_samples, self.X, self.y,
+            random_state=self.seed
         )
 
         assert len(scores) == n_samples

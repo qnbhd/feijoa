@@ -123,7 +123,7 @@ class TinyDBStorage(Storage):
 
         job, *_ = jobs
 
-        return job.optimizer_name_dsl
+        return job["optimizer_name_dsl"]
 
     def get_job_id_by_name(self, name) -> Optional[int]:
         jobs = self.jobs_table.search(Query().name == name)

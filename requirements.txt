@@ -22,6 +22,9 @@ pymoo>=0.6.0
 dash
 paretoset
 ujson
+types-PyYAML
+types-setuptools
+types-ujson
 
 furo>=2022.4.7
 importlib_metadata

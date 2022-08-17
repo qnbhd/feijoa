@@ -95,7 +95,9 @@ def plot_evaluations(job, params=None, invert_objective=False):
                     nbinsx=30,
                     row=i + 1,
                     col=i + 1,
-                    marker=dict(color="#330C73",),
+                    marker=dict(
+                        color="#330C73",
+                    ),
                     opacity=0.75,
                 )
                 continue
@@ -137,7 +139,7 @@ def plot_evaluations(job, params=None, invert_objective=False):
             *fig["layout"][cut("xaxis", i)]["domain"],
             *fig["layout"][cut("yaxis", i)]["domain"],
         )
-        for i in range(1, params_length ** 2 + 1)
+        for i in range(1, params_length**2 + 1)
     ]
 
     positions = [

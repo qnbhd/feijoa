@@ -1,11 +1,13 @@
-from functools import lru_cache, wraps
+from functools import lru_cache
+from functools import wraps
 from time import monotonic_ns
 
+from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import create_engine
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
-from sqlalchemy import Integer, BigInteger
+from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import TypeDecorator
 from sqlalchemy import types
@@ -20,9 +22,13 @@ _Base: DeclarativeMeta = declarative_base()
 
 
 def timed_lru_cache(
-    _func=None, *, seconds: int = 7000, maxsize: int = 128, typed: bool = False
+    _func=None,
+    *,
+    seconds: int = 7000,
+    maxsize: int = 128,
+    typed: bool = False,
 ):
-    """ Extension over existing lru_cache with timeout
+    """Extension over existing lru_cache with timeout
     :param seconds: timeout value
     :param maxsize: maximum size of the cache
     :param typed: whether different keys for different types of cache keys
@@ -32,10 +38,12 @@ def timed_lru_cache(
         # create a function wrapped with traditional lru_cache
         f = lru_cache(maxsize=maxsize, typed=typed)(f)
         # convert seconds to nanoseconds to set the expiry time in nanoseconds
-        f.delta = seconds * 10 ** 9
+        f.delta = seconds * 10**9
         f.expiration = monotonic_ns() + f.delta
 
-        @wraps(f)  # wraps is used to access the decorated function attributes
+        @wraps(
+            f
+        )  # wraps is used to access the decorated function attributes
         def wrapped_f(*args, **kwargs):
             if monotonic_ns() >= f.expiration:
                 # if the current cache expired of the decorated function then
@@ -235,18 +243,24 @@ class BenchesStorage:
 
     @timed_lru_cache(seconds=10)
     def get_unique_problems(self):
-        query = '''SELECT DISTINCT problem from trials;'''
+        query = """SELECT DISTINCT problem from trials;"""
         records = self.session.execute(query).all()
         return [r.problem for r in records]
 
-    @timed_lru_cache(seconds=10)
+    # @timed_lru_cache(seconds=5)
     def load_trials(self, problem=None, iterations=None):
         if problem and iterations:
-            trials = self.session.query(TrialModel).\
-                filter_by(problem=problem, iterations=iterations).all()
-        elif problem and problem != 'all':
-            trials = self.session.query(TrialModel). \
-                filter_by(problem=problem).all()
+            trials = (
+                self.session.query(TrialModel)
+                .filter_by(problem=problem, iterations=iterations)
+                .all()
+            )
+        elif problem and problem != "all":
+            trials = (
+                self.session.query(TrialModel)
+                .filter_by(problem=problem)
+                .all()
+            )
         else:
             trials = self.session.query(TrialModel).all()
 
@@ -261,6 +275,7 @@ class BenchesStorage:
             "dist": [],
             "iterations_before_best": [],
             "pareto_ranking": [],
+            "machine_id": [],
         }
 
         for trial in trials:
@@ -275,14 +290,17 @@ class BenchesStorage:
             data["iterations_before_best"].append(
                 trial.iterations_before_best
             )
+            data["machine_id"].append(trial.machine_id)
             data["pareto_ranking"].append(trial.pareto_ranking)
 
         return data
 
     @timed_lru_cache(seconds=10)
     def get_total_ranking(self):
-        query = f"select *, AVG(pareto_ranking) as ranking" \
-                f" from trials group by optimizer;"
+        query = (
+            "select *, AVG(pareto_ranking) as ranking"
+            " from trials group by optimizer;"
+        )
 
         ranking = self.session.execute(query).all()
 
@@ -307,6 +325,3 @@ class BenchesStorage:
             )
 
         return result
-
-
-

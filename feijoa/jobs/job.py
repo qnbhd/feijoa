@@ -36,6 +36,7 @@ import warnings
 import joblib
 import numpy as np
 import pandas as pd
+import rich
 from rich.progress import Progress
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
@@ -124,7 +125,7 @@ class Job:
         self.optimizer_name_dsl: str = ""
         self.search_space = search_space
         self.pending_experiments = 0
-        self.loaded_experiments_pool = []
+        self.loaded_experiments_pool: List[Experiment] = []
 
         self.seeds: List[dict] = []
 
@@ -376,14 +377,24 @@ class Job:
             else contextlib.nullcontext()
         )
 
-        log.info(f"New job with name: `{self.name}` was started.")
+        def range_checker(p, value):
+            if isinstance(p, (Real, Categorical)):
+                assert p.low <= value <= p.high, f"{p.low} <= {value} <= {p.high}"
+            if isinstance(p, Categorical):
+                assert value in p.choices, f"value in [{p.choices}]"
 
         trials = 0
         with progress as bar:  # type: ignore
             # pyre-ignore[16]:
+            m = float('+inf')
             task = bar.add_task("Optimizing", total=n_trials)
             while trials < n_trials:
                 configurations = self.ask(n_points_iter)
+
+                for c in configurations:
+                    for param, value in c.params.items():
+                        sp_p = self.search_space.get(param)
+                        range_checker(sp_p, value)
 
                 if not configurations:
                     warnings.warn("No new configurations.")
@@ -407,7 +418,6 @@ class Job:
                 configurations_len = len(configurations)
                 trials += configurations_len
                 # pyre-ignore[16]:
-                bar.update(task, advance=configurations_len)
 
                 # noinspection PyUnresolvedReferences,PyBroadException
                 parallel = joblib.Parallel(
@@ -427,7 +437,11 @@ class Job:
                         experiment, result, force=(trials >= n_trials)
                     )
 
-                log.info(f"Trials: {trials}/{n_trials}")
+                bar.update(task, advance=configurations_len, description=f"Trials <{self.name}>]: {trials}/{n_trials}")
+
+                if self.best_value < m:
+                    log.info(f"New best result: {self.best_value}")
+                    m = self.best_value
 
         if in_notebook():
             from IPython.display import clear_output
@@ -537,7 +551,9 @@ class Job:
             return None
 
         applicator = partial(
-            Experiment, job_id=self.id, state=ExperimentState.WIP,
+            Experiment,
+            job_id=self.id,
+            state=ExperimentState.WIP,
         )
 
         experiments = [
@@ -838,8 +854,11 @@ def load_job(
 
     job.loaded_experiments_pool.extend(experiments)
 
-    job.optimizer_name_dsl = storage.get_optimizer_name_by_job_id(
+    dsl_name = storage.get_optimizer_name_by_job_id(
         job.id
     )
+
+    if dsl_name:
+        job.optimizer_name_dsl = dsl_name
 
     return job

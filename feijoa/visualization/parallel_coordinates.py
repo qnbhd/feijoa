@@ -51,7 +51,9 @@ def pad(string: str, width: int, filler=" ", fill_chars=3):
 
 
 def plot_parallel_coordinates(
-    job, params=None, invert_objective=False,
+    job,
+    params=None,
+    invert_objective=False,
 ):
     """
     Plot the parallel coordinates for

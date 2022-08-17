@@ -65,8 +65,8 @@ def test_integrated_rdb_storage():
         y = experiment.params.get("y")
         return (
             (1.5 - x + x * y) ** 2
-            + (2.25 - x + x * y ** 2) ** 2
-            + (2.625 - x + x * y ** 3) ** 2
+            + (2.25 - x + x * y**2) ** 2
+            + (2.625 - x + x * y**3) ** 2
         )
 
     space.insert(Real("x", low=0.0, high=5.0))

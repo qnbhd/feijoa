@@ -179,7 +179,10 @@ def test_oracle_parser_correct(input_line, expected):
             "SyntaxError('Error while parsing at end of line."
             " Description:\n\tERROR: Error  : WORD ANGLEBRACKETL WORD . $end')",
         ),
-        ("ucb<>", "Error parsing `>` at 1 line in 4 position.",),
+        (
+            "ucb<>",
+            "Error parsing `>` at 1 line in 4 position.",
+        ),
         (
             "ucb<bayesian>[1=1]",
             "Error parsing `1` at 1 line in 14 position.",

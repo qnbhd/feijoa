@@ -140,7 +140,7 @@ def get_plugin(name):
     return cls
 
 
-def maker(line, search_space: SearchSpace):
+def maker(line, search_space: SearchSpace, random_state=0):
     parser = _OracleParser()
     parsed = parser.parse(line)
 
@@ -162,7 +162,8 @@ def maker(line, search_space: SearchSpace):
             plugins.append(plug_cls(**plug_params))
 
         oracle_instance = top_oracle_cls(
-            search_space=search_space, **top_oracle_params
+            search_space=search_space, **top_oracle_params,
+            seed=random_state,
         )
 
         for p in plugins:
@@ -192,7 +193,8 @@ def maker(line, search_space: SearchSpace):
             plug_cls = get_plugin(plug_name)
             plugins.append(plug_cls(**plug_params))
 
-        oracle_instance = o_cls(search_space=search_space, **o_params)
+        oracle_instance = o_cls(search_space=search_space, **o_params,
+                                seed=random_state)
 
         for p in plugins:
             p.subscribers = [oracle_instance]

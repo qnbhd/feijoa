@@ -160,7 +160,10 @@ class Genetic(Oracle):
 
             configs = [
                 Configuration(
-                    transform(solution, self.search_space,),
+                    transform(
+                        solution,
+                        self.search_space,
+                    ),
                     requestor=self.name,
                     request_id=i,
                 )
