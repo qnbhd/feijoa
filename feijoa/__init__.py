@@ -23,7 +23,7 @@
 import os
 from os.path import abspath, dirname
 
-__version__ = "0.1.0"
+__version__ = "0.1.9"
 __feijoa_folder__: str = os.path.join(dirname(abspath(__file__)))
 __project_folder__: str = dirname(__feijoa_folder__)
 

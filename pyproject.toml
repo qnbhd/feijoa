@@ -1,6 +1,6 @@
 [project]
 name = "feijoa"
-version = "0.1.7"
+version = "0.1.9"
 description = "Hyperparameter's optimization framework"
 authors = [
     {name = "Konstantin Templin", email = "1qnbhd@gmail.com"}
@@ -47,8 +47,8 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-exclude = ["tests", "docs", "examples"]
+[tool.setuptools]
+package-dir = {"" = "feijoa"}
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0.1", "isort>=5.8.0", "flake8>=4.0.1", "pytest-cov>=3.0.0", "importlib-metadata"]
