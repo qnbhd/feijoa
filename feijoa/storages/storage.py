@@ -192,6 +192,7 @@ class Storage(metaclass=abc.ABCMeta):
         if not experiments:
             return None
 
+        # FIXME (qnbhd): Comparison with None
         return min(experiments, key=lambda x: x.objective_result)  # type: ignore
 
     def top_experiments(self, job_id, n) -> List[Experiment]:

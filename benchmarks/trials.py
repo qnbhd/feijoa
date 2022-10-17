@@ -1,21 +1,25 @@
+from collections import defaultdict
+from datetime import datetime
 from functools import lru_cache
 from functools import wraps
 from time import monotonic_ns
+from typing import List
+import uuid
 
+from clickhouse_sqlalchemy import engines
 from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import create_engine
+from sqlalchemy import DateTime
 from sqlalchemy import Float
-from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import String
-from sqlalchemy import TypeDecorator
-from sqlalchemy import types
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.orm import relationship
 from sqlalchemy.orm import sessionmaker
+
+from feijoa import Experiment
 
 
 _Base: DeclarativeMeta = declarative_base()
@@ -66,7 +70,8 @@ def timed_lru_cache(
 class MachineInfoModel(_Base):
     __tablename__ = "machines"
 
-    id = Column(Integer, primary_key=True)
+    uuid = Column(String, primary_key=True, nullable=False)
+
     name = Column(String)
     sys_platform = Column(String)
     architecture = Column(String)
@@ -78,6 +83,8 @@ class MachineInfoModel(_Base):
     ram = Column(BigInteger)
     cpu_freq_min = Column(BigInteger)
     cpu_freq_max = Column(BigInteger)
+
+    __table_args__ = (engines.Memory(),)
 
     UniqueConstraint(
         "name",
@@ -97,22 +104,28 @@ class MachineInfoModel(_Base):
 class TrialModel(_Base):  # type: ignore
     __tablename__ = "trials"
 
-    id = Column(Integer, primary_key=True)
+    uuid = Column(String, primary_key=True, nullable=False)
 
-    machine_id = Column(ForeignKey(MachineInfoModel.id))
-    machine = relationship(MachineInfoModel, backref="trials")
+    machine_uuid = Column(String, nullable=False)
 
     optimizer = Column(String)
+
     problem = Column(String)
+    space_size = Column(BigInteger)
+    parameters_count = Column(Integer)
+    problem_group = Column(String)
+    noise = Column(String)
+    modality = Column(String)
+    minima = Column(Float)
+
     best = Column(Float)
-    mem_peak = Column(Float)
-    mem_mean = Column(Float)
+    rss_peak = Column(Float)
+    rss_mean = Column(Float)
     time = Column(Float)
     dist = Column(Float)
 
     iterations = Column(BigInteger)
-    iterations_before_best = Column(BigInteger)
-    pareto_ranking = Column(BigInteger)
+    rewards = Column(BigInteger)
 
     UniqueConstraint(
         "optimizer",
@@ -121,6 +134,23 @@ class TrialModel(_Base):  # type: ignore
         "iterations",
         name="uconstr",
     )
+
+    __table_args__ = (engines.Memory(),)
+
+
+class Result(_Base):
+    __tablename__ = "results"
+
+    uuid = Column(String, primary_key=True, nullable=False)
+    trial_uuid = Column(String, nullable=False)
+
+    state = Column(String)
+    create_datetime = Column(DateTime)
+    finish_datetime = Column(DateTime)
+
+    objective_value = Column(Float)
+
+    __table_args__ = (engines.Memory(),)
 
 
 class BenchesStorage:
@@ -169,6 +199,7 @@ class BenchesStorage:
             raise Exception()
         elif len(models) == 0:
             machine = MachineInfoModel(
+                uuid=str(uuid.uuid4()),
                 name=name,
                 sys_platform=sys_platform,
                 architecture=architecture,
@@ -182,18 +213,20 @@ class BenchesStorage:
                 cpu_freq_max=cpu_freq_max,
             )
             self.session.add(machine)
-            self.session.commit()
-            return machine.id
+            self.session.flush()
+            # self.session.commit()
+            return machine.uuid
         elif len(models) == 1:
-            return models[0].id
+            return models[0].uuid
 
     def is_exists_trial(
-        self, problem, optimizer, machine_id, iterations
+        self, problem, optimizer, machine_uuid, iterations
     ) -> bool:
+
         result = self.session.query(TrialModel).filter(
             TrialModel.problem == problem,
             TrialModel.optimizer == optimizer,
-            TrialModel.machine_id == machine_id,
+            TrialModel.machine_uuid == machine_uuid,
             TrialModel.iterations == iterations,
         )
 
@@ -201,50 +234,55 @@ class BenchesStorage:
 
     def insert_trial(
         self,
-        machine_id,
+        machine_uuid,
         problem,
         optimizer,
         best,
-        mem_peak,
-        mem_mean,
+        rss_peak,
+        rss_mean,
         iterations,
         time,
         dist,
-        iterations_before_best,
-    ) -> int:
+        rewards,
+        space_size,
+        parameters_count,
+        problem_group,
+        noise,
+        modality,
+        minima,
+    ) -> str:
 
-        trial = TrialModel(
-            machine_id=machine_id,
+        params = dict(
+            uuid=str(uuid.uuid4()),
+            space_size=space_size,
+            parameters_count=parameters_count,
+            problem_group=problem_group,
+            noise=noise,
+            modality=modality,
+            minima=minima,
+            machine_uuid=machine_uuid,
             problem=problem,
             optimizer=optimizer,
             best=best,
-            mem_peak=mem_peak,
-            mem_mean=mem_mean,
+            rss_peak=rss_peak,
+            rss_mean=rss_mean,
             iterations=int(iterations),
             time=time,
             dist=dist,
-            iterations_before_best=int(iterations_before_best),
+            rewards=int(rewards),
         )
 
-        self.session.add(trial)
-        self.session.commit()
+        self.session.execute(TrialModel.__table__.insert(), params)
 
-        return trial.id
-
-    def set_pareto_ranking(self, trial_id, pareto_rank):
-        trial = (
-            self.session.query(TrialModel)
-            .filter_by(id=trial_id)
-            .one()
-        )
-        trial.pareto_ranking = int(pareto_rank)
-
-        self.session.commit()
+        return params["uuid"]
 
     @timed_lru_cache(seconds=10)
     def get_unique_problems(self):
-        query = """SELECT DISTINCT problem from trials;"""
-        records = self.session.execute(query).all()
+        records = (
+            self.session.query(TrialModel)
+            .distinct(TrialModel.problem)
+            .all()
+        )
         return [r.problem for r in records]
 
     # @timed_lru_cache(seconds=5)
@@ -264,64 +302,46 @@ class BenchesStorage:
         else:
             trials = self.session.query(TrialModel).all()
 
-        data = {
-            "optimizer": [],
-            "problem": [],
-            "best": [],
-            "mem_peak": [],
-            "mem_mean": [],
-            "iterations": [],
-            "time": [],
-            "dist": [],
-            "iterations_before_best": [],
-            "pareto_ranking": [],
-            "machine_id": [],
-        }
+        data = defaultdict(list)
 
         for trial in trials:
             data["optimizer"].append(trial.optimizer)
             data["problem"].append(trial.problem)
             data["best"].append(trial.best)
-            data["mem_peak"].append(trial.mem_peak)
-            data["mem_mean"].append(trial.mem_mean)
+            data["rss_peak"].append(trial.rss_peak)
+            data["rss_mean"].append(trial.rss_mean)
             data["iterations"].append(trial.iterations)
             data["time"].append(trial.time)
             data["dist"].append(trial.dist)
-            data["iterations_before_best"].append(
-                trial.iterations_before_best
-            )
-            data["machine_id"].append(trial.machine_id)
-            data["pareto_ranking"].append(trial.pareto_ranking)
+            data["rewards"].append(trial.rewards)
+            data["machine_uuid"].append(trial.machine_uuid)
 
         return data
 
-    @timed_lru_cache(seconds=10)
-    def get_total_ranking(self):
-        query = (
-            "select *, AVG(pareto_ranking) as ranking"
-            " from trials group by optimizer;"
-        )
+    def insert_results(
+        self, trial_uuid, experiments_list: List[Experiment]
+    ):
 
-        ranking = self.session.execute(query).all()
+        pool = []
 
-        result = {
-            "optimizer": [],
-            "ranking": [],
-        }
-
-        for record in ranking:
-            result["optimizer"].append(record.optimizer)
-            result["ranking"].append(1 / record.ranking)
-            result["optimizer"].append(record.optimizer)
-            result["problem"].append(record.problem)
-            result["best"].append(record.best)
-            result["mem_peak"].append(record.mem_peak)
-            result["mem_mean"].append(record.mem_mean)
-            result["iterations"].append(record.iterations)
-            result["time"].append(record.time)
-            result["dist"].append(record.dist)
-            result["iterations_before_best"].append(
-                record.iterations_before_best
+        for e in experiments_list:
+            params = dict()
+            params["uuid"] = str(uuid.uuid4())
+            params["trial_uuid"] = trial_uuid
+            params["create_datetime"] = datetime.fromtimestamp(  # type: ignore
+                e.create_timestamp
             )
+            assert e.finish_timestamp is not None
+            params["finish_datetime"] = datetime.fromtimestamp(  # type: ignore
+                e.finish_timestamp
+            )
+            assert e.objective_result is not None
+            params["objective_value"] = e.objective_result
+            pool.append(params)
 
-        return result
+        # noinspection PyUnresolvedReferences
+        self.session.execute(Result.__table__.insert(), pool)  # type: ignore
+
+    def __del__(self):
+        self.session.close()
+        self.engine.dispose()

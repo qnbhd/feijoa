@@ -51,6 +51,7 @@ class RDBStorage(Storage):
 
     def __init__(self, url):
         self.engine = create_engine(url)
+        # noinspection PyUnresolvedReferences
         _Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = self.Session()

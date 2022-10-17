@@ -5,6 +5,7 @@ import logging
 import random
 import time
 
+from benchmarks.storage import BenchmarksStorage
 from benchmarks.suite import get_machine_info
 from benchmarks.trials import BenchesStorage
 from benchmarks.utils import pickup_problems
@@ -14,8 +15,7 @@ import numpy as np
 import pandas as pd
 from paretoset import paretorank
 from rich.console import Console
-from rich.progress import Progress
-from sklearn.preprocessing import MinMaxScaler
+from scipy.special import softmax
 
 from feijoa import create_job
 from feijoa.utils.logging import init
@@ -28,11 +28,28 @@ log = logging.getLogger(__name__)
 console = Console()
 
 
+def norm(y, a=0.0, b=1.0):
+    return (b - a) * (y - y.min()) / (y.max() - y.min()) + a
+
+
+def ffiz(x):
+    return (
+        14.01781
+        - 0.184
+        + (1.184433 - 14.01781)
+        / (1 + ((x - 0.09) / 0.708392) ** 4.232001) ** 0.884245
+    )
+
+
+def ffee(x):
+    return 1 / (1 + np.abs(x - 1) ** 10)
+
+
 class BenchmarkSuite:
     def __init__(self, db_url):
         self.optimizers = list()
-        self.storage = BenchesStorage(db_url)
-        self.machine_id = self.storage.insert_machine(
+        self.storage = BenchmarksStorage(db_url)
+        self.machine_id = self.storage.put_machine(
             **get_machine_info()
         )
 
@@ -74,116 +91,94 @@ class BenchmarkSuite:
         ]
 
         for problem, optimizer in picked:
-            current_trials = defaultdict(list)
+            iterations = problem.iterations
+            problem_id = self.storage.put_problem(
+                problem.name,
+                problem.space.card,
+                len(problem.space),
+                problem.group,
+                iterations,
+            )
+            optimizer_id = self.storage.put_optimizer(optimizer)
 
-            for iterations in problem.iterations:
-                # iterations = random.choice(problem.iterations)
+            is_exists = self.storage.is_exists_trial(
+                problem_id, optimizer_id, self.machine_id
+            )
 
-                is_exists = self.storage.is_exists_trial(
-                    problem.name, optimizer, self.machine_id, iterations
+            if is_exists:
+                continue
+
+            log.info(
+                f"Start new task: {problem.name} with"
+                f" optimizer: {optimizer}, iterations: {iterations}"
+            )
+
+            job = create_job(
+                search_space=problem.space,
+                name=f"{problem.name}_{optimizer}",
+                storage="sqlite:///:memory:",
+            )
+
+            start = time.monotonic()
+
+            def evaluator(experiment):
+                return problem.fun(**experiment.params)
+
+            # noinspection PyBroadException
+            try:
+                np.random.seed(0)
+                random.seed(0)
+                mem_usage = memory_profiler.memory_usage(
+                    (
+                        job.do,
+                        (evaluator,),
+                        {
+                            "n_trials": iterations,
+                            "n_jobs": -1,
+                            "n_points_iter": 20,
+                            "optimizer": optimizer,
+                            "progress_bar": True,
+                        },
+                    ),
+                    max_iterations=1,
                 )
+            except Exception as e:
+                log.critical("Error occured")
+                print(e)
+                console.print_exception(max_frames=20)
+                continue
 
-                if is_exists:
-                    # log.warning(
-                    #     f"Trial with problem: `{problem.name}`,"
-                    #     f" optimizer: `{optimizer}`,"
-                    #     f" machine id: `{self.machine_id}`,"
-                    #     f" iterations: `{iterations}`"
-                    #     " was skipped because result exists."
-                    # )
-                    continue
+            best = job.best_value
+            mem_peak = np.max(mem_usage)
+            mem_mean = np.mean(mem_usage)
+            time_ = time.monotonic() - start
+            dist = np.abs(problem.solution - job.best_value)
 
-                log.info(
-                    f"Start new task: {problem.name} with"
-                    f" optimizer: {optimizer}, iterations: {iterations}"
+            try:
+                trial_uuid = self.storage.put_trial(
+                    self.machine_id,
+                    optimizer_id,
+                    problem_id,
+                    best,
+                    mem_peak,
+                    mem_mean,
+                    time_,
+                    dist,
+                    job.rewards,
                 )
+                self.storage.put_results(trial_uuid, job.experiments)
+            except Exception as e:
+                log.critical("let's wait a little bit ....")
+                raise e
 
-                job = create_job(
-                    search_space=problem.space,
-                    name=f"{problem.name}_{optimizer}",
-                    storage="sqlite:///:memory:",
-                )
+            # current_df = pd.DataFrame.from_dict(current_trials)
+            # pareto_ranking = self.calculate_pareto_ranking(current_df, problem.name)
 
-                start = time.monotonic()
-
-                def evaluator(experiment):
-                    return problem.fun(**experiment.params)
-
-                # noinspection PyBroadException
-                try:
-                    np.random.seed(0)
-                    random.seed(0)
-                    mem_usage = memory_profiler.memory_usage(
-                        (
-                            job.do,
-                            (evaluator,),
-                            {
-                                "n_trials": iterations,
-                                "n_jobs": -1,
-                                "n_points_iter": 20,
-                                "optimizer": optimizer,
-                                "progress_bar": True,
-                            },
-                        ),
-                        max_iterations=1,
-                    )
-                except Exception as e:
-                    log.critical("Error occured")
-                    print(e)
-                    console.print_exception(max_frames=20)
-                    continue
-
-                current_trials["optimizer"].append(optimizer)
-                current_trials["problem"].append(problem.name)
-
-                job_df = job.dataframe
-                minima = job_df["objective_result"].argmin()
-                iterations_before_best = int(job_df.iloc[minima].id)
-
-                best = job.best_value
-                mem_peak = np.max(mem_usage)
-                mem_mean = np.mean(mem_usage)
-                iterations = job.experiments_count
-                time_ = time.monotonic() - start
-                dist = np.abs(problem.solution - job.best_value)
-
-                current_trials["best"].append(best)
-                current_trials["mem_peak"].append(mem_peak)
-                current_trials["mem_mean"].append(mem_mean)
-                current_trials["iterations"].append(iterations)
-                current_trials["time"].append(time_)
-                current_trials["dist"].append(dist)
-                current_trials["iterations_before_best"].append(
-                    iterations_before_best
-                )
-                current_trials["machine_id"].append(self.machine_id)
-
-                try:
-                    trial_id = self.storage.insert_trial(
-                        self.machine_id,
-                        problem.name,
-                        optimizer,
-                        best,
-                        mem_peak,
-                        mem_mean,
-                        iterations,
-                        time_,
-                        dist,
-                        iterations_before_best,
-                    )
-                except Exception:
-                    log.critical("let's wait a little bit ....")
-                    time.sleep(5)
-                    continue
-
-                # current_df = pd.DataFrame.from_dict(current_trials)
-                # pareto_ranking = self.calculate_pareto_ranking(current_df, problem.name)
-
-                # for trial_id, rank in zip(trial_indices, pareto_ranking):
-                #     self.storage.set_pareto_ranking(trial_id, rank)
-                #
-                # for col, val in current_trials.items():
-                #     trials[col].append(val)
+            # for trial_id, rank in zip(trial_indices, pareto_ranking):
+            #     self.storage.set_pareto_ranking(trial_id, rank)
+            #
+            # for col, val in current_trials.items():
+            #     trials[col].append(val)
 
         return pd.DataFrame.from_dict(trials)
 
@@ -196,17 +191,21 @@ class BenchmarkSuite:
             directions.append(direction)
             metrics.append(metric)
 
-        problem_df = df[metrics]
-        ranks = paretorank(problem_df, sense=directions)
-        ranks = [1 / rank * 100 / iterations for rank, iterations in zip(ranks, df['iterations'])]
+        ranks = norm(
+            sum(
+                norm(df[tm]) * (-1 if direction == "min" else 1)
+                for tm, direction in zip(metrics, directions)
+            )
+        )
+
         df["rank"] = ranks
 
         if problem_name == "all":
-            problems_count = len(df['problem'].unique())
+            problems_count = len(df["problem"].unique())
 
-            for opt in df['optimizer'].unique():
-                opt_df = df[df['optimizer'] == opt]
-                pr = len(opt_df['problem'].unique())
+            for opt in df["optimizer"].unique():
+                opt_df = df[df["optimizer"] == opt]
+                pr = len(opt_df["problem"].unique())
                 if pr < problems_count / 3:
                     log.info(f"Remove {opt}")
                     df.drop(opt_df.index, inplace=True)
@@ -216,9 +215,10 @@ class BenchmarkSuite:
                     df
                 )
             )
-            ret_df['rank'] = (
-                (ret_df['rank'] - ret_df['rank'].min()) / (ret_df['rank'].max() - ret_df['rank'].min() + 1e-9)
-            )
+
+            # ret_df.loc[df['rank'] == df['rank'].max(), 'rank'] *= 1.05
+            ret_df["rank"] = norm(softmax(ret_df["rank"]))
+
             return ret_df
 
         data = defaultdict(list)
@@ -232,20 +232,15 @@ class BenchmarkSuite:
             data["rank"].append(mean_rank)
 
         ret_df = pd.DataFrame.from_dict(data)
-        ret_df['rank'] = (
-            (ret_df['rank'] - ret_df['rank'].min()) / (ret_df['rank'].max() - ret_df['rank'].min() + 1e-9)
-        )
+
+        # ret_df.loc[df['rank'] == df['rank'].max(), 'rank'] *= 1.05
+        ret_df["rank"] = norm(softmax(ret_df["rank"]))
 
         return ret_df
 
     def load_dataframe(self):
-        results = self.storage.load_trials()
+        results = self.storage.fetch_trials()
         return pd.DataFrame.from_dict(results)
-
-    def get_total_ranking(self):
-        return pd.DataFrame.from_dict(
-            self.storage.get_total_ranking()
-        )
 
     @staticmethod
     def calculate_avg_ranking_for_optimizers(dataframe):
@@ -258,14 +253,16 @@ class BenchmarkSuite:
             query = dataframe.query(
                 f"optimizer == '{optimizer}' and"
                 f" problem == '{problem}'"
-            )["rank"].mean()
+            )
 
-            if not np.isfinite(query):
+            mean_rank = query["rank"].mean()
+
+            if not np.isfinite(mean_rank):
                 continue
 
             trials["optimizer"].append(optimizer)
             trials["problem"].append(problem)
-            trials["rank"].append(query)
+            trials["rank"].append(mean_rank)
 
         sdf = pd.DataFrame.from_dict(trials)
 
@@ -375,21 +372,18 @@ cli.add_command(load_dataframe)
 cli.add_command(calculate_ranking)
 
 if __name__ == "__main__":
-    bsuite = BenchmarkSuite(
-        "postgresql+psycopg2://postgres:"
-        "myPassword@188.124.39.245/postgres"
-    )
 
-    bsuite.add_optimizer("bayesian[acq=lfboei]")
-    bsuite.add_optimizer("bayesian[acq=lfbopoi]")
-    bsuite.add_optimizer("bayesian[acq=ucb]")
-    bsuite.add_optimizer("cmaes")
+    bsuite = BenchmarkSuite("sqlite:///test.db")
+
+    bsuite.add_optimizer("bcmaes")
+    bsuite.add_optimizer("optuna_nsgaii")
+    bsuite.add_optimizer("optuna_cmaes")
+    bsuite.add_optimizer("optuna_motpe")
     bsuite.add_optimizer("opentuner")
     bsuite.add_optimizer("hyperopt")
     bsuite.add_optimizer("pysot")
     bsuite.add_optimizer("opentuner")
 
-    bsuite.add_optimizer("skopt")
     bsuite.add_optimizer("pattern")
     bsuite.add_optimizer("pso")
     bsuite.add_optimizer("ucb<bayesian,cmaes>")
@@ -407,8 +401,5 @@ if __name__ == "__main__":
     bsuite.add_optimizer(
         "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]+reducer>"
     )
-    bsuite.add_optimizer(
-        "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor], pso>"
-    )
 
-    bsuite.do()
+    bsuite.do(randomized=True, k=100)

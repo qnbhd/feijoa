@@ -113,6 +113,7 @@ class Job:
         storage: Storage,
         search_space: SearchSpace,
         job_id: int,
+        loaded=False,
         **kwargs,
     ):
 
@@ -129,9 +130,9 @@ class Job:
 
         self.seeds: List[dict] = []
 
-        assert not self.storage.is_job_name_exists(self.name)
-
-        self.storage.insert_job(self)
+        if not loaded:
+            assert not self.storage.is_job_name_exists(self.name)
+            self.storage.insert_job(self)
 
     @property
     def best_parameters(self) -> Optional[dict]:
@@ -150,7 +151,7 @@ class Job:
 
         return (
             self.best_experiment.params
-            if self.best_experiment
+            if self.best_experiment is not None
             else None
         )
 
@@ -169,7 +170,7 @@ class Job:
 
         return (
             self.best_experiment.objective_result
-            if self.best_experiment
+            if self.best_experiment is not None
             else None
         )
 
@@ -286,6 +287,7 @@ class Job:
         optimizer="",
         progress_bar=True,
         use_numba_jit=False,
+        seed=None,
     ):
         """
         Do optimization for current job.
@@ -333,6 +335,8 @@ class Job:
                 Show progress bar (rich) or not.
             use_numba_jit (bool):
                 Use numba for objective evaluation speedup.
+            seed (int | None):
+                Random seed
 
         Returns:
             None
@@ -350,7 +354,9 @@ class Job:
         if not optimizer and self.optimizer_name_dsl:
             optimizer_name = self.optimizer_name_dsl
 
-        self.optimizer = maker(optimizer_name, self.search_space)
+        self.optimizer = maker(
+            optimizer_name, self.search_space, random_state=seed
+        )
         self.optimizer_name_dsl = optimizer_name
 
         self.storage.update_optimizer_name_by_job_id(
@@ -378,28 +384,30 @@ class Job:
         )
 
         def range_checker(p, value):
-            if isinstance(p, (Real, Categorical)):
-                assert p.low <= value <= p.high, f"{p.low} <= {value} <= {p.high}"
+            if isinstance(p, (Real, Integer)):
+                assert (
+                    p.low <= value <= p.high
+                ), f"{p.low} <= {value} <= {p.high}"
             if isinstance(p, Categorical):
                 assert value in p.choices, f"value in [{p.choices}]"
 
         trials = 0
         with progress as bar:  # type: ignore
             # pyre-ignore[16]:
-            m = float('+inf')
+            m = float("+inf")
             task = bar.add_task("Optimizing", total=n_trials)
             while trials < n_trials:
                 configurations = self.ask(n_points_iter)
-
-                for c in configurations:
-                    for param, value in c.params.items():
-                        sp_p = self.search_space.get(param)
-                        range_checker(sp_p, value)
 
                 if not configurations:
                     warnings.warn("No new configurations.")
                     # TODO (qnbhd): make closing
                     break
+
+                for c in configurations:
+                    for param, value in c.params.items():
+                        sp_p = self.search_space.get(param)
+                        range_checker(sp_p, value)
 
                 configurations = configurations[
                     : min(len(configurations), n_trials - trials)
@@ -437,9 +445,13 @@ class Job:
                         experiment, result, force=(trials >= n_trials)
                     )
 
-                bar.update(task, advance=configurations_len, description=f"Trials <{self.name}>]: {trials}/{n_trials}")
+                bar.update(
+                    task,
+                    advance=configurations_len,
+                    description=f"Trials <{self.name}>]: {trials}/{n_trials}",
+                )
 
-                if self.best_value < m:
+                if self.best_value and self.best_value < m:
                     log.info(f"New best result: {self.best_value}")
                     m = self.best_value
 
@@ -850,13 +862,13 @@ def load_job(
     experiments = storage.get_experiments_by_job_id(job_id)
     search_space = storage.get_search_space_by_job_id(job_id)
 
-    job = Job(name, storage, search_space, job_id, **kwargs)
+    job = Job(
+        name, storage, search_space, job_id, **kwargs, loaded=True
+    )
 
     job.loaded_experiments_pool.extend(experiments)
 
-    dsl_name = storage.get_optimizer_name_by_job_id(
-        job.id
-    )
+    dsl_name = storage.get_optimizer_name_by_job_id(job.id)
 
     if dsl_name:
         job.optimizer_name_dsl = dsl_name

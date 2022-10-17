@@ -98,6 +98,7 @@ def acquisition(
         s1 = x1.shape[0]
         s0 = x0.shape[0]
 
+        # FIXME (qnbhd): ValueError: Input sample_weight contains NaN.
         w = np.concatenate(
             [w1 * (s1 + s0) / s1, w0 * (s1 + s0) / s0],
             axis=0,  # pragma: no mutate
@@ -120,6 +121,7 @@ def acquisition(
             n_jobs=-1, random_state=random_state
         )
         clf.fit(X, classified)
+        # FIXME (qnbhd): IndexError: index 1 is out of bounds for axis 1 with size 1
         y_pred = clf.predict_proba(X_samples)[:, 1]
         return y_pred
 
@@ -247,7 +249,6 @@ class Bayesian(Oracle):
 
         self.y = np.empty(shape=(0,))
 
-
         # setup acquisition function
 
         if not isinstance(self.model, GaussianProcessRegressor):
@@ -328,8 +329,12 @@ class Bayesian(Oracle):
         )
 
         scores = acquisition(
-            self.model, self.acq_function, X_samples, self.X, self.y,
-            random_state=self.seed
+            self.model,
+            self.acq_function,
+            X_samples,
+            self.X,
+            self.y,
+            random_state=self.seed,
         )
 
         assert len(scores) == n_samples

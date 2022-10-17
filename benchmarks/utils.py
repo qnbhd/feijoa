@@ -41,7 +41,7 @@ def solution(group):
     return inner
 
 
-def iterations(*iters):
+def iterations(iters):
     def inner(func):
         setattr(func, "__bench_iterations__", iters)
         return func
@@ -91,7 +91,7 @@ def pickup_problems(*paths):
 
         for key, value in func.__annotations__.items():
             match = re.match(
-                "^\[(?P<bounds>.+)]:(?P<kind>.+)", value
+                "^[(?P<bounds>.+)]:(?P<kind>.+)", value
             )  # noqa: W605
             kind = match.group("kind")
             bounds = match.group("bounds")
@@ -108,9 +108,7 @@ def pickup_problems(*paths):
 
         bench_name = func.__name__
         bench_group = getattr(func, "__bench_group__", "common")
-        bench_iterations = getattr(
-            func, "__bench_iterations__", tuple()
-        )
+        bench_iterations = getattr(func, "__bench_iterations__")
         bench_solution = getattr(func, "__bench_solution__", 0.0)
 
         problems.append(

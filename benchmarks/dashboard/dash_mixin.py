@@ -1,14 +1,17 @@
 import inspect
-import os
-from os.path import abspath
-from os.path import dirname
+from itertools import chain
+import logging
 
-from benchmarks.dashboard.layout import make_layout
 import dash
+import dash_bootstrap_components as dbc
+
+
+log = logging.getLogger("dash_mixin")
 
 
 class DashMixin:
-    def __init__(self):
+    def __init__(self, *external_modules):
+        log.critical("Call DashMixin")
         self.app = dash.Dash(
             __name__,
             meta_tags=[
@@ -17,22 +20,45 @@ class DashMixin:
                     "content": "width=device-width, initial-scale=1",
                 }
             ],
+            external_stylesheets=[dbc.themes.CYBORG],
         )
 
         self.app.title = "Feijoa oracles ranking"
-        self.app.layout = make_layout(self.app)
 
-        methods = inspect.getmembers(
-            self,
-            lambda x: inspect.ismethod(x)
-            and not x.__name__.startswith("_")
-            and hasattr(x, "__dash_args__"),
-        )
+        external_modules = external_modules or []
 
-        for name, method in methods:
-            arguments = getattr(method, "__dash_args__")
-            kw_arguments = getattr(method, "__dash_kwargs__", {})
-            self.app.callback(*arguments, **kw_arguments)(method)
+        source = chain([self], external_modules)
+
+        for obj in source:
+
+            functions_predicate = (
+                (lambda x: inspect.ismethod(x))
+                if isinstance(obj, DashMixin)
+                else (lambda x: inspect.isfunction(x))
+            )
+
+            methods = inspect.getmembers(
+                obj,
+                lambda x: functions_predicate(x)
+                and not x.__name__.startswith("_")
+                and hasattr(x, "__dash_args__"),
+            )
+
+            for name, method in methods:
+                arguments = getattr(method, "__dash_args__")
+                kw_arguments = getattr(method, "__dash_kwargs__", {})
+
+                if name.startswith("client"):
+                    self.app.clientside_callback(
+                        method.__doc__, *arguments, **kw_arguments
+                    )
+                    log.info(
+                        f"Clientside callback {name} was registered."
+                    )
+                    continue
+
+                log.info(f"Callback {name} was registered.")
+                self.app.callback(*arguments, **kw_arguments)(method)
 
 
 def dashed(*args, **kwargs):

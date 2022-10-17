@@ -70,7 +70,9 @@ class Skopt(Oracle):
         super().__init__(**kwargs)
 
         self.skopt_space = self._make_space(search_space)
-        self.optimizer_instance = skopt.Optimizer(self.skopt_space, random_state=self.seed)
+        self.optimizer_instance = skopt.Optimizer(
+            self.skopt_space, random_state=self.seed
+        )
 
         self.ask_generator: Optional[Generator] = None
 

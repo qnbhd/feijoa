@@ -25,7 +25,7 @@ jobs:
 
     - name: install checkers
       run: |
-        pip install black flake8 isort mypy blackdoc types-PyYAML
+        pip install black flake8 isort mypy blackdoc types-PyYAML types-ujson
 
     - name: black
       run: black . --check --diff

@@ -26,9 +26,9 @@ import logging
 from typing import Generator
 from typing import List
 from typing import Optional
-import optuna
 
 import numpy
+import optuna
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
@@ -57,8 +57,10 @@ class OptunaTPE(Oracle):
         super().__init__(*args, **kwargs)
         self.space = search_space
         self._ask_gen = None
-        self.name = f'Optuna<{self.SAMPLER.__name__}>'
-        self.study = optuna.create_study(sampler=self.SAMPLER(seed=self.seed))
+        self.name = f"Optuna<{self.SAMPLER.__name__}>"
+        self.study = optuna.create_study(
+            sampler=self.SAMPLER(seed=self.seed)
+        )
         self.trial = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
@@ -73,38 +75,46 @@ class OptunaTPE(Oracle):
 
             for param in self.space:
                 if isinstance(param, Real):
-                    configuration[param.name] = self.trial.suggest_float(param.name,
-                                                                    low=param.low, high=param.high)
+                    configuration[
+                        param.name
+                    ] = self.trial.suggest_float(
+                        param.name, low=param.low, high=param.high
+                    )
                 elif isinstance(param, Integer):
-                    configuration[param.name] = self.trial.suggest_int(param.name,
-                                                                  low=param.low, high=param.high)
+                    configuration[
+                        param.name
+                    ] = self.trial.suggest_int(
+                        param.name, low=param.low, high=param.high
+                    )
                 elif isinstance(param, Categorical):
-                    configuration[param.name] = self.trial.suggest_categorical(param.name,
-                                                                          choices=param.choices)
+                    configuration[
+                        param.name
+                    ] = self.trial.suggest_categorical(
+                        param.name, choices=param.choices
+                    )
 
             c = Configuration(configuration, requestor=self.name)
             yield [c]
 
     def tell(self, config, result):
         """No needed."""
-        log.info(f'Telled for {self.name}')
+        log.info(f"Telled for {self.name}")
         self.study.tell(self.trial, result)
 
 
 class OptunaCMAES(OptunaTPE):
-    anchor = 'optuna_cmaes'
-    aliases = ('optuna-cmaes', 'Optuna-CMAES')
-    SAMPLER = optuna.samplers.CmaEsSampler
+    anchor = "optuna_cmaes"
+    aliases = ("optuna-cmaes", "Optuna-CMAES")
+    SAMPLER = optuna.samplers.CmaEsSampler  # type: ignore
 
 
 class OptunaNSGAII(OptunaTPE):
-    anchor = 'optuna_nsgaii'
-    aliases = ('optuna-nsgaii', 'Optuna-NSGAII')
-    SAMPLER = optuna.samplers.NSGAIISampler
+    anchor = "optuna_nsgaii"
+    aliases = ("optuna-nsgaii", "Optuna-NSGAII")
+    SAMPLER = optuna.samplers.NSGAIISampler  # type: ignore
 
 
 class OptunaMOTPE(OptunaTPE):
-    anchor = 'optuna_motpe'
-    aliases = ('optuna-motpe', 'Optuna-MOTPE')
-    SAMPLER = optuna.samplers.MOTPESampler
-
+    anchor = "optuna_motpe"
+    aliases = ("optuna-motpe", "Optuna-MOTPE")
+    SAMPLER = optuna.samplers.MOTPESampler  # type: ignore

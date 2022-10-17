@@ -1,30 +1,18 @@
 import logging
 import math
 import sys
-from typing import Optional, List, Generator, Tuple
+from typing import Generator
+from typing import List
+from typing import Optional
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from scipy.stats import multivariate_normal
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from scipy.stats import multivariate_normal
-
 from feijoa.utils.transformers import transform
-
-
-def Schwefel2(X):
-    if type(X) == list:
-        X = np.array(X)
-        n = X.shape[0]
-        X = X.reshape([1,n])
-    else:
-        try:
-            n = X.shape[1]
-        except:
-            n = len(X)
-            X = np.array(X).reshape([1,n])
-    return np.sum(np.abs(X),1)+np.prod(np.abs(X),1)
 
 
 # noinspection PyAbstractClass,SpellCheckingInspection,PyPep8Naming
@@ -82,13 +70,18 @@ class BCMAES(Oracle):
     # noinspection PyUnusedLocal
     def _ask(self, W: int) -> Generator:
         while True:
-        # while np.linalg.norm(self.variance) > self.tol:
+            # while np.linalg.norm(self.variance) > self.tol:
             E_mu = self.mu0
             E_sigma = self.psi / (self.v0 - self.n - 1)
             self.step += 1
 
-            sample_X = np.random.multivariate_normal(mean=E_mu, cov=E_sigma, size=(self.n,))
-            sample_X = np.clip(sample_X, self.bounds[:, 0], self.bounds[:, 1])
+            # FIXME (qnbhd): ValueError: mean and cov must have same length
+            sample_X = np.random.multivariate_normal(
+                mean=E_mu, cov=E_sigma, size=(self.n,)
+            )
+            sample_X = np.clip(
+                sample_X, self.bounds[:, 0], self.bounds[:, 1]
+            )
 
             yield self.make_configs(sample_X)
 
@@ -96,28 +89,38 @@ class BCMAES(Oracle):
             g_x = self.results.pop()
 
             df = pd.DataFrame(sample_X)
-            df['g_x'] = g_x
-            df['g_x'] = g_x
-            df['d'] = multivariate_normal.pdf(sample_X, mean=E_mu, cov=E_sigma, allow_singular=True)
-            x_order_d = df.sort_values(by=['d'], ascending=False)
-            x_order_f = x_order_d.sort_values(by=['g_x'], kind='mergesort')
+            df["g_x"] = g_x
+            df["g_x"] = g_x
+            df["d"] = multivariate_normal.pdf(
+                sample_X, mean=E_mu, cov=E_sigma, allow_singular=True
+            )
+            x_order_d = df.sort_values(by=["d"], ascending=False)
+            x_order_f = x_order_d.sort_values(
+                by=["g_x"], kind="mergesort"
+            )
 
-            d_ordered = x_order_d[x_order_d.columns[-1:]].values / sum(df['d'])
+            d_ordered = x_order_d[
+                x_order_d.columns[-1:]
+            ].values / sum(df["d"])
             x_order_f = x_order_f[x_order_f.columns[:-2]].values
             x_order_d = x_order_d[x_order_d.columns[:-2]].values
 
             x_all = df[df.columns[:-2]].values
-            d = np.array(df['d'])[:, None] / sum(df['d'])
+            d = np.array(df["d"])[:, None] / sum(df["d"])
             x_bar_f = np.sum(x_order_f * d_ordered, axis=0)
             x_bar = np.sum(x_all * d, axis=0)
             mean = x_order_f[0]
 
             # sigma part :
             sigma_emp = np.dot((x_all - x_bar).T, (x_all - x_bar) * d)
-            sigma_ordered = np.dot((x_order_f - x_bar_f).T, (x_order_f - x_bar_f)
-                                   * d_ordered)
+            sigma_ordered = np.dot(
+                (x_order_f - x_bar_f).T,
+                (x_order_f - x_bar_f) * d_ordered,
+            )
             # other :
-            self.variance = (sigma_ordered - (sigma_emp - E_sigma)) * self.factor
+            self.variance = (
+                sigma_ordered - (sigma_emp - E_sigma)
+            ) * self.factor
 
             variance_norm = np.linalg.norm(self.variance)
 
@@ -167,11 +170,20 @@ class BCMAES(Oracle):
                 if self.count > 40:
                     self.factor = 0.5
 
-            self.mu0 = (self.mu0 * self.k0 + self.n * mean) / (self.k0 + self.n)
+            self.mu0 = (self.mu0 * self.k0 + self.n * mean) / (
+                self.k0 + self.n
+            )
             self.k0 = self.k0 + self.n
             self.v0 = self.v0 + self.n
-            self.psi = self.psi + (self.k0 * self.n) / (self.k0 + self.n) * np.dot(np.mat(mean - self.mu0),
-                                                                              np.mat(mean - self.mu0).T) + self.variance * (self.n - 1)
+            self.psi = (
+                self.psi
+                + (self.k0 * self.n)
+                / (self.k0 + self.n)
+                * np.dot(
+                    np.mat(mean - self.mu0), np.mat(mean - self.mu0).T
+                )
+                + self.variance * (self.n - 1)
+            )
             self.psi = self.psi * self.factor
 
     def tell(self, config, result):

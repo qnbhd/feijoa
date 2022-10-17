@@ -151,6 +151,18 @@ class SearchSpace:
 
         return SearchSpace(*pool)
 
+    @property
+    def card(self):
+        num = 1
+        for p in self:
+            if isinstance(p, Real):
+                num *= (p.high - p.low) / 0.1
+            elif isinstance(p, Integer):
+                num *= p.high - p.low
+            elif isinstance(p, Categorical):
+                num *= len(p.choices)
+        return int(num)
+
 
 def parameter_factory(**kwargs):
     """
