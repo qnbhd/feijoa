@@ -21,17 +21,13 @@
 # SOFTWARE.
 """Search space module."""
 
-from typing import List
 import warnings
+from typing import List
 
 import numpy as np
 import yaml
 
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Parameter
-from feijoa.search.parameters import Real
-
+from feijoa.search.parameters import Categorical, Integer, Parameter, Real
 
 __all__ = ["SearchSpace"]
 
@@ -207,8 +203,7 @@ def from_yaml(yaml_file: str) -> SearchSpace:
     Load search space from yaml file."""
 
     warnings.warn(
-        "Function `from_yaml` is deprecated."
-        "Use SearchSpace.from_yaml instead.",
+        "Function `from_yaml` is deprecated." "Use SearchSpace.from_yaml instead.",
         DeprecationWarning,
     )
 

@@ -19,14 +19,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from typing import Generator
-from typing import List
-from typing import Optional
+from typing import Generator, List, Optional
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.visitors import Randomizer
-
 
 __all__ = ["Random"]
 

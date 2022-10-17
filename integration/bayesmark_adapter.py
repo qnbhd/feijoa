@@ -1,20 +1,13 @@
 import logging
-from typing import Generator
-from typing import List
-from typing import Optional
+from typing import Generator, List, Optional
 
 from bayesmark.builtin_opt.hyperopt_optimizer import HyperoptOptimizer
-from bayesmark.builtin_opt.opentuner_optimizer import (
-    OpentunerOptimizer,
-)
+from bayesmark.builtin_opt.opentuner_optimizer import OpentunerOptimizer
 from bayesmark.builtin_opt.pysot_optimizer import PySOTOptimizer
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
-
+from feijoa.search.parameters import Categorical, Integer, Real
 
 log = logging.getLogger(__name__)
 

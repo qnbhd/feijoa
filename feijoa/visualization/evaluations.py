@@ -71,9 +71,7 @@ def plot_evaluations(job, params=None, invert_objective=False):
     """
 
     df = job.get_dataframe(brief=True, only_good=True)
-    objectives = df["objective_result"] * (
-        1 if not invert_objective else -1
-    )
+    objectives = df["objective_result"] * (1 if not invert_objective else -1)
     df.drop(columns=["id", "objective_result"], inplace=True)
     params = params or df.columns
 
@@ -143,9 +141,7 @@ def plot_evaluations(job, params=None, invert_objective=False):
     ]
 
     positions = [
-        (x0, x1, y0, y1)
-        for (x0, x1, y0, y1) in positions
-        if x0 == 0.0 or y0 == 0.0
+        (x0, x1, y0, y1) for (x0, x1, y0, y1) in positions if x0 == 0.0 or y0 == 0.0
     ]
 
     names = list(params) * 2

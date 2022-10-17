@@ -1,7 +1,6 @@
+from dash import Input, Output, State
+
 from benchmarks.dashboard.dash_mixin import dashed
-from dash import Input
-from dash import Output
-from dash import State
 
 
 @dashed(

@@ -1,9 +1,9 @@
 import json
 
-from benchmarks.dashboard.dash_mixin import dashed
-from dash import Input
-from dash import Output
 import ujson
+from dash import Input, Output
+
+from benchmarks.dashboard.dash_mixin import dashed
 
 
 @dashed(
@@ -30,9 +30,7 @@ def update_yaxis_scale(value):
     return ujson.dumps(value)
 
 
-@dashed(
-    Output("directions", "data"), Input("checklist-input", "value")
-)
+@dashed(Output("directions", "data"), Input("checklist-input", "value"))
 def update_directions(checks):
     return json.dumps(
         {

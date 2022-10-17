@@ -21,22 +21,16 @@
 # SOFTWARE.
 """Grid search class module."""
 
-from itertools import product
 import logging
-from typing import Generator
-from typing import List
-from typing import Optional
+from itertools import product
+from typing import Generator, List, Optional
 
 import numpy
 import optuna
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import ParametersVisitor
-from feijoa.search.parameters import Real
-
+from feijoa.search.parameters import Categorical, Integer, ParametersVisitor, Real
 
 __all__ = ["OptunaTPE"]
 
@@ -58,9 +52,7 @@ class OptunaTPE(Oracle):
         self.space = search_space
         self._ask_gen = None
         self.name = f"Optuna<{self.SAMPLER.__name__}>"
-        self.study = optuna.create_study(
-            sampler=self.SAMPLER(seed=self.seed)
-        )
+        self.study = optuna.create_study(sampler=self.SAMPLER(seed=self.seed))
         self.trial = None
 
     def ask(self, n: int = 1) -> Optional[List[Configuration]]:
@@ -75,21 +67,15 @@ class OptunaTPE(Oracle):
 
             for param in self.space:
                 if isinstance(param, Real):
-                    configuration[
-                        param.name
-                    ] = self.trial.suggest_float(
+                    configuration[param.name] = self.trial.suggest_float(
                         param.name, low=param.low, high=param.high
                     )
                 elif isinstance(param, Integer):
-                    configuration[
-                        param.name
-                    ] = self.trial.suggest_int(
+                    configuration[param.name] = self.trial.suggest_int(
                         param.name, low=param.low, high=param.high
                     )
                 elif isinstance(param, Categorical):
-                    configuration[
-                        param.name
-                    ] = self.trial.suggest_categorical(
+                    configuration[param.name] = self.trial.suggest_categorical(
                         param.name, choices=param.choices
                     )
 

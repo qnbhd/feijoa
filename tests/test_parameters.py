@@ -1,8 +1,6 @@
 import pytest
 
-from feijoa import Categorical
-from feijoa import Integer
-from feijoa import Real
+from feijoa import Categorical, Integer, Real
 from feijoa.exceptions import ParametersIncorrectInputValues
 from feijoa.search.parameters import ParametersVisitor
 

@@ -1,26 +1,25 @@
+import uuid
 from collections import defaultdict
 from datetime import datetime
-from functools import lru_cache
-from functools import wraps
+from functools import lru_cache, wraps
 from time import monotonic_ns
 from typing import List
-import uuid
 
 from clickhouse_sqlalchemy import engines
-from sqlalchemy import BigInteger
-from sqlalchemy import Column
-from sqlalchemy import create_engine
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    String,
+    UniqueConstraint,
+    create_engine,
+)
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from feijoa import Experiment
-
 
 _Base: DeclarativeMeta = declarative_base()
 
@@ -45,9 +44,7 @@ def timed_lru_cache(
         f.delta = seconds * 10**9
         f.expiration = monotonic_ns() + f.delta
 
-        @wraps(
-            f
-        )  # wraps is used to access the decorated function attributes
+        @wraps(f)  # wraps is used to access the decorated function attributes
         def wrapped_f(*args, **kwargs):
             if monotonic_ns() >= f.expiration:
                 # if the current cache expired of the decorated function then
@@ -219,9 +216,7 @@ class BenchesStorage:
         elif len(models) == 1:
             return models[0].uuid
 
-    def is_exists_trial(
-        self, problem, optimizer, machine_uuid, iterations
-    ) -> bool:
+    def is_exists_trial(self, problem, optimizer, machine_uuid, iterations) -> bool:
 
         result = self.session.query(TrialModel).filter(
             TrialModel.problem == problem,
@@ -278,11 +273,7 @@ class BenchesStorage:
 
     @timed_lru_cache(seconds=10)
     def get_unique_problems(self):
-        records = (
-            self.session.query(TrialModel)
-            .distinct(TrialModel.problem)
-            .all()
-        )
+        records = self.session.query(TrialModel).distinct(TrialModel.problem).all()
         return [r.problem for r in records]
 
     # @timed_lru_cache(seconds=5)
@@ -294,11 +285,7 @@ class BenchesStorage:
                 .all()
             )
         elif problem and problem != "all":
-            trials = (
-                self.session.query(TrialModel)
-                .filter_by(problem=problem)
-                .all()
-            )
+            trials = self.session.query(TrialModel).filter_by(problem=problem).all()
         else:
             trials = self.session.query(TrialModel).all()
 
@@ -318,9 +305,7 @@ class BenchesStorage:
 
         return data
 
-    def insert_results(
-        self, trial_uuid, experiments_list: List[Experiment]
-    ):
+    def insert_results(self, trial_uuid, experiments_list: List[Experiment]):
 
         pool = []
 

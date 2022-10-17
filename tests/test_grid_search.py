@@ -1,8 +1,4 @@
-from feijoa import Categorical
-from feijoa import create_job
-from feijoa import Integer
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Categorical, Integer, Real, SearchSpace, create_job
 
 
 def test_grid_search():

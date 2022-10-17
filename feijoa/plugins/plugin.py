@@ -23,9 +23,7 @@
 
 from abc import ABCMeta
 
-from feijoa.utils.mixins import Observer
-from feijoa.utils.mixins import Subject
-
+from feijoa.utils.mixins import Observer, Subject
 
 __all__ = ["Plugin"]
 

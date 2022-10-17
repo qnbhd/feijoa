@@ -48,13 +48,9 @@ def test_experiment():
 
     params_dumped = json.dumps(ex1.params, sort_keys=True)
 
+    assert hashlib.sha1(params_dumped.encode()).hexdigest() == params_part
     assert (
-        hashlib.sha1(params_dumped.encode()).hexdigest()
-        == params_part
-    )
-    assert (
-        hashlib.sha1(str(ex1.objective_result).encode()).hexdigest()
-        == objective_part
+        hashlib.sha1(str(ex1.objective_result).encode()).hexdigest() == objective_part
     )
 
     ex2 = Experiment(

@@ -21,19 +21,14 @@
 # SOFTWARE.
 
 import os
-from os.path import abspath
-from os.path import dirname
-
+from os.path import abspath, dirname
 
 __version__ = "0.1.0"
 __feijoa_folder__: str = os.path.join(dirname(abspath(__file__)))
 __project_folder__: str = dirname(__feijoa_folder__)
 
-from .jobs.job import create_job
-from .jobs.job import load_job
+from .jobs.job import create_job, load_job
 from .models import Experiment
-from .search.parameters import Categorical
-from .search.parameters import Integer
-from .search.parameters import Real
+from .search.parameters import Categorical, Integer, Real
 from .search.space import SearchSpace
 from .storages import Storage

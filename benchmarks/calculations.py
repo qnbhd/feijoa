@@ -1,11 +1,10 @@
 from collections import defaultdict
 from pprint import pprint
 
-from numba import jit
-from numba import prange
 import numpy as np
-from scipy.special import softmax
 import swifter
+from numba import jit, prange
+from scipy.special import softmax
 
 
 @jit(forceobj=True)
@@ -39,8 +38,7 @@ def make_ranks(
 
     return norm(
         np.sum(
-            norm(dataframe[metrics[i]])
-            * (-1 if directions[i] == "min" else 1)
+            norm(dataframe[metrics[i]]) * (-1 if directions[i] == "min" else 1)
             for i in prange(len(metrics))
         )
     )

@@ -21,21 +21,15 @@
 # SOFTWARE.
 """Grid search class module."""
 
-from itertools import product
 import logging
-from typing import Generator
-from typing import List
-from typing import Optional
+from itertools import product
+from typing import Generator, List, Optional
 
 import numpy
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import ParametersVisitor
-from feijoa.search.parameters import Real
-
+from feijoa.search.parameters import Categorical, Integer, ParametersVisitor, Real
 
 __all__ = ["Grid"]
 
@@ -67,9 +61,7 @@ class GridMaker(ParametersVisitor):
         """Pick up real grid."""
 
         return numpy.round(
-            numpy.arange(
-                p.low, p.high + GridMaker.EPS, GridMaker.EPS
-            ),
+            numpy.arange(p.low, p.high + GridMaker.EPS, GridMaker.EPS),
             2,
         )
 
@@ -104,9 +96,7 @@ class Grid(Oracle):
 
         # grids for all parameters
 
-        grids = [
-            p.accept(GridMaker()) for p in self.search_space.params
-        ]
+        grids = [p.accept(GridMaker()) for p in self.search_space.params]
 
         # iterator for grid search
 
@@ -130,10 +120,7 @@ class Grid(Oracle):
                 except StopIteration:
                     break
 
-                cfg = {
-                    h.name: v
-                    for h, v in zip(self.search_space, generation)
-                }
+                cfg = {h.name: v for h, v in zip(self.search_space, generation)}
 
                 cfgs.append(Configuration(cfg, requestor=self.name))
 

@@ -1,9 +1,7 @@
-from contextlib import redirect_stderr
 import io
+from contextlib import redirect_stderr
 
-from ply import lex
-from ply import yacc
-
+from ply import lex, yacc
 
 __all__ = ["_OracleParser"]
 
@@ -198,8 +196,7 @@ class _OracleParser:
         if p is None:
             return
         self.exception_message = (
-            f"Error parsing `{p.value}` "
-            f"at {p.lineno} line in {p.lexpos} position."
+            f"Error parsing `{p.value}` " f"at {p.lineno} line in {p.lexpos} position."
         )
 
     def __init__(self):
@@ -215,9 +212,7 @@ class _OracleParser:
         self.exception_message = ""
 
         with io.StringIO() as buf, redirect_stderr(buf):
-            tree = self.parser.parse(
-                doc, lexer=self.lexer.lexer, debug=1
-            )
+            tree = self.parser.parse(doc, lexer=self.lexer.lexer, debug=1)
 
             if self.lexer.exception_message:
                 # intercept lexer error message
@@ -226,11 +221,7 @@ class _OracleParser:
             # try pick up error message from lexer debug output
             if not tree and not self.exception_message:
                 error_line = next(
-                    (
-                        line
-                        for line in buf.getvalue().splitlines()
-                        if "ERROR" in line
-                    ),
+                    (line for line in buf.getvalue().splitlines() if "ERROR" in line),
                 )
                 self.exception_message = (
                     "Error while parsing at end of line. Description:\n"

@@ -1,14 +1,13 @@
 import contextlib
-from functools import lru_cache
 import importlib.util
 import inspect
-from itertools import chain
 import pathlib
 import sys
+from functools import lru_cache
+from itertools import chain
 
 from feijoa import __feijoa_folder__
-from feijoa.exceptions import PackageNotInstalledError
-from feijoa.exceptions import SearchOracleNotFoundedError
+from feijoa.exceptions import PackageNotInstalledError, SearchOracleNotFoundedError
 from feijoa.plugins.plugin import Plugin
 from feijoa.search.oracles.meta.bandit import UCB1
 from feijoa.search.oracles.meta.meta import MetaOracle
@@ -18,13 +17,10 @@ from feijoa.search.space import SearchSpace
 # noinspection PyProtectedMember
 from feijoa.utils._oracle_parser import _OracleParser
 
-
 SEARCH_FOLDER = pathlib.Path(__feijoa_folder__) / "search"
 ALGORITHMS_FOLDER = SEARCH_FOLDER / "oracles"
 PLUGINS_FOLDER = pathlib.Path(__feijoa_folder__) / "plugins"
-INTEGRATION_FOLDER = (
-    pathlib.Path(__feijoa_folder__).parent / "integration"
-)
+INTEGRATION_FOLDER = pathlib.Path(__feijoa_folder__).parent / "integration"
 
 
 @lru_cache(maxsize=None)
@@ -44,19 +40,12 @@ def fetch_classes(base_class, *folders, only_anchors=False):
 
     target = (
         script
-        for script in chain(
-            *[
-                pathlib.Path(folder).rglob("*.py")
-                for folder in folders
-            ]
-        )
+        for script in chain(*[pathlib.Path(folder).rglob("*.py") for folder in folders])
         if "__" not in script.name
     )
 
     for script in target:
-        spec = importlib.util.spec_from_file_location(
-            script.stem, str(script)
-        )
+        spec = importlib.util.spec_from_file_location(script.stem, str(script))
         module = importlib.util.module_from_spec(spec)
         sys.modules[module.__name__] = module
 
@@ -66,10 +55,7 @@ def fetch_classes(base_class, *folders, only_anchors=False):
         iterable = (
             obj
             for obj in inspect.getmembers(module, inspect.isclass)
-            if (
-                obj[1].__module__ == module.__name__
-                and issubclass(obj[1], base_class)
-            )
+            if (obj[1].__module__ == module.__name__ and issubclass(obj[1], base_class))
         )
 
         for name, cls in iterable:
@@ -208,7 +194,5 @@ def maker(line, search_space: SearchSpace, random_state=None):
 
         oracles_pool.append(oracle_instance)
 
-    top_oracle_instance = top_oracle_cls(
-        *oracles_pool, **top_oracle_params
-    )
+    top_oracle_instance = top_oracle_cls(*oracles_pool, **top_oracle_params)
     return top_oracle_instance

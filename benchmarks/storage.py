@@ -1,33 +1,29 @@
+import uuid
 from collections import defaultdict
 from datetime import datetime
 from functools import wraps
-import uuid
 
 import numpy as np
-from sqlalchemy import BigInteger
-from sqlalchemy import Column
-from sqlalchemy import create_engine
-from sqlalchemy import DateTime
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import (
+    BigInteger,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+    create_engine,
+)
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.orm.session import Session
 
-from feijoa import create_job
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Real, SearchSpace, create_job
 
 
 def clip_locals(locals_: dict, attrs: list):
-    return {
-        key: value for key, value in locals_.items() if key in attrs
-    }
+    return {key: value for key, value in locals_.items() if key in attrs}
 
 
 class Base:
@@ -39,11 +35,7 @@ class Base:
 
         # noinspection PyArgumentList
         return cls(
-            **{
-                key: value
-                for key, value in params.items()
-                if key in cls.get_columns()
-            }
+            **{key: value for key, value in params.items() if key in cls.get_columns()}
         )
 
     @classmethod
@@ -137,8 +129,7 @@ class Optimizer(_Base):
     @classmethod
     def fetch_unique(cls, session):
         return frozenset(
-            opt.name
-            for opt in session.query(cls).distinct(cls.name).all()
+            opt.name for opt in session.query(cls).distinct(cls.name).all()
         )
 
     @classmethod
@@ -165,8 +156,7 @@ class Problem(_Base):
     @classmethod
     def fetch_unique(cls, session):
         return frozenset(
-            problem.name
-            for problem in session.query(cls).distinct(cls.name).all()
+            problem.name for problem in session.query(cls).distinct(cls.name).all()
         )
 
     @classmethod
@@ -315,12 +305,7 @@ class BenchmarksStorage:
             self.session.commit()
             return optimizer.id
 
-        return (
-            self.session.query(Optimizer)
-            .filter(Optimizer.name == name)
-            .one()
-            .id
-        )
+        return self.session.query(Optimizer).filter(Optimizer.name == name).one().id
 
     def put_trial(
         self,
@@ -439,13 +424,9 @@ class BenchmarksStorage:
         for e in results:
             params = dict()
             params["trial_id"] = trial_uuid
-            params["create_date"] = datetime.fromtimestamp(
-                e.create_timestamp
-            )
+            params["create_date"] = datetime.fromtimestamp(e.create_timestamp)
             params["state"] = e.state
-            params["finish_date"] = datetime.fromtimestamp(
-                e.finish_timestamp
-            )
+            params["finish_date"] = datetime.fromtimestamp(e.finish_timestamp)
             params["objective_value"] = e.objective_result
             params["id_in_trial"] = e.id
             pool.append(Result(**params))
@@ -465,10 +446,7 @@ class BenchmarksStorage:
         trials = defaultdict(list)
 
         for record in query_records:
-            obj = {
-                col: getattr(record, col)
-                for col in record.get_columns()
-            }
+            obj = {col: getattr(record, col) for col in record.get_columns()}
             for col, val in obj.items():
                 trials[col].append(val)
 
@@ -488,10 +466,7 @@ class BenchmarksStorage:
         results = defaultdict(list)
 
         for record in query_records:
-            obj = {
-                col: getattr(record, col)
-                for col in record.get_columns()
-            }
+            obj = {col: getattr(record, col) for col in record.get_columns()}
             for col, val in obj.items():
                 results[col].append(val)
             results["optimizer"].append(record.trial.optimizer.name)

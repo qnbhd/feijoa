@@ -23,18 +23,15 @@
 
 import abc
 import random
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 import numpy
 
 from feijoa.models.configuration import Configuration
 
-
 __all__ = ["Oracle"]
 
-from feijoa.utils.mixins import Observer
-from feijoa.utils.mixins import Subject
+from feijoa.utils.mixins import Observer, Subject
 
 
 class Oracle(Subject, Observer, metaclass=abc.ABCMeta):

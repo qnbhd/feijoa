@@ -1,18 +1,15 @@
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 import pytest
 
-from feijoa import create_job
-from feijoa import Experiment
-from feijoa import load_job
-from feijoa import Real
-from feijoa import SearchSpace
-from feijoa.exceptions import DuplicatedJobError
-from feijoa.exceptions import InvalidStoragePassed
-from feijoa.exceptions import InvalidStorageRFC1738
-from feijoa.exceptions import JobNotFoundError
-from feijoa.exceptions import SearchOracleNotFoundedError
+from feijoa import Experiment, Real, SearchSpace, create_job, load_job
+from feijoa.exceptions import (
+    DuplicatedJobError,
+    InvalidStoragePassed,
+    InvalidStorageRFC1738,
+    JobNotFoundError,
+    SearchOracleNotFoundedError,
+)
 
 # noinspection PyProtectedMember
 from feijoa.jobs.job import _load_storage
@@ -53,15 +50,10 @@ def test_create_load_job():
 
         return Result(objective_result=obj, metrics=metrics)
 
-    job = create_job(
-        search_space=space, name="foo", storage="sqlite:///foo.db"
-    )
+    job = create_job(search_space=space, name="foo", storage="sqlite:///foo.db")
     job.do(objective, n_trials=10, optimizer="ucb<random>")
 
-    assert (
-        isinstance(job.experiments, list)
-        and len(job.experiments) == 10
-    )
+    assert isinstance(job.experiments, list) and len(job.experiments) == 10
     assert job.experiments_count == 10
     assert len(job.top_experiments(100)) == 10
 
@@ -69,10 +61,7 @@ def test_create_load_job():
 
     job2 = load_job(name="foo", storage="sqlite:///foo.db")
 
-    assert (
-        isinstance(job2.experiments, list)
-        and len(job2.experiments) == 10
-    )
+    assert isinstance(job2.experiments, list) and len(job2.experiments) == 10
     assert job2.experiments_count == 10
     assert len(job2.top_experiments(100)) == 10
 

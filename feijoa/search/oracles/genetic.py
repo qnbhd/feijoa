@@ -23,16 +23,11 @@
 
 import logging
 import time
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Generator, List, Optional, Tuple
 
 import numpy as np
 
-from feijoa.utils.imports import ImportWrapper
-from feijoa.utils.imports import LazyModuleImportProxy
-
+from feijoa.utils.imports import ImportWrapper, LazyModuleImportProxy
 
 with ImportWrapper():
     from pymoo.core.problem import Problem
@@ -43,24 +38,16 @@ with ImportWrapper():
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.utils.transformers import inverse_transform
-from feijoa.utils.transformers import transform
-
+from feijoa.utils.transformers import inverse_transform, transform
 
 de = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.de")
 ga = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.ga")
-cmaes = LazyModuleImportProxy(
-    "pymoo.algorithms.soo.nonconvex.cmaes" ""
-)
+cmaes = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.cmaes" "")
 brkga = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.brkga")
 
-direct = LazyModuleImportProxy(
-    "pymoo.algorithms.soo.nonconvex.direct"
-)
+direct = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.direct")
 es = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.es")
-nichega = LazyModuleImportProxy(
-    "pymoo.algorithms.soo.nonconvex.ga_niching"
-)
+nichega = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.ga_niching")
 g3pcs = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.g3pcx")
 isres = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.isres")
 pso = LazyModuleImportProxy("pymoo.algorithms.soo.nonconvex.pso")
@@ -119,9 +106,7 @@ class Genetic(Oracle):
         self.termination = NoTermination()
 
         # create an oracle object that never terminates
-        self.algorithm.setup(
-            self.problem, termination=self.termination
-        )
+        self.algorithm.setup(self.problem, termination=self.termination)
 
         self.args = args
         self.kwargs = kwargs
@@ -193,31 +178,17 @@ class Genetic(Oracle):
         x0.X = inverse_transform(config, self.search_space)
         x0.F = np.array([result])
 
-        if (
-            self.pool
-            and result
-            < min(self.pool, key=lambda solution: solution.F).F
-        ):
+        if self.pool and result < min(self.pool, key=lambda solution: solution.F).F:
             log.debug(f"Restarting {self.name}")
 
             # take into account base class type
-            params = {
-                "sampling": Population(
-                    individuals=np.array(self.pool)
-                )
-            }
+            params = {"sampling": Population(individuals=np.array(self.pool))}
             if issubclass(self.algorithm_cls, LocalSearch):
-                params = {
-                    "x0": Population(individuals=np.array(self.pool))
-                }
+                params = {"x0": Population(individuals=np.array(self.pool))}
 
             # restart our oracle
-            self.algorithm = self.algorithm_cls(
-                *self.args, **self.kwargs, **params
-            )
-            self.algorithm.setup(
-                self.problem, termination=self.termination
-            )
+            self.algorithm = self.algorithm_cls(*self.args, **self.kwargs, **params)
+            self.algorithm.setup(self.problem, termination=self.termination)
 
         self.pool.append(x0)
 

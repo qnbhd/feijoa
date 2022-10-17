@@ -22,16 +22,14 @@
 """Experiment model class module."""
 
 import datetime
-from enum import Enum
 import hashlib
 import json
-from typing import Any
-from typing import Optional
+from enum import Enum
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
 from feijoa.models.configuration import Configuration
-
 
 __all__ = ["ExperimentState", "Experiment"]
 
@@ -132,10 +130,7 @@ class Experiment(BaseModel):
     def is_finished(self):
         """Check if experiment is finished."""
 
-        return (
-            self.state == ExperimentState.OK
-            or self.state == ExperimentState.ERROR
-        )
+        return self.state == ExperimentState.OK or self.state == ExperimentState.ERROR
 
     def _calculate_hash(self):
         """Calculate hash."""

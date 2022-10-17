@@ -1,9 +1,6 @@
 import numpy as np
 
-from utils import bench
-from utils import group
-from utils import iterations
-from utils import solution
+from utils import bench, group, iterations, solution
 
 
 @bench
@@ -100,9 +97,7 @@ def bukin6(
     x: "[-15, -5]:real",
     y: "[-3, 3]:real",
 ):
-    return 100 * np.sqrt(np.abs(y - 0.01 * x * x)) + 0.01 * np.abs(
-        x + 10
-    )
+    return 100 * np.sqrt(np.abs(y - 0.01 * x * x)) + 0.01 * np.abs(x + 10)
 
 
 @bench

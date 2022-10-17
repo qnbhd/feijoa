@@ -28,7 +28,6 @@ from sklearn.preprocessing import LabelEncoder
 from ..jobs.job import Job
 from .evaluator import ImportanceEvaluator
 
-
 __all__ = ["MDIEvaluator"]
 
 

@@ -1,8 +1,8 @@
 from collections import defaultdict
 from pprint import pprint
 
-from numba import jit
 import numpy as np
+from numba import jit
 from scipy.special import softmax
 
 
@@ -29,18 +29,7 @@ def norm(y, a=0.0, b=1.0):
 @jit(cache=True, inline="always", nopython=True)
 def calc_coeffs(s, t, rho, kappa):
     a = 2 * (rho - 2 * kappa + 1) / t / t
-    b = (
-        (
-            -4 * rho * s
-            - rho * t
-            + 8 * kappa * s
-            + 4 * kappa * t
-            - 4 * s
-            - 3 * t
-        )
-        / t
-        / t
-    )
+    b = (-4 * rho * s - rho * t + 8 * kappa * s + 4 * kappa * t - 4 * s - 3 * t) / t / t
     c = (
         (
             2 * rho * s * s
@@ -76,9 +65,7 @@ def make_curve(s, t, rho, kappa):
     return curve
 
 
-def calc_penalty(
-    x0_, xhat_, xfmaxx0_, threshold=0.5, rho=0.8, kappa=0.85
-):
+def calc_penalty(x0_, xhat_, xfmaxx0_, threshold=0.5, rho=0.8, kappa=0.85):
     ff = make_curve(xhat_, threshold, rho, kappa)
     return ff(x0_)
 
@@ -119,9 +106,7 @@ def feijoa_score(
 
     scores = dict()
 
-    for optimizer, results, iters in zip(
-        optimizers, results_desc_trands, iterations
-    ):
+    for optimizer, results, iters in zip(optimizers, results_desc_trands, iterations):
         angle = calc_angle(results, iters)
         angle = stardantize_angle(angle)
         psi = calc_penalty(
@@ -137,11 +122,7 @@ def feijoa_score(
         if angle < 0 or psi < 0 or sigma < 0:
             return None
 
-        score = (
-            alpha * angle**5
-            + beta * psi**3
-            + gamma * sigma**0.3
-        )
+        score = alpha * angle**5 + beta * psi**3 + gamma * sigma**0.3
 
         scores[optimizer] = score
 
@@ -171,9 +152,7 @@ def main():
 
     solution = 0.0
 
-    scores = feijoa_score(
-        0.4, 0.2, 0.9, optimizers, results, iterations, solution
-    )
+    scores = feijoa_score(0.4, 0.2, 0.9, optimizers, results, iterations, solution)
 
     pprint(scores)
 

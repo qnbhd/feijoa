@@ -21,23 +21,17 @@
 # SOFTWARE.
 """Scikit-optimize integration module."""
 
-from typing import Generator
-from typing import List
-from typing import Optional
+from typing import Generator, List, Optional
 
-from numpy import float64
-from numpy import int64
-from numpy.ma import MaskedArray
 import sklearn.utils.fixes
+from numpy import float64, int64
+from numpy.ma import MaskedArray
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
+from feijoa.search.parameters import Categorical, Integer, Real
 from feijoa.search.space import SearchSpace
 from feijoa.utils.imports import ImportWrapper
-
 
 sklearn.utils.fixes.MaskedArray = MaskedArray
 # noinspection PyPackageRequirements
@@ -82,22 +76,12 @@ class Skopt(Oracle):
 
         for p in space.params:
             if isinstance(p, Integer):
-                params.append(
-                    skopt.space.Integer(
-                        name=p.name, low=p.low, high=p.high
-                    )
-                )
+                params.append(skopt.space.Integer(name=p.name, low=p.low, high=p.high))
             elif isinstance(p, Real):
-                params.append(
-                    skopt.space.Real(
-                        name=p.name, low=p.low, high=p.high
-                    )
-                )
+                params.append(skopt.space.Real(name=p.name, low=p.low, high=p.high))
             elif isinstance(p, Categorical):
                 params.append(
-                    skopt.space.Categorical(
-                        name=p.name, categories=p.choices
-                    )
+                    skopt.space.Categorical(name=p.name, categories=p.choices)
                 )
 
         return params
@@ -123,11 +107,7 @@ class Skopt(Oracle):
 
                     potentially_cfg[k] = v
 
-                asked.append(
-                    Configuration(
-                        potentially_cfg, requestor=self.name
-                    )
-                )
+                asked.append(Configuration(potentially_cfg, requestor=self.name))
 
             yield asked
 

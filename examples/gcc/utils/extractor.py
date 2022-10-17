@@ -22,12 +22,10 @@
 import json
 import logging
 import os
-from os.path import abspath
-from os.path import dirname
 import re
+from os.path import abspath, dirname
 
 from feijoa.utils.imports import ImportWrapper
-
 
 with ImportWrapper():
     import executor
@@ -103,12 +101,8 @@ def parse_optimizers(gcc_toolchain_path):
     O_num_pat = re.compile("-O<number>")
     flag_align_eq_pat = re.compile("-f(align-[-a-z]+)=")
     flag_pat = re.compile("-f([-a-z0-9]+)")
-    flag_enum_pat = re.compile(
-        "-f([-a-z0-9]+)=\\[([-A-Za-z_\\|]+)\\]"
-    )
-    flag_interval_pat = re.compile(
-        "-f([-a-z0-9]+)=<([0-9]+),([0-9]+)>"
-    )
+    flag_enum_pat = re.compile("-f([-a-z0-9]+)=\\[([-A-Za-z_\\|]+)\\]")
+    flag_interval_pat = re.compile("-f([-a-z0-9]+)=<([0-9]+),([0-9]+)>")
     flag_number_pat = re.compile("-f([-a-z0-9]+)=<number>")
 
     optimizers = {}
@@ -239,12 +233,8 @@ def parse_parameters(gcc_toolchain_path):
 
     out = result.split("\n")[1:]
 
-    param_enum_pat = re.compile(
-        "--param=([-a-zA-Z0-9]+)=\\[([-A-Za-z_\\|]+)\\]"
-    )
-    param_interval_pat = re.compile(
-        "--param=([-a-zA-Z0-9]+)=<(-?[0-9]+),([0-9]+)>"
-    )
+    param_enum_pat = re.compile("--param=([-a-zA-Z0-9]+)=\\[([-A-Za-z_\\|]+)\\]")
+    param_interval_pat = re.compile("--param=([-a-zA-Z0-9]+)=<(-?[0-9]+),([0-9]+)>")
     param_number_pat = re.compile("--param=([-a-zA-Z0-9]+)=")
     param_old_interval_pat = re.compile(
         "\\s+([-a-zA-Z0-9]+)\\s+default\\s+(-?\\d+)\\s"
@@ -321,9 +311,7 @@ def parse_parameters(gcc_toolchain_path):
                 log.info(f"Integer: {name} {minimum} {maximum}")
                 return
             else:
-                log.info(
-                    f"Parameter {m.group(1)} has incorrect bounds."
-                )
+                log.info(f"Parameter {m.group(1)} has incorrect bounds.")
 
         log.warning(f"Unknown parameter {line}")
 
@@ -375,14 +363,10 @@ def fix_parameters(gcc_toolchain, all_params):
                 return False
 
         if value["type"] == "integer":
-            if not check_is_working_flag(
-                gcc_toolchain, f'{param}={value["range"][0]}'
-            ):
+            if not check_is_working_flag(gcc_toolchain, f'{param}={value["range"][0]}'):
                 return False
         if value["type"] == "categorical":
-            if not check_is_working_flag(
-                gcc_toolchain, value["choices"][0]
-            ):
+            if not check_is_working_flag(gcc_toolchain, value["choices"][0]):
                 return False
 
         return True
@@ -404,9 +388,7 @@ def get_version(gcc_toolchain_path):
 
     """
     try:
-        result = executor.execute(
-            f"{gcc_toolchain_path} --version", capture=True
-        )
+        result = executor.execute(f"{gcc_toolchain_path} --version", capture=True)
         spl = (
             result.split("\n")[0]
             .replace(" ", "_")
@@ -464,17 +446,9 @@ def extract(gcc_toolchain_path):
     for k, v in fixed.items():
         flag_type = v["type"]
         if flag_type == "categorical":
-            choices = (
-                "["
-                + ", ".join(
-                    [u if u else "null" for u in v["choices"]]
-                )
-                + "]"
-            )
+            choices = "[" + ", ".join([u if u else "null" for u in v["choices"]]) + "]"
             out.write(template.format(k, flag_type, choices))
         elif flag_type == "integer":
-            out.write(
-                integer_template.format(k, flag_type, v["range"])
-            )
+            out.write(integer_template.format(k, flag_type, v["range"]))
 
     out.close()

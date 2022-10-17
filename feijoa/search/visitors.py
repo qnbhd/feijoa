@@ -44,9 +44,7 @@ class Randomizer(ParametersVisitor):
         return self.random_generator.randint(p.low, p.high)
 
     def visit_real(self, p):
-        return (
-            p.high - p.low
-        ) * self.random_generator.random() + p.low
+        return (p.high - p.low) * self.random_generator.random() + p.low
 
     def visit_categorical(self, p):
         return self.random_generator.choice(p.choices)

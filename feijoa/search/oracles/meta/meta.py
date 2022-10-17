@@ -23,14 +23,11 @@
 
 import abc
 import logging
-from typing import Generator
-from typing import List
-from typing import Optional
+from typing import Generator, List, Optional
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
 from feijoa.utils.imports import LazyModuleImportProxy
-
 
 seed = LazyModuleImportProxy("feijoa.search.seed")
 
@@ -64,9 +61,7 @@ class MetaOracle(Oracle):
 
         # pick up all seed's oracles
 
-        seed_oracles = [
-            a for a in self.oracles if isinstance(a, seed.SeedOracle)
-        ]
+        seed_oracles = [a for a in self.oracles if isinstance(a, seed.SeedOracle)]
 
         # remove all seed's oracles
 
