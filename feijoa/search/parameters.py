@@ -23,7 +23,6 @@
 
 import abc
 
-
 __all__ = [
     "Parameter",
     "Integer",
@@ -141,9 +140,7 @@ class Integer(Parameter):
 
         if not isinstance(low, int) or not isinstance(high, int):
             raise ParametersIncorrectInputValues(
-                "Low and High bounds for"
-                " Integer parameter"
-                " must be ints."
+                "Low and High bounds for" " Integer parameter" " must be ints."
             )
         if low > high:
             raise ParametersIncorrectInputValues(
@@ -154,9 +151,7 @@ class Integer(Parameter):
         self.high = high
 
     def __repr__(self):
-        return (
-            f"Integer('{self.name}, low={self.low}, high={self.high})"
-        )
+        return f"Integer('{self.name}, low={self.low}, high={self.high})"
 
     @property
     def bounds(self):
@@ -228,9 +223,7 @@ class Real(Parameter):
 
         if not isinstance(low, float) or not isinstance(high, float):
             raise ParametersIncorrectInputValues(
-                "Low and High bounds for"
-                " Float parameter"
-                " must be floats."
+                "Low and High bounds for" " Float parameter" " must be floats."
             )
 
         if low > high:
@@ -242,9 +235,7 @@ class Real(Parameter):
         self.high = high
 
     def __repr__(self):
-        return (
-            f"Real('{self.name}', low={self.low}, high={self.high})"
-        )
+        return f"Real('{self.name}', low={self.low}, high={self.high})"
 
     @property
     def bounds(self):
@@ -304,8 +295,7 @@ class Categorical(Parameter):
 
         if not choices:
             raise ParametersIncorrectInputValues(
-                "Choices for Categorical"
-                " parameter must be not empty."
+                "Choices for Categorical" " parameter must be not empty."
             )
         if len(choices) != len(set(choices)):
             raise ParametersIncorrectInputValues(

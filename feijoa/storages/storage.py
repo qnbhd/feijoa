@@ -20,12 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import abc
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from feijoa.models import Experiment
 from feijoa.search.space import SearchSpace
-
 
 __all__ = ["Storage"]
 

@@ -1,23 +1,18 @@
 import json
 import time
 
+from dash import Input, Output, State, html
+
 from benchmarks.dashboard.dash_mixin import dashed
 from benchmarks.dashboard.layouts.outlined import (
     make_oracles_ranking_page_outlined,
-)
-from benchmarks.dashboard.layouts.outlined import (
     make_outlined_navbar_content,
 )
 from benchmarks.dashboard.layouts.regular import (
+    make_home_page,
     make_oracles_ranking_page,
 )
-from benchmarks.dashboard.layouts.regular import make_home_page
 from benchmarks.dashboard.layouts.span import pickup_nav_content
-from dash import html
-from dash import Input
-from dash import Output
-from dash import State
-
 
 DELAY = 1.0
 
@@ -31,9 +26,7 @@ DELAY = 1.0
 def update_problems_dropdown_theme(theme, style, n):
     time.sleep(DELAY)
     theme = json.loads(theme)
-    style["background-color"] = (
-        "black" if theme == "dark" else "white"
-    )
+    style["background-color"] = "black" if theme == "dark" else "white"
     style["color"] = "#adafae" if theme == "dark" else "#343a40"
     style["border-color"] = "#adafae" if theme == "dark" else "black"
     style["border-width"] = "0.1rem"
@@ -47,9 +40,7 @@ def update_problems_dropdown_theme(theme, style, n):
 )
 def update_side(side, value):
     time.sleep(DELAY)
-    side["background-color"] = (
-        "#111111" if json.loads(value) == "dark" else "#f4f4f4"
-    )
+    side["background-color"] = "#111111" if json.loads(value) == "dark" else "#f4f4f4"
     return side
 
 
@@ -60,9 +51,7 @@ def update_side(side, value):
 )
 def update_pg(pg_content, value):
     time.sleep(DELAY)
-    pg_content["background-color"] = (
-        "black" if json.loads(value) == "dark" else "white"
-    )
+    pg_content["background-color"] = "black" if json.loads(value) == "dark" else "white"
     return pg_content
 
 
@@ -86,9 +75,7 @@ def update_nav(side, value):
     State("n_changes_theme", "data"),
 )
 def update_theme(value, n):
-    return json.dumps("white" if value else "dark"), json.dumps(
-        json.loads(n) + 1
-    )
+    return json.dumps("white" if value else "dark"), json.dumps(json.loads(n) + 1)
 
 
 @dashed(
@@ -157,9 +144,7 @@ def render_page_content_outlined(pathname, ticks, opc_style):
             [
                 html.H1("404: Not found", className="text-danger"),
                 html.Hr(),
-                html.P(
-                    f"The pathname {pathname} was not recognised..."
-                ),
+                html.P(f"The pathname {pathname} was not recognised..."),
             ],
             className="p-3 bg-light rounded-3",
         ),

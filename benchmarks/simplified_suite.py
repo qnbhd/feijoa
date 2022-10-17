@@ -1,14 +1,9 @@
-from collections import defaultdict
-from collections import namedtuple
-from itertools import product
 import logging
 import random
 import time
+from collections import defaultdict, namedtuple
+from itertools import product
 
-from benchmarks.storage import BenchmarksStorage
-from benchmarks.suite import get_machine_info
-from benchmarks.trials import BenchesStorage
-from benchmarks.utils import pickup_problems
 import click as click
 import memory_profiler
 import numpy as np
@@ -17,9 +12,12 @@ from paretoset import paretorank
 from rich.console import Console
 from scipy.special import softmax
 
+from benchmarks.storage import BenchmarksStorage
+from benchmarks.suite import get_machine_info
+from benchmarks.trials import BenchesStorage
+from benchmarks.utils import pickup_problems
 from feijoa import create_job
 from feijoa.utils.logging import init
-
 
 init(verbose=True)
 
@@ -36,8 +34,7 @@ def ffiz(x):
     return (
         14.01781
         - 0.184
-        + (1.184433 - 14.01781)
-        / (1 + ((x - 0.09) / 0.708392) ** 4.232001) ** 0.884245
+        + (1.184433 - 14.01781) / (1 + ((x - 0.09) / 0.708392) ** 4.232001) ** 0.884245
     )
 
 
@@ -49,9 +46,7 @@ class BenchmarkSuite:
     def __init__(self, db_url):
         self.optimizers = list()
         self.storage = BenchmarksStorage(db_url)
-        self.machine_id = self.storage.put_machine(
-            **get_machine_info()
-        )
+        self.machine_id = self.storage.put_machine(**get_machine_info())
 
     def add_optimizer(self, optimizer):
         self.optimizers.append(optimizer)
@@ -73,15 +68,11 @@ class BenchmarkSuite:
 
         picked = [
             [
-                Problem(
-                    fun, name, space, group, iterations, solution
-                ),
+                Problem(fun, name, space, group, iterations, solution),
                 optimizer,
             ]
             for optimizer in (
-                random.choices(self.optimizers, k=k)
-                if randomized
-                else self.optimizers
+                random.choices(self.optimizers, k=k) if randomized else self.optimizers
             )
             for (fun, name, space, group, iterations, solution) in (
                 random.choices(pickup_problems(), k=k)
@@ -210,11 +201,7 @@ class BenchmarkSuite:
                     log.info(f"Remove {opt}")
                     df.drop(opt_df.index, inplace=True)
 
-            ret_df = (
-                BenchmarkSuite.calculate_avg_ranking_for_optimizers(
-                    df
-                )
-            )
+            ret_df = BenchmarkSuite.calculate_avg_ranking_for_optimizers(df)
 
             # ret_df.loc[df['rank'] == df['rank'].max(), 'rank'] *= 1.05
             ret_df["rank"] = norm(softmax(ret_df["rank"]))
@@ -251,8 +238,7 @@ class BenchmarkSuite:
             dataframe["problem"].unique(),
         ):
             query = dataframe.query(
-                f"optimizer == '{optimizer}' and"
-                f" problem == '{problem}'"
+                f"optimizer == '{optimizer}' and" f" problem == '{problem}'"
             )
 
             mean_rank = query["rank"].mean()
@@ -304,9 +290,7 @@ def run(database):
     test_suite.add_optimizer("de")
     test_suite.add_optimizer("nichega")
     test_suite.add_optimizer("isres")
-    test_suite.add_optimizer(
-        "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]>"
-    )
+    test_suite.add_optimizer("ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]>")
     test_suite.add_optimizer(
         "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]+reducer>"
     )
@@ -317,11 +301,7 @@ def run(database):
     df = test_suite.do(randomized=True)
     print(df)
 
-    print(
-        test_suite.get_total_ranking().sort_values(
-            by="ranking", ascending=False
-        )
-    )
+    print(test_suite.get_total_ranking().sort_values(by="ranking", ascending=False))
 
 
 @click.command()
@@ -395,9 +375,7 @@ if __name__ == "__main__":
     bsuite.add_optimizer("de")
     bsuite.add_optimizer("nichega")
     bsuite.add_optimizer("isres")
-    bsuite.add_optimizer(
-        "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]>"
-    )
+    bsuite.add_optimizer("ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]>")
     bsuite.add_optimizer(
         "ucb<bayesian[acq=lfboei, regr=RandomForestRegressor]+reducer>"
     )

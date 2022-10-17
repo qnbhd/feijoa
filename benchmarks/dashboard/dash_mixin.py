@@ -1,10 +1,9 @@
 import inspect
-from itertools import chain
 import logging
+from itertools import chain
 
 import dash
 import dash_bootstrap_components as dbc
-
 
 log = logging.getLogger("dash_mixin")
 
@@ -52,9 +51,7 @@ class DashMixin:
                     self.app.clientside_callback(
                         method.__doc__, *arguments, **kw_arguments
                     )
-                    log.info(
-                        f"Clientside callback {name} was registered."
-                    )
+                    log.info(f"Clientside callback {name} was registered.")
                     continue
 
                 log.info(f"Callback {name} was registered.")

@@ -1,9 +1,4 @@
-from feijoa import Categorical
-from feijoa import create_job
-from feijoa import Experiment
-from feijoa import Integer
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Categorical, Experiment, Integer, Real, SearchSpace, create_job
 
 
 def faked_random(nums):

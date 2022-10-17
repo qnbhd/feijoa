@@ -2,11 +2,7 @@ import random
 
 import numpy as np
 
-from feijoa import Categorical
-from feijoa import create_job
-from feijoa import Integer
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Categorical, Integer, Real, SearchSpace, create_job
 from feijoa.search.oracles.bayesian import Bayesian
 
 

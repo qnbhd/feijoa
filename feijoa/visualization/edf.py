@@ -24,7 +24,6 @@
 import numpy as np
 import plotly.graph_objs as go
 
-
 __all__ = ["plot_edf"]
 
 
@@ -59,15 +58,11 @@ def plot_edf(
     name = name or job.name
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
-    objectives = df["objective_result"] * (
-        1 if not invert_objective else -1
-    )
+    objectives = df["objective_result"] * (1 if not invert_objective else -1)
     min_value, max_value = objectives.min(), objectives.max()
     lspace = np.linspace(min_value, max_value, 100)
 
-    dist = np.array([np.sum(objectives <= x) for x in lspace]) / len(
-        objectives
-    )
+    dist = np.array([np.sum(objectives <= x) for x in lspace]) / len(objectives)
 
     fig.add_trace(
         go.Scatter(

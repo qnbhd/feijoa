@@ -52,9 +52,7 @@ def plot_objective_hist(
 
     fig = fig or go.Figure()
     df = job.get_dataframe(brief=True)
-    objectives = df["objective_result"] * (
-        1 if not invert_objective else -1
-    )
+    objectives = df["objective_result"] * (1 if not invert_objective else -1)
 
     fig.add_histogram(x=objectives, nbinsx=100)
 

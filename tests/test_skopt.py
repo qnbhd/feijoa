@@ -1,13 +1,7 @@
 import pytest as pytest
 
-from feijoa import Categorical
-from feijoa import create_job
-from feijoa import Experiment
-from feijoa import Integer
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Categorical, Experiment, Integer, Real, SearchSpace, create_job
 from feijoa.utils.imports import import_or_skip
-
 
 import_or_skip("skopt")
 
@@ -23,9 +17,7 @@ def objective(experiment: Experiment):
     )
 
 
-@pytest.mark.skip(
-    reason="skopt from integration folder will added in next release"
-)
+@pytest.mark.skip(reason="skopt from integration folder will added in next release")
 def test_skopt():
     # noinspection DuplicatedCode
     space = SearchSpace()

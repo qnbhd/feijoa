@@ -21,16 +21,13 @@
 # SOFTWARE.
 import copy
 import logging
-from typing import Generator
-from typing import List
-from typing import Optional
+from typing import Generator, List, Optional
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.parameters import Integer
 from feijoa.search.space import SearchSpace
 from feijoa.search.visitors import Randomizer
-
 
 log = logging.getLogger(__name__)
 
@@ -83,9 +80,7 @@ class Pattern(Oracle):
 
     def _ask(self, n: int) -> Generator:
         randomizer = Randomizer()
-        center = {
-            p.name: p.accept(randomizer) for p in self.search_space
-        }
+        center = {p.name: p.accept(randomizer) for p in self.search_space}
         yield [Configuration(center, requestor=self.name)]
 
         def set_unit_value(p, config, uv):
@@ -112,9 +107,7 @@ class Pattern(Oracle):
             for param in self.search_space:
                 if param.is_primitive():
 
-                    unit_value = param.get_unit_value(
-                        center[param.name]
-                    )
+                    unit_value = param.get_unit_value(center[param.name])
 
                     if unit_value > 0.0:
                         down_cfg = copy.copy(center)
@@ -123,11 +116,7 @@ class Pattern(Oracle):
                             down_cfg,
                             min(1.0, unit_value - self.step_size),
                         )
-                        yield [
-                            Configuration(
-                                down_cfg, requestor=self.name
-                            )
-                        ]
+                        yield [Configuration(down_cfg, requestor=self.name)]
                         points.append(down_cfg)
 
                     if unit_value < 1.0:
@@ -137,9 +126,7 @@ class Pattern(Oracle):
                             up_cfg,
                             min(1.0, unit_value + self.step_size),
                         )
-                        yield [
-                            Configuration(up_cfg, requestor=self.name)
-                        ]
+                        yield [Configuration(up_cfg, requestor=self.name)]
                         points.append(up_cfg)
 
                 else:

@@ -25,7 +25,6 @@ import abc
 
 from feijoa.jobs.job import Job
 
-
 __all__ = ["ImportanceEvaluator"]
 
 

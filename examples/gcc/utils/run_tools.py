@@ -19,38 +19,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from contextlib import suppress
-from functools import partial
 import hashlib
 import logging
 import os
-from os.path import abspath
-from os.path import dirname
 import platform
 import random
-from typing import Dict
-from typing import Optional
-from typing import Tuple
-from typing import Union
+from contextlib import suppress
+from functools import partial
+from os.path import abspath, dirname
+from typing import Dict, Optional, Tuple, Union
 
 import numpy
 
 from feijoa.utils.imports import ImportWrapper
 
-
 with ImportWrapper():
     from executor import ExternalCommandFailed, execute
 
-from feijoa import create_job
-from feijoa import Experiment
-from feijoa import load_job
-from feijoa import SearchSpace
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Parameter
-from feijoa.search.parameters import ParametersVisitor
-from feijoa.search.parameters import Real
-
+from feijoa import Experiment, SearchSpace, create_job, load_job
+from feijoa.search.parameters import (
+    Categorical,
+    Integer,
+    Parameter,
+    ParametersVisitor,
+    Real,
+)
 
 log = logging.getLogger(__name__)
 
@@ -87,18 +80,14 @@ class GccRenderer(ParametersVisitor):
     def visit_real(self, p: Real) -> Optional[str]:
         return self.visit_common(p)
 
-    def visit_categorical(
-        self, p: Categorical, **kwargs
-    ) -> Optional[str]:
+    def visit_categorical(self, p: Categorical, **kwargs) -> Optional[str]:
         value = self.get_value(p)
         if value:
             return f"{value}"
         return None
 
 
-def render(
-    experiment: Experiment, space: SearchSpace, renderer_cls
-) -> str:
+def render(experiment: Experiment, space: SearchSpace, renderer_cls) -> str:
     """Render an experiment to cli flags.
 
     Args:
@@ -194,10 +183,7 @@ def compile_source(
 
     stdout = run_command_and_capture_stdout(compile_cmd)
 
-    if (
-        stdout is not None
-        and stdout.lstrip("-").replace(".", "").isdigit()
-    ):
+    if stdout is not None and stdout.lstrip("-").replace(".", "").isdigit():
         compile_time = float(stdout)
     else:
         return None
@@ -306,9 +292,7 @@ def objective(
 
     experiment.metrics = metrics
 
-    config_hash = hashlib.sha256(
-        str(hash(experiment.json())).encode()
-    ).hexdigest()
+    config_hash = hashlib.sha256(str(hash(experiment.json())).encode()).hexdigest()
 
     # TODO: check if file is exists and remove random.randint
     binary_out = config_hash + str(random.randint(1, 99999)) + ".out"
@@ -316,9 +300,7 @@ def objective(
 
     rendered_opts = render(experiment, search_space, GccRenderer)
 
-    compile_result = compile_source(
-        toolchain, source_file, rendered_opts, binary_out
-    )
+    compile_result = compile_source(toolchain, source_file, rendered_opts, binary_out)
 
     if not compile_result:
         with suppress(FileNotFoundError):
@@ -527,9 +509,7 @@ def run_job(
     """
 
     space = SearchSpace.from_yaml_file(search_space_file)
-    job = create_job(
-        search_space=space, storage=storage, name=job_name
-    )
+    job = create_job(search_space=space, storage=storage, name=job_name)
     baselines, job = run_gcc(
         job,
         toolchain,

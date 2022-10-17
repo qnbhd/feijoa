@@ -27,7 +27,6 @@ from sklearn.preprocessing import LabelEncoder
 from ..utils.imports import ImportWrapper
 from .evaluator import ImportanceEvaluator
 
-
 with ImportWrapper():
     # pyre-ignore[21]:
     from fanova import fANOVA

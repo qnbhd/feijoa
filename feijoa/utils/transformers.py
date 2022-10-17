@@ -21,9 +21,7 @@
 # SOFTWARE.
 import numpy as np
 
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
+from feijoa.search.parameters import Categorical, Integer, Real
 
 
 def transform(sol, search_space):

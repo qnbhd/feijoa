@@ -1,7 +1,5 @@
-from dash import dcc
-from dash import html
 import dash_bootstrap_components as dbc
-
+from dash import dcc, html
 
 graphs_layout = html.Div(
     [
@@ -30,9 +28,7 @@ graphs_layout = html.Div(
         html.Br(),
         html.Div(
             [
-                dcc.Graph(
-                    id="live-update-graph1", style={"width": "100%"}
-                ),
+                dcc.Graph(id="live-update-graph1", style={"width": "100%"}),
             ],
             # style={'padding': 10, 'flex': 1},
         ),
@@ -170,9 +166,7 @@ sidebar = html.Div(
                 [
                     dbc.AccordionItem(
                         [
-                            dcc.Markdown(
-                                r"$$\alpha$$-coef", mathjax=True
-                            ),
+                            dcc.Markdown(r"$$\alpha$$-coef", mathjax=True),
                             dcc.Slider(
                                 0,
                                 1,
@@ -180,15 +174,9 @@ sidebar = html.Div(
                                 value=0.1,
                                 id="slider-alpha",
                             ),
-                            dcc.Markdown(
-                                r"$$\beta$$-coef", mathjax=True
-                            ),
-                            dcc.Slider(
-                                0, 1, 0.1, value=0.1, id="slider-beta"
-                            ),
-                            dcc.Markdown(
-                                r"$$\gamma$$-coef", mathjax=True
-                            ),
+                            dcc.Markdown(r"$$\beta$$-coef", mathjax=True),
+                            dcc.Slider(0, 1, 0.1, value=0.1, id="slider-beta"),
+                            dcc.Markdown(r"$$\gamma$$-coef", mathjax=True),
                             dcc.Slider(
                                 0,
                                 1,
@@ -215,9 +203,7 @@ sidebar = html.Div(
                 [
                     dbc.AccordionItem(
                         [
-                            dcc.Markdown(
-                                r"$$y$$-axis scale", mathjax=True
-                            ),
+                            dcc.Markdown(r"$$y$$-axis scale", mathjax=True),
                             dbc.RadioItems(
                                 options=[
                                     {

@@ -22,51 +22,40 @@
 """Job class module."""
 
 import contextlib
+import logging
+import warnings
 from datetime import datetime
 from functools import partial
-import logging
-from typing import Any
-from typing import Callable
-from typing import ContextManager
-from typing import List
-from typing import Optional
-from typing import Union
-import warnings
+from typing import Any, Callable, ContextManager, List, Optional, Union
 
 import joblib
 import numpy as np
 import pandas as pd
-import rich
 from rich.progress import Progress
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
 
-from feijoa.exceptions import DuplicatedJobError
-from feijoa.exceptions import ExperimentNotFinishedError
-from feijoa.exceptions import InvalidSearchOraclePassed
-from feijoa.exceptions import InvalidStoragePassed
-from feijoa.exceptions import InvalidStorageRFC1738
-from feijoa.exceptions import JobNotFoundError
-from feijoa.models import Experiment
-from feijoa.models import Result
+from feijoa.exceptions import (
+    DuplicatedJobError,
+    ExperimentNotFinishedError,
+    InvalidStoragePassed,
+    InvalidStorageRFC1738,
+    JobNotFoundError,
+)
+from feijoa.models import Experiment, Result
 from feijoa.models.experiment import ExperimentState
-from feijoa.search.oracles.finder import maker
-from feijoa.search.oracles.finder import Oracle
+from feijoa.search.oracles.finder import Oracle, maker
 from feijoa.search.oracles.meta.meta import MetaOracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
+from feijoa.search.parameters import Categorical, Integer, Real
 from feijoa.search.seed import SeedOracle
 from feijoa.search.space import SearchSpace
 from feijoa.storages import Storage
 from feijoa.storages.rdb.storage import RDBStorage
 
-
 __all__ = ["Job", "create_job", "load_job"]
 
 from feijoa.utils.imports import ImportWrapper
 from feijoa.utils.misc import in_notebook
-
 
 log = logging.getLogger(__name__)
 
@@ -149,11 +138,7 @@ class Job:
 
         """
 
-        return (
-            self.best_experiment.params
-            if self.best_experiment is not None
-            else None
-        )
+        return self.best_experiment.params if self.best_experiment is not None else None
 
     @property
     def best_value(self) -> Optional[Any]:
@@ -354,14 +339,10 @@ class Job:
         if not optimizer and self.optimizer_name_dsl:
             optimizer_name = self.optimizer_name_dsl
 
-        self.optimizer = maker(
-            optimizer_name, self.search_space, random_state=seed
-        )
+        self.optimizer = maker(optimizer_name, self.search_space, random_state=seed)
         self.optimizer_name_dsl = optimizer_name
 
-        self.storage.update_optimizer_name_by_job_id(
-            self.id, self.optimizer_name_dsl
-        )
+        self.storage.update_optimizer_name_by_job_id(self.id, self.optimizer_name_dsl)
 
         if self.seeds:
             self.optimizer.oracles.insert(0, SeedOracle(*self.seeds))
@@ -385,9 +366,7 @@ class Job:
 
         def range_checker(p, value):
             if isinstance(p, (Real, Integer)):
-                assert (
-                    p.low <= value <= p.high
-                ), f"{p.low} <= {value} <= {p.high}"
+                assert p.low <= value <= p.high, f"{p.low} <= {value} <= {p.high}"
             if isinstance(p, Categorical):
                 assert value in p.choices, f"value in [{p.choices}]"
 
@@ -428,22 +407,14 @@ class Job:
                 # pyre-ignore[16]:
 
                 # noinspection PyUnresolvedReferences,PyBroadException
-                parallel = joblib.Parallel(
-                    n_jobs=n_jobs, prefer="threads"
-                )
+                parallel = joblib.Parallel(n_jobs=n_jobs, prefer="threads")
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    results = parallel(
-                        dela(u) for u in configurations
-                    )
+                    results = parallel(dela(u) for u in configurations)
 
                 # Applying result
-                for experiment, result in zip(
-                    configurations, results
-                ):
-                    self.tell(
-                        experiment, result, force=(trials >= n_trials)
-                    )
+                for experiment, result in zip(configurations, results):
+                    self.tell(experiment, result, force=(trials >= n_trials))
 
                 bar.update(
                     task,
@@ -460,9 +431,7 @@ class Job:
 
             clear_output(wait=False)
 
-    def tell(
-        self, experiment, result: Union[float, Result], force=False
-    ):
+    def tell(self, experiment, result: Union[float, Result], force=False):
         """
         Finish concrete experiment
         and results to oracles.
@@ -483,11 +452,7 @@ class Job:
 
         """
 
-        objective = (
-            result.objective_result
-            if isinstance(result, Result)
-            else result
-        )
+        objective = result.objective_result if isinstance(result, Result) else result
 
         if np.isfinite(objective):
             experiment.success_finish()
@@ -500,13 +465,9 @@ class Job:
             if isinstance(result, Result):
                 if force:
                     with contextlib.suppress(Exception):
-                        self.optimizer.tell(
-                            experiment.params, result.objective_result
-                        )
+                        self.optimizer.tell(experiment.params, result.objective_result)
                 else:
-                    self.optimizer.tell(
-                        experiment.params, result.objective_result
-                    )
+                    self.optimizer.tell(experiment.params, result.objective_result)
                 experiment.apply(result.objective_result)
                 experiment.metrics = result.metrics
             else:
@@ -534,9 +495,7 @@ class Job:
 
         """
 
-        self.optimizer.tell(
-            experiment.params, experiment.objective_result
-        )
+        self.optimizer.tell(experiment.params, experiment.objective_result)
 
     def ask(self, n: int) -> Optional[List[Experiment]]:
         """
@@ -571,11 +530,7 @@ class Job:
         experiments = [
             applicator(
                 params=config,
-                id=(
-                    self.experiments_count
-                    + self.pending_experiments
-                    + i
-                ),
+                id=(self.experiments_count + self.pending_experiments + i),
                 create_timestamp=datetime.timestamp(datetime.now()),
             )
             for i, config in enumerate(configs)
@@ -725,9 +680,7 @@ class Job:
         self.seeds.append(seed)
 
 
-def _load_storage(
-    storage_or_name: Union[str, Optional[Storage]]
-) -> Storage:
+def _load_storage(storage_or_name: Union[str, Optional[Storage]]) -> Storage:
     """
     Load a storage object.
 
@@ -798,9 +751,7 @@ def create_job(
 
     """
 
-    name = name or "job" + datetime.now().strftime(
-        "%H_%M_%S_%m_%d_%Y"
-    )
+    name = name or "job" + datetime.now().strftime("%H_%M_%S_%m_%d_%Y")
 
     storage = _load_storage(storage)
 
@@ -810,9 +761,7 @@ def create_job(
     if storage.is_job_name_exists(name):
         raise DuplicatedJobError(f"Job {name} is already exists.")
 
-    job = Job(
-        name, storage, search_space, storage.jobs_count + 1, **kwargs
-    )
+    job = Job(name, storage, search_space, storage.jobs_count + 1, **kwargs)
 
     return job
 
@@ -862,9 +811,7 @@ def load_job(
     experiments = storage.get_experiments_by_job_id(job_id)
     search_space = storage.get_search_space_by_job_id(job_id)
 
-    job = Job(
-        name, storage, search_space, job_id, **kwargs, loaded=True
-    )
+    job = Job(name, storage, search_space, job_id, **kwargs, loaded=True)
 
     job.loaded_experiments_pool.extend(experiments)
 

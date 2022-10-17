@@ -23,25 +23,20 @@
 
 import inspect
 import logging
-from typing import Generator
-from typing import List
-from typing import Optional
+from typing import Generator, List, Optional
 
 import numpy as np
 from scipy.stats import norm
 
 # noinspection PyUnresolvedReferences
 # noinspection PyUnresolvedReferences
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.gaussian_process import GaussianProcessRegressor
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.visitors import Randomizer
-from feijoa.utils.transformers import inverse_transform
-from feijoa.utils.transformers import transform
-
+from feijoa.utils.transformers import inverse_transform, transform
 
 __all__ = ["Bayesian", "acquisition"]
 
@@ -49,9 +44,7 @@ log = logging.getLogger(__name__)
 
 
 # noinspection PyPep8Naming
-def acquisition(
-    model, kind, X_samples, X, y, random_state=None, **kwargs
-):
+def acquisition(model, kind, X_samples, X, y, random_state=None, **kwargs):
     """
     Acquisition function for bayesian optimization.
 
@@ -117,9 +110,7 @@ def acquisition(
 
         tau = np.quantile(y, q=0.33)
         classified = np.greater_equal(y, tau)
-        clf = RandomForestClassifier(
-            n_jobs=-1, random_state=random_state
-        )
+        clf = RandomForestClassifier(n_jobs=-1, random_state=random_state)
         clf.fit(X, classified)
         # FIXME (qnbhd): IndexError: index 1 is out of bounds for axis 1 with size 1
         y_pred = clf.predict_proba(X_samples)[:, 1]
@@ -291,10 +282,7 @@ class Bayesian(Oracle):
         randomizer = Randomizer(self.seed)
         random_samples = [
             Configuration(
-                {
-                    p.name: p.accept(randomizer)
-                    for p in self.search_space
-                },
+                {p.name: p.accept(randomizer) for p in self.search_space},
                 requestor=self.name,
             )
             for _ in range(self.n_warmup)
@@ -348,9 +336,7 @@ class Bayesian(Oracle):
 
         vec = np.array(inverse_transform(config, self.search_space))
 
-        self.X = np.concatenate(
-            [self.X, vec.reshape(1, -1)]
-        )  # pragma: no mutate
+        self.X = np.concatenate([self.X, vec.reshape(1, -1)])  # pragma: no mutate
         self.y = np.concatenate([self.y, [result]])
 
         if len(self.y) > 5:  # pragma: no mutate
@@ -358,8 +344,5 @@ class Bayesian(Oracle):
 
     def update(self, event, subject, *args, **kwargs):
         log.info(
-            f"Event: {event},"
-            f"Subject: {subject}"
-            f"Args: {args}"
-            f"Kwargs: {kwargs}"
+            f"Event: {event}," f"Subject: {subject}" f"Args: {args}" f"Kwargs: {kwargs}"
         )

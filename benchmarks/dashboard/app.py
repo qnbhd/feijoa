@@ -3,23 +3,20 @@ from contextlib import suppress
 from itertools import chain
 from typing import List
 
-from benchmarks.calculations import calculate_general_ranks
-from benchmarks.dashboard.dash_mixin import dashed
-from benchmarks.dashboard.dash_mixin import DashMixin
-from benchmarks.dashboard.layouts.span import pickup_span_layout
-from benchmarks.dashboard.utils import parse_metrics_and_directions
-from benchmarks.ranker import feijoa_score
-from benchmarks.storage import BenchmarksStorage
-from benchmarks.storage import Problem
 import callbacks
-from dash import Input
-from dash import Output
-from dash import State
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import ujson
+from dash import Input, Output, State
+
+from benchmarks.calculations import calculate_general_ranks
+from benchmarks.dashboard.dash_mixin import DashMixin, dashed
+from benchmarks.dashboard.layouts.span import pickup_span_layout
+from benchmarks.dashboard.utils import parse_metrics_and_directions
+from benchmarks.ranker import feijoa_score
+from benchmarks.storage import BenchmarksStorage, Problem
 
 # the style arguments for the sidebar. We use position:fixed and a fixed width
 from feijoa.utils.logging import init
@@ -44,8 +41,7 @@ class Dashboard(DashMixin):
         problems = self.storage.get_unique_problems()
 
         drops = [
-            {"label": p.capitalize(), "value": p}
-            for p in chain(problems, ["all"])
+            {"label": p.capitalize(), "value": p} for p in chain(problems, ["all"])
         ]
         return drops
 
@@ -92,9 +88,7 @@ class Dashboard(DashMixin):
             features, ujson.loads(directions)
         )
 
-        ranks = calculate_general_ranks(
-            dataframe, problem, features, directions
-        )
+        ranks = calculate_general_ranks(dataframe, problem, features, directions)
 
         with suppress(ValueError):
             fig = px.bar(

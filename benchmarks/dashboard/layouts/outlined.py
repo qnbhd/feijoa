@@ -1,6 +1,6 @@
-from benchmarks.dashboard.utils import mk_preloader_comp
 from dash import html
 
+from benchmarks.dashboard.utils import mk_preloader_comp
 
 graphs_layout = html.Div(
     [
@@ -12,9 +12,7 @@ graphs_layout = html.Div(
         html.Br(),
         html.Div(
             [
-                mk_preloader_comp(
-                    width="100rem", height="30rem", zIndex=10
-                ),
+                mk_preloader_comp(width="100rem", height="30rem", zIndex=10),
             ],
         ),
         html.Br(),

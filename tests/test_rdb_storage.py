@@ -1,7 +1,4 @@
-from feijoa import create_job
-from feijoa import Experiment
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Experiment, Real, SearchSpace, create_job
 from feijoa.models.configuration import Configuration
 from feijoa.models.experiment import ExperimentState
 from feijoa.storages.rdb.storage import RDBStorage

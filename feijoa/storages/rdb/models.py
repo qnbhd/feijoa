@@ -23,17 +23,9 @@
 
 import json
 
-from sqlalchemy import Column
-from sqlalchemy import Float
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import TypeDecorator
-from sqlalchemy import types
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, TypeDecorator, types
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import relationship
-
 
 __all__ = [
     "SearchSpaceModel",
@@ -79,9 +71,7 @@ class ParameterModel(_Base):  # type: ignore
 
     id = Column(Integer, primary_key=True)
     search_space_id = Column(ForeignKey(SearchSpaceModel.id))  # type: ignore
-    search_space = relationship(
-        SearchSpaceModel, backref="parameters"  # type: ignore
-    )
+    search_space = relationship(SearchSpaceModel, backref="parameters")  # type: ignore
 
     name = Column(String)
     kind = Column(String)

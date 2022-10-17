@@ -19,19 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from datetime import datetime
 import json
 import logging
 import os
 import subprocess
+from datetime import datetime
 
 import click
 from examples.gcc.utils.extractor import extract
-from examples.gcc.utils.run_tools import continue_job
-from examples.gcc.utils.run_tools import run_job
+from examples.gcc.utils.run_tools import continue_job, run_job
 
 from feijoa.utils.logging import init
-
 
 now = datetime.now().strftime("%H-%M-%S_%m_%d_%Y")
 
@@ -43,9 +41,7 @@ log = logging.getLogger(__name__)
 def command_exists(command):
     try:
         devnull = open(os.devnull, "w")
-        subprocess.call(
-            [command], stdout=devnull, stderr=subprocess.STDOUT
-        )
+        subprocess.call([command], stdout=devnull, stderr=subprocess.STDOUT)
         return True
     except OSError:
         return False
@@ -53,9 +49,7 @@ def command_exists(command):
 
 def validate_cli_command(ctx, param, value):
     if not command_exists(value):
-        raise click.BadParameter(
-            f"CLI command `{value}` not founded."
-        )
+        raise click.BadParameter(f"CLI command `{value}` not founded.")
     return value
 
 

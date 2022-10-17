@@ -21,8 +21,7 @@
 # SOFTWARE.
 """RDB storage uses SQLAlchemy module."""
 
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -30,11 +29,13 @@ from sqlalchemy.orm import sessionmaker
 from feijoa.models import Experiment
 from feijoa.models.configuration import Configuration
 from feijoa.search.space import SearchSpace
-from feijoa.storages.rdb.models import _Base
-from feijoa.storages.rdb.models import ExperimentModel
-from feijoa.storages.rdb.models import JobModel
-from feijoa.storages.rdb.models import ParameterModel
-from feijoa.storages.rdb.models import SearchSpaceModel
+from feijoa.storages.rdb.models import (
+    ExperimentModel,
+    JobModel,
+    ParameterModel,
+    SearchSpaceModel,
+    _Base,
+)
 from feijoa.storages.storage import Storage
 
 
@@ -82,9 +83,7 @@ class RDBStorage(Storage):
         self.session.commit()
 
     def get_optimizer_name_by_job_id(self, job_id) -> Optional[str]:
-        job_model = (
-            self.session.query(JobModel).filter_by(id=job_id).one()
-        )
+        job_model = self.session.query(JobModel).filter_by(id=job_id).one()
         optimizer = job_model.last_optimizer
         return optimizer
 
@@ -95,22 +94,16 @@ class RDBStorage(Storage):
         self.session.commit()
 
     def get_search_space_by_job_id(self, job_id):
-        job_model = (
-            self.session.query(JobModel).filter_by(id=job_id).one()
-        )
+        job_model = self.session.query(JobModel).filter_by(id=job_id).one()
         parameters = job_model.search_space.parameters
         return SearchSpace.from_db_parameters(parameters)
 
     def is_job_name_exists(self, name):
-        job_model = (
-            self.session.query(JobModel).filter_by(name=name).first()
-        )
+        job_model = self.session.query(JobModel).filter_by(name=name).first()
         return bool(job_model)
 
     def get_job_id_by_name(self, name) -> Optional[int]:
-        job_model = (
-            self.session.query(JobModel).filter_by(name=name).first()
-        )
+        job_model = self.session.query(JobModel).filter_by(name=name).first()
         return job_model.id if job_model else None
 
     def insert_experiment(self, experiment):
@@ -139,23 +132,17 @@ class RDBStorage(Storage):
 
     def get_experiments_by_job_id(self, job_id) -> List[Experiment]:
         experiments_models = (
-            self.session.query(ExperimentModel)
-            .filter_by(job_id=job_id)
-            .all()
+            self.session.query(ExperimentModel).filter_by(job_id=job_id).all()
         )
         experiments = []
         for exp in experiments_models:
-            exp.params = Configuration(
-                exp.params, requestor=exp.requestor
-            )
+            exp.params = Configuration(exp.params, requestor=exp.requestor)
             experiments.append(Experiment.from_orm(exp))
         return experiments
 
     def get_experiments_count(self, job_id) -> int:
         experiments_models = (
-            self.session.query(ExperimentModel)
-            .filter_by(job_id=job_id)
-            .all()
+            self.session.query(ExperimentModel).filter_by(job_id=job_id).all()
         )
         return len(experiments_models)
 

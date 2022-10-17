@@ -1,10 +1,7 @@
 import logging
 import math
 import sys
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Tuple
+from typing import Generator, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -79,9 +76,7 @@ class BCMAES(Oracle):
             sample_X = np.random.multivariate_normal(
                 mean=E_mu, cov=E_sigma, size=(self.n,)
             )
-            sample_X = np.clip(
-                sample_X, self.bounds[:, 0], self.bounds[:, 1]
-            )
+            sample_X = np.clip(sample_X, self.bounds[:, 0], self.bounds[:, 1])
 
             yield self.make_configs(sample_X)
 
@@ -95,13 +90,9 @@ class BCMAES(Oracle):
                 sample_X, mean=E_mu, cov=E_sigma, allow_singular=True
             )
             x_order_d = df.sort_values(by=["d"], ascending=False)
-            x_order_f = x_order_d.sort_values(
-                by=["g_x"], kind="mergesort"
-            )
+            x_order_f = x_order_d.sort_values(by=["g_x"], kind="mergesort")
 
-            d_ordered = x_order_d[
-                x_order_d.columns[-1:]
-            ].values / sum(df["d"])
+            d_ordered = x_order_d[x_order_d.columns[-1:]].values / sum(df["d"])
             x_order_f = x_order_f[x_order_f.columns[:-2]].values
             x_order_d = x_order_d[x_order_d.columns[:-2]].values
 
@@ -118,9 +109,7 @@ class BCMAES(Oracle):
                 (x_order_f - x_bar_f) * d_ordered,
             )
             # other :
-            self.variance = (
-                sigma_ordered - (sigma_emp - E_sigma)
-            ) * self.factor
+            self.variance = (sigma_ordered - (sigma_emp - E_sigma)) * self.factor
 
             variance_norm = np.linalg.norm(self.variance)
 
@@ -170,18 +159,14 @@ class BCMAES(Oracle):
                 if self.count > 40:
                     self.factor = 0.5
 
-            self.mu0 = (self.mu0 * self.k0 + self.n * mean) / (
-                self.k0 + self.n
-            )
+            self.mu0 = (self.mu0 * self.k0 + self.n * mean) / (self.k0 + self.n)
             self.k0 = self.k0 + self.n
             self.v0 = self.v0 + self.n
             self.psi = (
                 self.psi
                 + (self.k0 * self.n)
                 / (self.k0 + self.n)
-                * np.dot(
-                    np.mat(mean - self.mu0), np.mat(mean - self.mu0).T
-                )
+                * np.dot(np.mat(mean - self.mu0), np.mat(mean - self.mu0).T)
                 + self.variance * (self.n - 1)
             )
             self.psi = self.psi * self.factor

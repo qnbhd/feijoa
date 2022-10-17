@@ -77,9 +77,7 @@ def plot_parallel_coordinates(
     """
 
     df = job.get_dataframe(brief=True, only_good=True)
-    objectives = df["objective_result"] * (
-        1 if not invert_objective else -1
-    )
+    objectives = df["objective_result"] * (1 if not invert_objective else -1)
     df.drop(columns=["id", "objective_result"], inplace=True)
     omin = objectives.min()
     omax = objectives.max()
@@ -97,9 +95,7 @@ def plot_parallel_coordinates(
     ]
 
     if any([df[col].dtype.name == "object" for col in params]):
-        raise ValueError(
-            "Dataframe should not have columns with object type."
-        )
+        raise ValueError("Dataframe should not have columns with object type.")
 
     for col in sorted(params, reverse=True):
         dim = {

@@ -26,11 +26,8 @@ import logging
 import numpy as np
 
 from feijoa.plugins.plugin import Plugin
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
+from feijoa.search.parameters import Categorical, Integer, Real
 from feijoa.search.space import SearchSpace
-
 
 log = logging.getLogger(__name__)
 
@@ -123,22 +120,14 @@ class DomainReducer(Plugin):
 
         self.original_bounds = np.array(bounds)
         self.bounds = np.array(np.copy(self.original_bounds))
-        self.min_window = np.array(
-            [self.min_window_value] * len(self.bounds)
-        )
+        self.min_window = np.array([self.min_window_value] * len(self.bounds))
 
         self.previous_optimal = np.mean(self.bounds, axis=1)
         self.current_optimal = np.mean(self.bounds, axis=1)
 
-        self.r = (
-            self.original_bounds[:, 1] - self.original_bounds[:, 0]
-        )
+        self.r = self.original_bounds[:, 1] - self.original_bounds[:, 0]
 
-        self.current_d = (
-            2.0
-            * (self.current_optimal - self.previous_optimal)
-            / self.r
-        )
+        self.current_d = 2.0 * (self.current_optimal - self.previous_optimal) / self.r
         self.previous_d = np.copy(self.current_d)
 
     # noinspection PyPep8Naming
@@ -158,8 +147,7 @@ class DomainReducer(Plugin):
         self.c_hat = np.sqrt(np.abs(self.c)) * np.sign(self.c)
 
         self.gamma = 0.5 * (
-            self.gamma_pan * (1.0 + self.c_hat)
-            + self.gamma_osc * (1.0 - self.c_hat)
+            self.gamma_pan * (1.0 + self.c_hat) + self.gamma_osc * (1.0 - self.c_hat)
         )
 
         self.contraction_rate = self.eta + np.abs(self.current_d) * (
@@ -168,9 +156,7 @@ class DomainReducer(Plugin):
 
         self.r = self.contraction_rate * self.r
 
-    def _prune(
-        self, new_bounds: np.ndarray, global_bounds: np.ndarray
-    ) -> np.ndarray:
+    def _prune(self, new_bounds: np.ndarray, global_bounds: np.ndarray) -> np.ndarray:
         Z = np.copy(new_bounds)
         Z[:, 1] = global_bounds[:, 0]
         Z.sort(axis=1)
@@ -185,12 +171,8 @@ class DomainReducer(Plugin):
         for i, entry in enumerate(new_bounds):
             window_width = abs(entry[0] - entry[1])
             if window_width < self.min_window[i]:
-                new_bounds[i, 0] -= (
-                    self.min_window[i] - window_width
-                ) / 2.0
-                new_bounds[i, 1] += (
-                    self.min_window[i] - window_width
-                ) / 2.0
+                new_bounds[i, 0] -= (self.min_window[i] - window_width) / 2.0
+                new_bounds[i, 1] += (self.min_window[i] - window_width) / 2.0
 
         return new_bounds
 

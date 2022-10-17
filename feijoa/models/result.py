@@ -21,8 +21,7 @@
 # SOFTWARE.
 """Result model class module."""
 
-from typing import Dict
-from typing import Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 

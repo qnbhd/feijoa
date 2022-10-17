@@ -19,17 +19,15 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-from collections import Counter
 import logging
-from typing import Tuple
-from typing import Type
+from collections import Counter
+from typing import Tuple, Type
 
-from mab import algs
 import numpy as np
+from mab import algs
 
 from feijoa.search.oracles.meta.meta import MetaOracle
 from feijoa.search.oracles.oracle import Oracle
-
 
 log = logging.getLogger(__name__)
 
@@ -50,11 +48,7 @@ def relative_change_d1(x_cur: float, x_prev: float):
     """
 
     sign = np.sign(x_prev - x_cur)
-    return (
-        sign
-        * np.abs(x_prev - x_cur)
-        / (1e-10 + np.abs(x_cur) + np.abs(x_prev))
-    )
+    return sign * np.abs(x_prev - x_cur) / (1e-10 + np.abs(x_cur) + np.abs(x_prev))
 
 
 class UCB1(MetaOracle):
@@ -95,9 +89,7 @@ class UCB1(MetaOracle):
         self.oracles.remove(oracle)
         self._fix_names()
         self.mab = self.STRATEGY(len(self.oracles))
-        self.name2index = {
-            oracle.name: i for i, oracle in enumerate(self.oracles)
-        }
+        self.name2index = {oracle.name: i for i, oracle in enumerate(self.oracles)}
 
         for algo_index, reward in self.rewards.items():
             for _ in range(reward):
@@ -125,10 +117,7 @@ class UCB1(MetaOracle):
         if not self.mab:
             self._fix_names()
             self.mab = self.STRATEGY(len(self.oracles))
-            self.name2index = {
-                oracle.name: i
-                for i, oracle in enumerate(self.oracles)
-            }
+            self.name2index = {oracle.name: i for i, oracle in enumerate(self.oracles)}
 
         _, ranking = self.mab.select()
         index = max(len(self.oracles), self.oracles_select_count)
@@ -157,10 +146,7 @@ class UCB1(MetaOracle):
         has_reward = False
         oracle_index = None
 
-        if (
-            np.isfinite(result)
-            and config.requestor in self.name2index
-        ):
+        if np.isfinite(result) and config.requestor in self.name2index:
             oracle_index = self.name2index[config.requestor]
 
             if self.results:
@@ -171,9 +157,7 @@ class UCB1(MetaOracle):
                 performance = relative_change * self.mult
 
                 if np.isfinite(performance):
-                    reward_multiplier = max(
-                        1, int(relative_change * self.mult)
-                    )
+                    reward_multiplier = max(1, int(relative_change * self.mult))
                 else:
                     reward_multiplier = 100
 

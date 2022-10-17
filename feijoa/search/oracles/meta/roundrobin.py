@@ -21,12 +21,11 @@
 # SOFTWARE.
 """Round robin meta oracle module."""
 
-from collections import deque
 import logging
+from collections import deque
 
 from feijoa.search.oracles.meta.meta import MetaOracle
 from feijoa.search.oracles.oracle import Oracle
-
 
 log = logging.getLogger(__name__)
 

@@ -1,14 +1,11 @@
 import importlib
 import importlib.util
 import inspect
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
-from feijoa import Categorical
-from feijoa import Integer
-from feijoa import Real
-from feijoa import SearchSpace
+from feijoa import Categorical, Integer, Real, SearchSpace
 
 
 def bench(func):
@@ -54,9 +51,7 @@ def get_pool(*pathes):
 
     for path in pathes:
         script = Path(path)
-        spec = importlib.util.spec_from_file_location(
-            script.stem, str(script)
-        )
+        spec = importlib.util.spec_from_file_location(script.stem, str(script))
         module = importlib.util.module_from_spec(spec)
         sys.modules[module.__name__] = module
 
@@ -68,8 +63,7 @@ def get_pool(*pathes):
             if (
                 obj[1].__module__ == module.__name__
                 and getattr(obj[1], "for_benchmarking", False)
-                and obj[1].__name__
-                not in ["bench", "iterations", "group"]
+                and obj[1].__name__ not in ["bench", "iterations", "group"]
             )
         )
 
@@ -90,9 +84,7 @@ def pickup_problems(*paths):
         space = SearchSpace()
 
         for key, value in func.__annotations__.items():
-            match = re.match(
-                "^[(?P<bounds>.+)]:(?P<kind>.+)", value
-            )  # noqa: W605
+            match = re.match("^[(?P<bounds>.+)]:(?P<kind>.+)", value)  # noqa: W605
             kind = match.group("kind")
             bounds = match.group("bounds")
 

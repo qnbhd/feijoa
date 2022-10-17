@@ -32,7 +32,6 @@ from ..jobs.job import Job
 from ..utils.imports import ImportWrapper
 from .evaluator import ImportanceEvaluator
 
-
 with ImportWrapper():
     # pyre-ignore[21]:
     import rsfanova

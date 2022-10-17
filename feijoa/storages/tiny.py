@@ -21,25 +21,20 @@
 # SOFTWARE.
 """TinyDB storage module."""
 
-from typing import List
-from typing import NamedTuple
-from typing import Optional
+from typing import List, NamedTuple, Optional
 
 from feijoa.utils.imports import ImportWrapper
-
 
 with ImportWrapper():
     from tinydb import Query, TinyDB
     from tinydb.table import Document
     from tinydb.operations import set as tinydb_set
 
-from feijoa.exceptions import DBVersionError
-from feijoa.exceptions import InsertExperimentWithTheExistedId
+from feijoa.exceptions import DBVersionError, InsertExperimentWithTheExistedId
 from feijoa.models import Experiment
 from feijoa.models.configuration import Configuration
 from feijoa.search.space import SearchSpace
 from feijoa.storages.storage import Storage
-
 
 __all__ = ["TinyDBStorage"]
 
@@ -97,19 +92,13 @@ class TinyDBStorage(Storage):
             self.parameters_table.insert(param_model)
 
     def update_optimizer_name_by_job_id(self, job_id, name):
-        self.jobs_table.update(
-            tinydb_set("last_optimizer", name), Query().id == "John"
-        )
+        self.jobs_table.update(tinydb_set("last_optimizer", name), Query().id == "John")
 
     def get_search_space_by_job_id(self, job_id) -> SearchSpace:
-        parameters = self.parameters_table.search(
-            Query().job_id == job_id
-        )
+        parameters = self.parameters_table.search(Query().job_id == job_id)
         pool = list()
         for p in parameters:
-            mod = _Parameter(
-                name=p["name"], kind=p["kind"], meta=p["meta"]
-            )
+            mod = _Parameter(name=p["name"], kind=p["kind"], meta=p["meta"])
             pool.append(mod)
         return SearchSpace.from_db_parameters(pool)
 
@@ -160,9 +149,7 @@ class TinyDBStorage(Storage):
             return None
 
         exp = q[0]
-        exp["params"] = Configuration(
-            exp["params"], requestor=exp["requestor"]
-        )
+        exp["params"] = Configuration(exp["params"], requestor=exp["requestor"])
         exp.pop("requestor")
 
         return Experiment(**exp)
@@ -175,9 +162,7 @@ class TinyDBStorage(Storage):
         docs = self._get_raw_experiments(job_id)
         experiments = []
         for doc in docs:
-            doc["params"] = Configuration(
-                doc["params"], requestor=doc["requestor"]
-            )
+            doc["params"] = Configuration(doc["params"], requestor=doc["requestor"])
             # doc.pop('requestor')
             exp = Experiment(**doc)
             experiments.append(exp)
