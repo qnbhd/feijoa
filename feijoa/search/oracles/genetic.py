@@ -43,9 +43,6 @@ with ImportWrapper():
 
 from feijoa.models.configuration import Configuration
 from feijoa.search.oracles.oracle import Oracle
-from feijoa.search.parameters import Categorical
-from feijoa.search.parameters import Integer
-from feijoa.search.parameters import Real
 from feijoa.utils.transformers import inverse_transform
 from feijoa.utils.transformers import transform
 
@@ -102,17 +99,9 @@ class Genetic(Oracle):
 
         self.search_space = search_space
 
-        self.bounds = np.zeros((len(self.search_space), 2))
-
-        for i, p in enumerate(self.search_space):
-            if isinstance(p, (Integer, Real)):
-                self.bounds[i, :] = np.array([p.low, p.high])
-            if isinstance(p, Categorical):
-                self.bounds[i, :] = np.array([0, len(p.choices) - 1])
-
         # parse lower and upper bounds
-        self.xl = self.bounds[:, 0]
-        self.xu = self.bounds[:, 1]
+        self.xl = self.search_space.bounds[:, 0]
+        self.xu = self.search_space.bounds[:, 1]
 
         self._ask_gen = None
 

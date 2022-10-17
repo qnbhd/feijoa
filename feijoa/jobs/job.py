@@ -24,10 +24,10 @@
 import contextlib
 from datetime import datetime
 from functools import partial
-import inspect
 import logging
 from typing import Any
 from typing import Callable
+from typing import ContextManager
 from typing import List
 from typing import Optional
 from typing import Union
@@ -36,26 +36,22 @@ import warnings
 import joblib
 import numpy as np
 import pandas as pd
+import rich
 from rich.progress import Progress
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import ArgumentError
 
 from feijoa.exceptions import DuplicatedJobError
 from feijoa.exceptions import ExperimentNotFinishedError
-from feijoa.exceptions import InvalidOptimizer
 from feijoa.exceptions import InvalidSearchOraclePassed
 from feijoa.exceptions import InvalidStoragePassed
 from feijoa.exceptions import InvalidStorageRFC1738
 from feijoa.exceptions import JobNotFoundError
-from feijoa.exceptions import SearchOracleNotFoundedError
 from feijoa.models import Experiment
 from feijoa.models import Result
 from feijoa.models.experiment import ExperimentState
-from feijoa.search.oracles.bayesian import Bayesian
-from feijoa.search.oracles.finder import get_algo
 from feijoa.search.oracles.finder import maker
 from feijoa.search.oracles.finder import Oracle
-from feijoa.search.oracles.meta.bandit import ThompsonSampler
 from feijoa.search.oracles.meta.meta import MetaOracle
 from feijoa.search.parameters import Categorical
 from feijoa.search.parameters import Integer
@@ -94,7 +90,6 @@ class Job:
                 storage=RDBStorage("sqlite:///:memory:"),
                 search_space=SearchSpace(),
                 job_id=1,
-                optimizer="ucb<bayesian>",
             )
 
     Args:
@@ -118,31 +113,25 @@ class Job:
         storage: Storage,
         search_space: SearchSpace,
         job_id: int,
-        pruners: Any = None,
-        optimizer=ThompsonSampler,
+        loaded=False,
+        **kwargs,
     ):
 
         self.name = name
         self.storage = storage
-        self.pruners = pruners
         self.id = job_id
 
-        if issubclass(type(optimizer), MetaOracle):
-            self.optimizer = optimizer
-        elif not issubclass(type(optimizer), MetaOracle) and (
-            not inspect.isclass(optimizer)
-            or not issubclass(optimizer, MetaOracle)
-        ):
-            raise InvalidOptimizer()
-        else:
-            self.optimizer = optimizer()
-
+        # noinspection PyTypeChecker
+        self.optimizer: MetaOracle = None  # type: ignore
+        self.optimizer_name_dsl: str = ""
         self.search_space = search_space
         self.pending_experiments = 0
+        self.loaded_experiments_pool: List[Experiment] = []
 
         self.seeds: List[dict] = []
 
-        if not self.storage.is_job_name_exists(self.name):
+        if not loaded:
+            assert not self.storage.is_job_name_exists(self.name)
             self.storage.insert_job(self)
 
     @property
@@ -162,7 +151,7 @@ class Job:
 
         return (
             self.best_experiment.params
-            if self.best_experiment
+            if self.best_experiment is not None
             else None
         )
 
@@ -181,7 +170,7 @@ class Job:
 
         return (
             self.best_experiment.objective_result
-            if self.best_experiment
+            if self.best_experiment is not None
             else None
         )
 
@@ -295,9 +284,10 @@ class Job:
         n_trials: int = 100,
         n_jobs: int = 1,
         n_points_iter: int = 1,
-        optimizer="bayesian",
+        optimizer="",
         progress_bar=True,
         use_numba_jit=False,
+        seed=None,
     ):
         """
         Do optimization for current job.
@@ -345,6 +335,8 @@ class Job:
                 Show progress bar (rich) or not.
             use_numba_jit (bool):
                 Use numba for objective evaluation speedup.
+            seed (int | None):
+                Random seed
 
         Returns:
             None
@@ -354,10 +346,28 @@ class Job:
 
         """
 
-        self.optimizer = maker(optimizer, self.search_space)
+        optimizer_name = "ucb<bayesian>"
+
+        if optimizer:
+            optimizer_name = optimizer
+
+        if not optimizer and self.optimizer_name_dsl:
+            optimizer_name = self.optimizer_name_dsl
+
+        self.optimizer = maker(
+            optimizer_name, self.search_space, random_state=seed
+        )
+        self.optimizer_name_dsl = optimizer_name
+
+        self.storage.update_optimizer_name_by_job_id(
+            self.id, self.optimizer_name_dsl
+        )
 
         if self.seeds:
             self.optimizer.oracles.insert(0, SeedOracle(*self.seeds))
+
+        for loaded_experiment in self.loaded_experiments_pool:
+            self._tell_for_loaded(loaded_experiment)
 
         if use_numba_jit:
             with ImportWrapper():
@@ -367,14 +377,24 @@ class Job:
 
         dela = joblib.delayed(objective)
 
-        progress = (
-            Progress(transient=True, disable=not progress_bar)
+        progress: ContextManager = (
+            Progress(transient=True, disable=not progress_bar)  # type: ignore
             if progress_bar
             else contextlib.nullcontext()
         )
 
+        def range_checker(p, value):
+            if isinstance(p, (Real, Integer)):
+                assert (
+                    p.low <= value <= p.high
+                ), f"{p.low} <= {value} <= {p.high}"
+            if isinstance(p, Categorical):
+                assert value in p.choices, f"value in [{p.choices}]"
+
         trials = 0
         with progress as bar:  # type: ignore
+            # pyre-ignore[16]:
+            m = float("+inf")
             task = bar.add_task("Optimizing", total=n_trials)
             while trials < n_trials:
                 configurations = self.ask(n_points_iter)
@@ -384,8 +404,13 @@ class Job:
                     # TODO (qnbhd): make closing
                     break
 
+                for c in configurations:
+                    for param, value in c.params.items():
+                        sp_p = self.search_space.get(param)
+                        range_checker(sp_p, value)
+
                 configurations = configurations[
-                    : min(len(configurations), n_trials)
+                    : min(len(configurations), n_trials - trials)
                 ]
 
                 if len(configurations) + trials > n_trials:
@@ -400,7 +425,7 @@ class Job:
 
                 configurations_len = len(configurations)
                 trials += configurations_len
-                bar.update(task, advance=configurations_len)
+                # pyre-ignore[16]:
 
                 # noinspection PyUnresolvedReferences,PyBroadException
                 parallel = joblib.Parallel(
@@ -416,14 +441,28 @@ class Job:
                 for experiment, result in zip(
                     configurations, results
                 ):
-                    self.tell(experiment, result)
+                    self.tell(
+                        experiment, result, force=(trials >= n_trials)
+                    )
+
+                bar.update(
+                    task,
+                    advance=configurations_len,
+                    description=f"Trials <{self.name}>]: {trials}/{n_trials}",
+                )
+
+                if self.best_value and self.best_value < m:
+                    log.info(f"New best result: {self.best_value}")
+                    m = self.best_value
 
         if in_notebook():
             from IPython.display import clear_output
 
             clear_output(wait=False)
 
-    def tell(self, experiment, result: Union[float, Result]):
+    def tell(
+        self, experiment, result: Union[float, Result], force=False
+    ):
         """
         Finish concrete experiment
         and results to oracles.
@@ -433,6 +472,8 @@ class Job:
                 Specified experiment.
             result (Union[float, Result]):
                 Result for current experiment.
+            force (bool):
+                Force result (suppress tell exceptions to optimizer)
 
         Returns:
             None
@@ -457,13 +498,23 @@ class Job:
             self.pending_experiments -= 1
 
             if isinstance(result, Result):
-                self.optimizer.tell(
-                    experiment.params, result.objective_result
-                )
+                if force:
+                    with contextlib.suppress(Exception):
+                        self.optimizer.tell(
+                            experiment.params, result.objective_result
+                        )
+                else:
+                    self.optimizer.tell(
+                        experiment.params, result.objective_result
+                    )
                 experiment.apply(result.objective_result)
                 experiment.metrics = result.metrics
             else:
-                self.optimizer.tell(experiment.params, result)
+                if force:
+                    with contextlib.suppress(Exception):
+                        self.optimizer.tell(experiment.params, result)
+                else:
+                    self.optimizer.tell(experiment.params, result)
                 experiment.apply(result)
 
             self.storage.insert_experiment(experiment)
@@ -509,7 +560,7 @@ class Job:
         configs = self.optimizer.ask(n)
 
         if not configs:
-            return configs
+            return None
 
         applicator = partial(
             Experiment,
@@ -759,9 +810,11 @@ def create_job(
     if storage.is_job_name_exists(name):
         raise DuplicatedJobError(f"Job {name} is already exists.")
 
-    return Job(
+    job = Job(
         name, storage, search_space, storage.jobs_count + 1, **kwargs
     )
+
+    return job
 
 
 def load_job(
@@ -809,10 +862,15 @@ def load_job(
     experiments = storage.get_experiments_by_job_id(job_id)
     search_space = storage.get_search_space_by_job_id(job_id)
 
-    job = Job(name, storage, search_space, job_id, **kwargs)
+    job = Job(
+        name, storage, search_space, job_id, **kwargs, loaded=True
+    )
 
-    for experiment in experiments:
-        # noinspection PyProtectedMember
-        job._tell_for_loaded(experiment)
+    job.loaded_experiments_pool.extend(experiments)
+
+    dsl_name = storage.get_optimizer_name_by_job_id(job.id)
+
+    if dsl_name:
+        job.optimizer_name_dsl = dsl_name
 
     return job

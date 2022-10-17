@@ -79,10 +79,7 @@ def inverse_transform(configuration: dict, search_space):
     for i, (key, value) in enumerate(configuration.items()):
         param = search_space.get(key)
 
-        if isinstance(param, Real):
-            solution[i] = value
-
-        if isinstance(param, Integer):
+        if isinstance(param, (Real, Integer)):
             solution[i] = value
 
         if isinstance(param, Categorical):

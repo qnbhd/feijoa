@@ -29,7 +29,9 @@ jobs:
           cache: 'pip'
 
       - name: Install feijoa regular
-        run: pip install feijoa
+        run: |
+          pip install feijoa
+          python -c "from feijoa import SearchSpace, Real, Integer"
 
       - name: Remove feijoa
         run: yes | pip uninstall feijoa

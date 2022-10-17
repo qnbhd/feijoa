@@ -92,9 +92,10 @@ class JobModel(_Base):  # type: ignore
     __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, unique=True)
     search_space_id = Column(ForeignKey(SearchSpaceModel.id))  # type: ignore
     search_space = relationship(SearchSpaceModel, backref="jobs")  # type: ignore
+    last_optimizer = Column(String)
 
     def __repr__(self):
         return f"Job<{self.id}, {self.name}"

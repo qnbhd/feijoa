@@ -10,6 +10,7 @@ from feijoa import __feijoa_folder__
 from feijoa.exceptions import PackageNotInstalledError
 from feijoa.exceptions import SearchOracleNotFoundedError
 from feijoa.plugins.plugin import Plugin
+from feijoa.search.oracles.meta.bandit import UCB1
 from feijoa.search.oracles.meta.meta import MetaOracle
 from feijoa.search.oracles.oracle import Oracle
 from feijoa.search.space import SearchSpace
@@ -32,7 +33,6 @@ def fetch_classes(base_class, *folders, only_anchors=False):
     Fetch oracle from specified oracles folders.
 
     By default, uses:
-        - integration folder
         - default oracles folder
 
     :returns: all founded oracle's classes.
@@ -85,24 +85,28 @@ def fetch_classes(base_class, *folders, only_anchors=False):
     return pool
 
 
-def fetch_oracles():
-    oracles = fetch_classes(
-        Oracle, ALGORITHMS_FOLDER, INTEGRATION_FOLDER
-    )
+def fetch_oracles(include_integration=False):
+    args = [ALGORITHMS_FOLDER]
+    if include_integration:
+        args.append(INTEGRATION_FOLDER)
+
+    oracles = fetch_classes(Oracle, *args)
     return oracles
 
 
-def fetch_plugins():
-    plugins = fetch_classes(
-        Plugin, PLUGINS_FOLDER, INTEGRATION_FOLDER
-    )
+def fetch_plugins(include_integration=False):
+    args = [ALGORITHMS_FOLDER]
+    if include_integration:
+        args.append(INTEGRATION_FOLDER)
+    plugins = fetch_classes(Plugin, *args)
     return plugins
 
 
-def fetch_top_oracles():
-    top_oracles = fetch_classes(
-        MetaOracle, SEARCH_FOLDER, INTEGRATION_FOLDER
-    )
+def fetch_top_oracles(include_integration=False):
+    args = [SEARCH_FOLDER]
+    if include_integration:
+        args.append(INTEGRATION_FOLDER)
+    top_oracles = fetch_classes(MetaOracle, *args)
     return top_oracles
 
 
@@ -139,7 +143,7 @@ def get_plugin(name):
     return cls
 
 
-def maker(line, search_space: SearchSpace):
+def maker(line, search_space: SearchSpace, random_state=None):
     parser = _OracleParser()
     parsed = parser.parse(line)
 
@@ -161,13 +165,17 @@ def maker(line, search_space: SearchSpace):
             plugins.append(plug_cls(**plug_params))
 
         oracle_instance = top_oracle_cls(
-            search_space=search_space, **top_oracle_params
+            search_space=search_space,
+            **top_oracle_params,
+            seed=random_state,
         )
 
         for p in plugins:
             p.subscribers = [oracle_instance]
 
-        return oracle_instance
+        top_oracle_instance = UCB1(oracle_instance)
+
+        return top_oracle_instance
 
     top_oracle_cls = get_top_oracle(top_oracle)
 
@@ -189,7 +197,9 @@ def maker(line, search_space: SearchSpace):
             plug_cls = get_plugin(plug_name)
             plugins.append(plug_cls(**plug_params))
 
-        oracle_instance = o_cls(search_space=search_space, **o_params)
+        oracle_instance = o_cls(
+            search_space=search_space, **o_params, seed=random_state
+        )
 
         for p in plugins:
             p.subscribers = [oracle_instance]

@@ -23,8 +23,6 @@ import importlib
 import types
 from typing import Any
 
-import pytest
-
 from feijoa.exceptions import PackageNotInstalledError
 
 
@@ -61,6 +59,7 @@ def import_or_skip(module, reason=""):
             AnyError: If anything bad happens.
 
     """
+    import pytest
 
     try:
         return pytest.importorskip(module, reason=reason)
@@ -80,5 +79,5 @@ class LazyModuleImportProxy(types.ModuleType):
         self.__dict__.update(module.__dict__)
         return module
 
-    def __getattr__(self, item: str) -> Any:
-        return getattr(self._load(), item)
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._load(), name)

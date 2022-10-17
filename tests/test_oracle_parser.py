@@ -149,6 +149,21 @@ from feijoa.utils._oracle_parser import _OracleParser
                 "top-oracle": "bayesian",
             },
         ),
+        (
+            "ucb<bayesian[acq=naive0, regr=RandomForestRegressor]>",
+            {
+                "oracles": [
+                    {
+                        "name": "bayesian",
+                        "params": {
+                            "acq": "naive0",
+                            "regr": "RandomForestRegressor",
+                        },
+                    }
+                ],
+                "top-oracle": "ucb",
+            },
+        ),
     ],
 )
 def test_oracle_parser_correct(input_line, expected):

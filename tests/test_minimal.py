@@ -28,7 +28,7 @@ def test_minimal():
     job.do(
         objective,
         n_trials=50,
-        optimizer="ucb<bayesian+reducer, cmaes, pso>",
+        optimizer="ucb<template,bayesian>",
     )
 
     assert abs(job.best_value - 0) < 5
@@ -40,7 +40,7 @@ def test_job_with_oracle_ensemble():
     space.insert(Real("x", low=0.0, high=5.0))
     space.insert(Real("y", low=0.0, high=2.0))
 
-    job = create_job(search_space=space, optimizer=ThompsonSampler)
+    job = create_job(search_space=space)
 
     job.do(
         objective,

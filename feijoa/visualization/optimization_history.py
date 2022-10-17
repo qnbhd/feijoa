@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 """Optimization history plot module."""
-
+import numpy as np
 import plotly.graph_objs as go
 
 
@@ -60,17 +60,25 @@ def plot_optimization_history(
 
     """
 
-    df = job.get_dataframe(desc=True)
+    df = job.get_dataframe()
     obj = df["objective_result"] * (1 if not invert_objective else -1)
     iterations = df["id"]
     name = name or job.name
+
+    convergence = np.zeros_like(df["objective_result"])
+
+    m = float("+inf")
+    for i in range(len(convergence)):
+        if obj[i] < m:
+            m = obj[i]
+        convergence[i] = m
 
     fig = fig or go.Figure()
 
     fig.add_trace(
         go.Scatter(
             x=iterations,
-            y=obj,
+            y=convergence,
             mode=mode,
             name=f"{name} bests",
         )

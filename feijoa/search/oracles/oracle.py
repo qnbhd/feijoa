@@ -22,8 +22,11 @@
 """Base class of search oracles."""
 
 import abc
+import random
 from typing import List
 from typing import Optional
+
+import numpy
 
 from feijoa.models.configuration import Configuration
 
@@ -70,9 +73,12 @@ class Oracle(Subject, Observer, metaclass=abc.ABCMeta):
 
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, seed=0, **kwargs):
         self._name = self.__class__.__name__
         self.subscribers = []
+        numpy.random.seed(seed)
+        random.seed(seed)
+        self.seed = seed
 
     @property
     @abc.abstractmethod

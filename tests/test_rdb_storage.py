@@ -17,6 +17,7 @@ def test_rdb_storage():
             self.search_space = SearchSpace()
             self.search_space.insert(Real("x", low=0.0, high=1.0))
             self.search_space.insert(Real("y", low=0.0, high=1.0))
+            self.optimizer_name_dsl = ""
 
     ex = Experiment(
         id=0,

@@ -34,6 +34,7 @@ from .evaluator import ImportanceEvaluator
 
 
 with ImportWrapper():
+    # pyre-ignore[21]:
     import rsfanova
 
 __all__ = ["RsFanovaEvaluator"]

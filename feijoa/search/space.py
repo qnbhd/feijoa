@@ -24,6 +24,7 @@
 from typing import List
 import warnings
 
+import numpy as np
 import yaml
 
 from feijoa.search.parameters import Categorical
@@ -96,6 +97,12 @@ class SearchSpace:
     def __len__(self):
         return len(self.params)
 
+    @property
+    def bounds(self):
+        """Get bounds from search space"""
+
+        return np.array([p.bounds for p in self])
+
     @classmethod
     def from_yaml(cls, yaml_string):
         """Load search space from yaml."""
@@ -143,6 +150,18 @@ class SearchSpace:
             pool.append(p)
 
         return SearchSpace(*pool)
+
+    @property
+    def card(self):
+        num = 1
+        for p in self:
+            if isinstance(p, Real):
+                num *= (p.high - p.low) / 0.1
+            elif isinstance(p, Integer):
+                num *= p.high - p.low
+            elif isinstance(p, Categorical):
+                num *= len(p.choices)
+        return int(num)
 
 
 def parameter_factory(**kwargs):
